@@ -1,0 +1,31 @@
+{
+  "name": "my-vue-ts-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.7.4",
+    "element-plus": "^2.8.0",
+    "lodash": "^4.17.21",
+    "path-browserify": "^1.0.1",
+    "vue": "^3.4.37",
+    "vue-lazyload": "^3.0.0",
+    "vue-router": "^4.4.3",
+    "yarn": "^1.22.22"
+  },
+  "devDependencies": {
+    "@types/node": "^22.4.0",
+    "@vitejs/plugin-vue": "^5.1.2",
+    "sass": "^1.77.8",
+    "typescript": "^5.5.3",
+    "unplugin-auto-import": "^0.18.2",
+    "unplugin-vue-components": "^0.27.4",
+    "vite": "^5.4.1",
+    "vue-tsc": "^2.0.29"
+  }
+}
