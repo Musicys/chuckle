@@ -1,5 +1,5 @@
 export interface home_cart{
-    id:Number,
+    id:number,
     title:string,
     arg:string[],
     url: string,
@@ -8,3 +8,7 @@ export interface home_cart{
 }
 
 
+export interface home_arg{
+    title:string,
+    nuber:number
+}

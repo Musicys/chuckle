@@ -3,8 +3,8 @@ import './style.css'
 import {router} from './router'
 import App from '@/App.vue'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import "//at.alicdn.com/t/c/font_4683552_sm5n4ukg3zc.js"
 
+import '//at.alicdn.com/t/c/font_4683552_k710nlah668.js'
 //加载工具
 import VueLazyload from 'vue-lazyload';
 

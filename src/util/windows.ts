@@ -2,7 +2,7 @@ import { ref, onMounted, onUnmounted,Ref } from 'vue';
 import debounce from 'lodash/debounce';
 let PCWiht:number=928
 
-let Pcflex:number=651
+let Pcflex:number=990
 // 创建响应式数据
 const windowWidth:Ref<number> = ref(window.innerWidth);
 const windowHeight:Ref<number>  = ref(window.innerHeight);

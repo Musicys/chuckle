@@ -1,6 +1,6 @@
 <template>
     <div class="page">
-            <div class="page-left">
+            <div :class="{'page-left':true,'right':Isjc,'left':!Isjc}">
              <div class="cart-xx">
               个人信息
              </div>
@@ -21,25 +21,51 @@
 
 
 
-
             </div>
-            <div class="page-right">
+            <div :class="{'page-right':true,'right':!Isjc,'left':Isjc}"  >
              <div class="cart-input">
-              公告
+              <div>
+                <el-icon class="icons"><ChatSquare /></el-icon>
+                公告
+              </div>
              </div>
 
 
 
-              <div class="cart-jt-box" style="border: none; background: none;">
+              <div    class="cart-jt-box"    style="border: none; background: none;">
 
 
-                <div class="jt-right">
-                    >>
+                <div  class="jt-right"   >
+                  
+                  <svg class="icons" aria-hidden="true"  @click="scrollToRight">
+               <use  xlink:href="#icon-youjiantou"></use>
+                  </svg>
+                  <svg class="icons" aria-hidden="true" @click="scrollToRight">
+               <use xlink:href="#icon-youjiantou"></use>
+                  </svg>
+
+                
+
+
+
                 </div>
-                <div class="jt-left">
-                  <<
+                
+                <div class="jt-left" >
+               
+             
+                  <svg class="icons" aria-hidden="true" @click="scrollToLeft">
+               <use xlink:href="#icon-zuojiantou"></use>
+                  </svg>
+
+                  <svg class="icons" aria-hidden="true" @click="scrollToLeft">
+                   <use xlink:href="#icon-zuojiantou"></use>
+                  </svg>
+              
+
+
+
                 </div>
-                <div class="cart-lbt"  @scroll="" >
+                <div class="cart-lbt"   @wheel="handleScroll" ref="scrollableDiv"  >
              
 
              <div class="lbt-left">
@@ -74,34 +100,80 @@
 
 
              <div class="cart-input">
-              公告
+
+             <div >
+              <el-icon class="icons"><Menu /></el-icon>
+             </div>
+
+              <div class="input-arg">
+                  <div style="background: #25c2fe; padding-right:5px;">首页</div>
+                <div v-for="i in ArgData" :key="i.title">
+                  {{ i.title }}
+
+                  <span>{{ i.nuber }}</span>
+                </div>
+          
+              </div>
+              <div  >
+                  更多  
+             </div>
+
              </div>
              
-             <Cart v-for=" i in Data" :data="i" :key="i.id.toString()"></Cart> 
-
-
+             <Cart v-for=" i in Data" :data="i" :key="i.id"></Cart> 
+<!-- 分页 -->
+              <div class="page">
+                  
               </div>
+              </div>
+
     </div>
 
 </template>
 
 <script setup lang="ts">
 import { defineComponent, defineAsyncComponent,Ref ,ref,watch } from 'vue'
-import { home_cart } from '@/util/type';
+import { home_cart ,home_arg} from '@/util/type';
 import {Isjc} from "@/util/windows";
 
-//监视Ispc 交换 left right顺序
 
-watch(Isjc,(newVal, oldVal) => {
-  console.log(`count changed from ${oldVal} to ${newVal}`);
-  // 在这里执行你需要的逻辑\
-  console.log(newVal);
+
+  //鼠标横向滚动事件
+const scrollableDiv = ref<HTMLDivElement | null>(null);
+
+const handleScroll = (event: WheelEvent) => {
+  event.preventDefault(); // 阻止默认的页面滚动行为
+  event.stopPropagation(); // 阻止事件冒泡到父元素
+
   
+  if (scrollableDiv.value) {
+    scrollableDiv.value.scrollBy({
+      left: event.deltaY < 0 ? -50 : 50, // 根据滚轮方向滚动
+      behavior: 'smooth' // 平滑滚动
+    });
+  }
+};
 
 
   
-})
+// })
+const scrollToRight = () => {
+      if (scrollableDiv.value) {
+        scrollableDiv.value.scrollTo({
+          left: scrollableDiv.value.scrollWidth,
+          behavior: 'smooth'
+        });
+      }
+    };
 
+    const scrollToLeft = () => {
+      if (scrollableDiv.value) {
+        scrollableDiv.value.scrollTo({
+          left: 0,
+          behavior: 'smooth'
+        });
+      }
+    };
 
 
 
@@ -121,10 +193,87 @@ const Data:Ref<home_cart[]>=ref([
     createdtime:new Date(),
     updatetime:new Date()
     
-  }
+  },
+  {
+    id:2,
+    title:"123",
+    url:"https://cdn.seovx.com/d/?mom=302",
+    arg:["科学","编程"],
+    createdtime:new Date(),
+    updatetime:new Date()
+    
+  },
+  {
+    id:3,
+    title:"123",
+    url:"https://cdn.seovx.com/d/?mom=302",
+    arg:["科学","编程"],
+    createdtime:new Date(),
+    updatetime:new Date()
+    
+  },
+  {
+    id:4,
+    title:"123",
+    url:"https://cdn.seovx.com/d/?mom=302",
+    arg:["科学","编程"],
+    createdtime:new Date(),
+    updatetime:new Date()
+    
+  },
+  {
+    id:5,
+    title:"123",
+    url:"https://cdn.seovx.com/d/?mom=302",
+    arg:["科学","编程"],
+    createdtime:new Date(),
+    updatetime:new Date()
+    
+  },
+  {
+    id:6,
+    title:"123",
+    url:"https://cdn.seovx.com/d/?mom=302",
+    arg:["科学","编程"],
+    createdtime:new Date(),
+    updatetime:new Date()
+    
+  },
+  {
+    id:7,
+    title:"123",
+    url:"https://cdn.seovx.com/d/?mom=302",
+    arg:["科学","编程"],
+    createdtime:new Date(),
+    updatetime:new Date()
+    
+  },
+  {
+    id:8,
+    title:"123",
+    url:"https://cdn.seovx.com/d/?mom=302",
+    arg:["科学","编程"],
+    createdtime:new Date(),
+    updatetime:new Date()
+    
+  },
+  
 
 ])
 
+
+
+
+
+//Arg数据
+const ArgData:Ref<home_arg[]>=ref([
+
+{title:"教程",nuber:4},
+{title:'其它4',nuber:7},
+{title:'学习笔记57',nuber:7},
+{title:'Hexo15',nuber:7},
+{title:'项目6',nuber:7}
+])
 
 
 
@@ -136,6 +285,23 @@ const Data:Ref<home_cart[]>=ref([
 </script>
 
 <style lang="scss" scoped>
+.icons{
+  font-size: 1.2em;
+
+}
+
+.icon{
+  font-size: 1em;
+
+}
+.right{
+  order: 1;
+}
+
+.left{
+  order: 2;
+}
+
 .bordr{
   color:var(--bk-font-color);
     border-radius: 10px;
@@ -160,6 +326,7 @@ const Data:Ref<home_cart[]>=ref([
     flex: 1;
     margin-bottom: 50px;
     margin-right: 10px;
+
     &>div{
       @extend .bordr;
     }
@@ -197,25 +364,28 @@ const Data:Ref<home_cart[]>=ref([
     }
     .cart-jt-box{
       position: relative;
+   
       .jt-right{
         position: absolute;
         right: 0;
         color: white;
         z-index: 3;
-        width: 30px;
-        font-size: 1.2em;
+        width: 35px;
+    
         height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
+     
+        
       }
       .jt-left{
-
+         
           position: absolute;
           left: 0;
           color: white;
           z-index: 3;
-        width: 30px;
+          width: 35px;
         font-size: 1.2em;
         height: 100%;
         display: flex;
@@ -228,9 +398,10 @@ const Data:Ref<home_cart[]>=ref([
         height: 200px;
         display: flex;
       overflow-y: hidden;
+     
       position: relative;
  
-
+     
 
    
         .lbt-left{
@@ -327,17 +498,90 @@ const Data:Ref<home_cart[]>=ref([
       
 
 /* 隐藏滚动条 */
-        // &::-webkit-scrollbar {
-        //   display: none;
-        // }
+        &::-webkit-scrollbar {
+          display: none;
+        }
     }
 
   }
     .cart-input{
 
-      height: 20px;
-   
+      height: 25px;
+      display: flex;
+      justify-content: space-between;
+      &>div:nth-child(1)
+      {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+      }
+      &>div:nth-child(2)
+      {
+       margin: auto 10px;
+     
+        height: 100%;
+        &>div{
+          margin-left: .5em;
+        }
+        
       
+      }
+
+
+
+      
+      &>div:nth-child(3)
+    {
+      cursor: pointer;
+      width: 50px;
+      display: flex;
+        justify-content: center;
+        align-items: center;
+        white-space: nowrap;
+
+    }
+    &>div:nth-child(3):hover{
+        color: #25c2fe;
+    }
+      .input-arg{
+        
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        overflow-y: hidden;
+        overflow-x: auto;
+      
+        &::-webkit-scrollbar {
+          display: none;
+        }
+    
+
+
+        &>div{
+          cursor: pointer;
+          border-radius: 5px;
+          padding: 4px;
+         
+          transition: color .3s ;
+          position: relative;
+          padding-right: 15px;
+          white-space: nowrap;
+
+
+          &>span{
+              width: 15px;
+              position: absolute;
+              font-size: .5em;
+            
+          }
+          
+        }
+        &>div:hover {
+          background: #25c2fe;
+        }
+
+      }
     }
   
     

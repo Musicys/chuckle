@@ -91,7 +91,7 @@ import util from "@/util/funtion"
                         <span>音乐</span>
         </el-menu-item>
         <el-menu-item index="5">
-          <svg class="icon" aria-hidden="true">
+                        <svg class="icon" aria-hidden="true">
                             <use xlink:href="#icon-guanyubeifen2"></use>
                         </svg>
                         <span>关于</span>
