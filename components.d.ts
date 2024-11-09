@@ -20,6 +20,7 @@ declare module 'vue' {
     ElProgress: duration=\"1\"': typeof import('element-plus/es')['ElProgress:duration=\"1\"']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     Lloding: typeof import('./src/components/lodding/lloding.vue')['default']
+    Monitor: typeof import('./src/components/monitor/monitor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Xinx: typeof import('./src/components/draw/xinx.vue')['default']

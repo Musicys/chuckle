@@ -7,6 +7,7 @@ import  Draw  from "@/components/draw/draw.vue";
 import  "@/util/windows";
 
 import {handleScroll} from "@/util/scrse"
+import { onMounted } from "vue";
 
 
 
@@ -18,7 +19,7 @@ import {handleScroll} from "@/util/scrse"
   <Draw/>
   <div class="page"   >
   
-<div class="page-zz" @scroll="handleScroll" >
+<div class="page-zz"   @scroll="handleScroll" >
       <index></index>
 
     </div>

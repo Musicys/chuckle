@@ -115,7 +115,7 @@ import util from "@/util/funtion"
 
   margin-top: 1em;
   &>span{
-    font-family: 'MyCustomFonts', sans-serif;
+      font-family: 'MyCustomFonts', sans-serif;
       font-weight: bold;
   }
   &>span:nth-child(2){

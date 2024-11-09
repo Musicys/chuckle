@@ -2,7 +2,10 @@
     <div class="page">
             <div :class="{'page-left':true,'right':Isjc,'left':!Isjc}">
              <div class="cart-xx">
-              个人信息
+              <UserCart/>
+
+
+
              </div>
              <div class="cart-ts">
               公告
@@ -10,13 +13,17 @@
              <div class="cart-gx">
               最近跟新
              </div>
-             <div class="cart-txl" v-for=" i in 4">
+             <div class="cart-txl" >
               标签
              </div>
 
+             <div class="cart-gd" >
+              归档
+             </div>
 
-
-
+             <div class="cart-zx" >
+              网站资讯
+             </div>
 
 
 
@@ -122,8 +129,14 @@
              
              <Cart v-for=" i in Data" :data="i" :key="i.id"></Cart> 
 <!-- 分页 -->
-              <div class="page">
-                  
+              <div style=" background:none; border: none;" class="page-but">
+                  <div class="select-page">1</div>
+                  <div>2</div>
+                  <div>......</div>
+                  <div>99</div>
+
+                  <input type="text">
+                  <div>跳转</div>
               </div>
               </div>
 
@@ -135,7 +148,7 @@
 import { defineComponent, defineAsyncComponent,Ref ,ref,watch } from 'vue'
 import { home_cart ,home_arg} from '@/util/type';
 import {Isjc} from "@/util/windows";
-
+import UserCart from "./usercart.vue";
 
 
   //鼠标横向滚动事件
@@ -166,7 +179,7 @@ const scrollToRight = () => {
       }
     };
 
-    const scrollToLeft = () => {
+ const scrollToLeft = () => {
       if (scrollableDiv.value) {
         scrollableDiv.value.scrollTo({
           left: 0,
@@ -285,6 +298,47 @@ const ArgData:Ref<home_arg[]>=ref([
 </script>
 
 <style lang="scss" scoped>
+
+
+
+.select-page{
+  background: var(--div-hover-color);
+
+}
+.page-but{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &>div{
+    cursor: pointer;
+    margin-left: 1em;
+    padding: 4px 8px;
+    border: 3px solid var(--cart-border-color);
+    border-radius: 5px;
+    background: var(--cart-back-color);
+    white-space: nowrap; 
+    
+    
+    
+    &:hover{
+    
+        background: #06c0b4;
+    }
+    
+  }
+  &>input
+    {
+      
+      width: 50px;
+      margin-left: 1em;
+    padding: 4px 8px;
+    border: 3px solid var(--cart-border-color);
+    border-radius: 5px;
+    background: var(--cart-back-color);
+    white-space: nowrap; 
+    }
+
+}
 .icons{
   font-size: 1.2em;
 
@@ -334,7 +388,8 @@ const ArgData:Ref<home_arg[]>=ref([
       margin-top: 10px;
     }
     .cart-xx{
-      height: 340px;
+ 
+      overflow: hidden;
     }
     .cart-ts{
       height: 200px;

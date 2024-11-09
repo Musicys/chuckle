@@ -42,7 +42,7 @@ border: 5px solid ;
   --back-darw-liner:linear-gradient(45deg, #F6DBE8, rgba(246, 219, 232, 0));
 
   --el-but-back:#49B1F5;
-
+  --div-hover-color:#06c0b4;
 
   --cart-border-color:#48f3f7;
   --cart-back-color:#bce3ec;
@@ -152,3 +152,16 @@ color: var(--bk-font-color) !important;
   background-color: none;
   }
  
+/*输入框样式*/
+
+
+input{
+  
+  outline: none; /* 清除聚焦时的外边框 */
+  background-color: transparent; /* 清除背景颜色 */
+  padding: 0; /* 清除填充 */
+  margin: 0; /* 清除外边距 */
+  font-family: inherit; /* 继承字体 */
+  font-size: inherit; /* 继承字体大小 */
+  color: inherit; /* 继承字体颜色 */
+}

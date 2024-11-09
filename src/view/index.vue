@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import Bgtop from "@/components/Bgtop/Bgtop.vue";
+
 import { Isindex } from "@/router";
+//监视scroll组件
+import Monitor from "@/components/monitor/monitor.vue";
+
+
+// 定义类型
 
 </script>
 
@@ -11,14 +17,15 @@ import { Isindex } from "@/router";
   <!-- 一级路由+路由切换动画 -->
 
 
-
+  <Monitor></Monitor>
 <div class="box">
+ 
   <transition name="slide-fade">
   <router-view v-if="Isindex" />
 </transition>
 
 </div>
-
+  <Monitor/>
 
   <!-- 公共组件 -->
 

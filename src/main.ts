@@ -4,7 +4,7 @@ import {router} from './router'
 import App from '@/App.vue'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
-import '//at.alicdn.com/t/c/font_4683552_k710nlah668.js'
+import '//at.alicdn.com/t/c/font_4683552_bog4rq477tv.js'
 //加载工具
 import VueLazyload from 'vue-lazyload';
 
