@@ -39,9 +39,8 @@ resolvers: [ElementPlusResolver()],
 [树洞]
 
 [音乐]
-ui:gi
-12
 
+<img src="./ui/image.png">
 
 
 
