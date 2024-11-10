@@ -18,7 +18,7 @@ export const music:Ref<user>=ref({
     userImg:"https://www.keaitupian.cn/cjpic/frombd/2/253/1676065055/2828606542.jpg",//用户头像
     LodingImgUrl:"",//过渡头像
     IndexBack:"",//主页默认背景色
-    drawURL:"https://img.shetu66.com/2023/11/14/1699962327144215.png",
+    drawURL:"https://tse2-mm.cn.bing.net/th/id/OIP-C.OX22ZodoOmhwmPQ3-31sSgAAAA?rs=1&pid=ImgDetMain",
     IndexBackImg:"",//主页背景图片
     GitHubUrl:"",//GITURL
     gitURL:"string,",

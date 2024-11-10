@@ -46,6 +46,7 @@ border: 5px solid ;
 
   --cart-border-color:#48f3f7;
   --cart-back-color:#bce3ec;
+  --cart-home-time-color:#858585;
 }
 /* 黑夜 */
 [data-theme='dark'] {

@@ -70,7 +70,7 @@ import {music} from "@/util/user";
         align-items:center;
         flex-direction: column;
         padding-bottom: 1em;
-
+        background-size: 100% 100%;
 
      
         img{

@@ -8,21 +8,84 @@
 
              </div>
              <div class="cart-ts">
-              公告
+              
+               <div class="flex">
+                  <div class="flex-tile"> <el-icon><Platform /></el-icon>
+                    公告</div>
+                  <div class="cart-arg-title-left">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                  </div>
+                </div>
+
+                <div class="cart-ts-nr">
+                {{ home_data.home_tilte }}
+                </div>
              </div>
              <div class="cart-gx">
-              最近跟新
+              <div class="flex">
+                  <div class="flex-tile"> 
+                    <el-icon><PieChart /></el-icon>
+                    最近跟新</div>
+                  <div class="cart-arg-title-left">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                  </div>
+                </div>
+
+                <div class="cart-gx-test">
+                    <div class="cart-gx-test-kp" v-for="i in home_data.home_1lates" :key="i.id">
+                      <div class=""><img v-lazy="i.url" alt=""></div>
+                      <div>
+                      <div>{{ i.title }}</div>
+                      <div>{{ i.time }}</div>
+                    </div>
+                    </div>
+                </div>
+
+            
              </div>
              <div class="cart-txl" >
-              标签
+              <div class="flex">
+                  <div class="flex-tile">
+                    
+                    <el-icon><Histogram /></el-icon>
+                    标签</div>
+                  <div class="cart-arg-title-left">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                  </div>
+                </div>
              </div>
 
              <div class="cart-gd" >
-              归档
+              <div class="flex">
+                  <div class="flex-tile"> 
+                    <el-icon><Edit /></el-icon>
+                    归档</div>
+                  <div class="cart-arg-title-left">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                  </div>
+                </div>
              </div>
 
              <div class="cart-zx" >
-              网站资讯
+              <div class="flex">
+                  <div class="flex-tile"> 
+                    
+                    <el-icon><Promotion /></el-icon>
+                    网站咨询</div>
+                  <div class="cart-arg-title-left">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                  </div>
+                </div>
              </div>
 
 
@@ -150,9 +213,12 @@ import { home_cart ,home_arg} from '@/util/type';
 import {Isjc} from "@/util/windows";
 import UserCart from "./usercart.vue";
 
-
+import { home_data } from "@/util/home";
   //鼠标横向滚动事件
 const scrollableDiv = ref<HTMLDivElement | null>(null);
+
+
+
 
 const handleScroll = (event: WheelEvent) => {
   event.preventDefault(); // 阻止默认的页面滚动行为
@@ -298,8 +364,42 @@ const ArgData:Ref<home_arg[]>=ref([
 </script>
 
 <style lang="scss" scoped>
+.flex{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .flex-tile{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+.cart-arg-title-left
+        { 
+          display: flex;
+          &>div{
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: .8em;
+       
+          }
+          &>div:nth-child(1)
+        {
+          background: red;
+        }
+          &>div:nth-child(2)
+        {
+          background:   #f5cf51;
+        }
+        &>div:nth-child(3)
+        {
+          background:     #5ed164;
+        }
 
+      
 
+        }
 
 .select-page{
   background: var(--div-hover-color);
@@ -392,10 +492,66 @@ const ArgData:Ref<home_arg[]>=ref([
       overflow: hidden;
     }
     .cart-ts{
-      height: 200px;
+      padding:  1em;
+      .cart-arg-title{
+        display: flex;
+        justify-content:space-between;
+        align-items: center;
+        color: var(--bk-font-color);
+       
+       
+      }
+      .cart-ts-nr{
+        margin-top: 1em;
+        line-height: 2em;
+        text-align: justify;
+        text-justify: inter-word;
+        font-size: .9em;
+      }
     }
     .cart-gx{
-      height: 250px;
+     
+      .cart-gx-test{
+        display: flex;
+        flex-direction: column;
+        margin: 1em 0;
+        .cart-gx-test-kp{
+          display: flex;
+          margin-bottom: .5em;
+          &>div{
+              cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            &>img{
+              width: 80px;
+              height: 70px;
+              border-radius: 10px;
+              margin-right:  1em;
+              margin-bottom: .5em;
+
+            }
+           
+            &>div{
+              margin-bottom: 1em;
+              font-size: .8em;
+        
+            }
+            &>:nth-child(1)
+            {
+              color:var(--bk-font-color);
+            }
+            &>:nth-child(1):hover{
+              color: #06c0b4;
+            }
+            &>:nth-child(2)
+            {
+              color:  var(--cart-home-time-color);
+            }
+          }
+        }
+      }
     }
     .cart-txl{
       height: 300px;
