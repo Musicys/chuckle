@@ -8,21 +8,15 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Bgtop: typeof import('./src/components/Bgtop/Bgtop.vue')['default']
-    BgTop: typeof import('./src/components/BgTop/BgTop.vue')['default']
     Draw: typeof import('./src/components/draw/draw.vue')['default']
-    ElButtom: typeof import('element-plus/es')['ElButtom']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElDrawer: typeof import('element-plus/es')['ElDrawer']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
-    ElMenuItemGroup: typeof import('element-plus/es')['ElMenuItemGroup']
-    ElProgress: duration=\"1\"': typeof import('element-plus/es')['ElProgress:duration=\"1\"']
-    ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     Lloding: typeof import('./src/components/lodding/lloding.vue')['default']
     Monitor: typeof import('./src/components/monitor/monitor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    Xinx: typeof import('./src/components/draw/xinx.vue')['default']
   }
 }

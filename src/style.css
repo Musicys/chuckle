@@ -47,6 +47,11 @@ border: 5px solid ;
   --cart-border-color:#48f3f7;
   --cart-back-color:#bce3ec;
   --cart-home-time-color:#858585;
+  --cart-muisc-color:#000000cf;
+  --cart-bgmuisc-bagk: #ffffff;
+
+
+  
 }
 /* 黑夜 */
 [data-theme='dark'] {
@@ -62,6 +67,11 @@ border: 5px solid ;
 
   --cart-border-color:#2eada7;
   --cart-back-color:#011217;
+  --cart-muisc-color:#ffffff;
+  --cart-bgmuisc-bagk: #333333;
+
+
+
 }
 
 body{

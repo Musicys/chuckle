@@ -1,13 +1,13 @@
 <template>
     <div class="page">
-        <div class="cd-muisc">
-            <div class="cd-muisc-top">
+        <div class="cd-muisc" v-if="Ispc"  >
+            <div class="cd-muisc-top" >
                 <div class="muisc-userheader"></div>
                 <div class="cd-toptext">Hello <br>
                 <strong>设计灵感</strong>
                 </div>
             </div>
-            <div class="cd-muisc-mian">
+            <div class="cd-muisc-mian" >
                 <ul>
                     发现音乐
                     <li>首页</li>
@@ -16,7 +16,7 @@
                     <li>博客</li>
                 </ul>
             </div>
-            <div class="cd-muisc-footer">
+            <div class="cd-muisc-footer" >
                 <ul>
                     我的音乐
                     <li>本地音乐</li>
@@ -57,7 +57,7 @@
                </div>
             </div>
         </div>
-        <div class="more-muisc">
+        <div class="more-muisc" v-if="Ispc" >
             <div class="more-muisc-top">
                <div class="vip">开通会员</div>
             </div>
@@ -97,15 +97,25 @@
 </template>
 
 <script setup lang="ts">
-    
-
+import {music_data  } from "@/util/music";
+import {Ispc} from "@/util/windows.ts"
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .page{
     height: 80vh;
-    background: rgb(241, 236, 236);
+   
+    background: var(--cart-bgmuisc-bagk);
+    color: var(--cart-muisc-color);
+    
     border-radius: 20px;
+    display: flex;
+     overflow: hidden;   
+     justify-content:space-around;
+     align-items: center;
+     &>div:nth-child(2){
+            margin: 1em;
+     }
 }
 ul{
     position: relative;
@@ -121,11 +131,9 @@ li{
 .cd-muisc{
     display: inline-block;
     height: 70vh;
-    width: 13%;
-    position: relative;
-    left: 30px;
-    top: -100px;
-    background-color: rgb(255, 255, 255);
+    flex: 1;
+   
+  
     border-radius: 20px;
 }
 .cd-muisc-top{
@@ -159,12 +167,10 @@ li{
 }
 .zt-muisc{
     display: inline-block;
-    width: 55%;
+    flex: 3;
     height: 75vh;
-    position: relative;
-    top: 20px;
-    left: 60px;
-    background-color: rgb(255, 255, 255);
+  
+ 
     border-radius: 20px;
 }
 .zt-music-top{
@@ -207,7 +213,7 @@ li{
     position: relative;
     top: 5px;
     left: 10px;
-    background-color:rgb(241, 236, 236);
+
 }
 .zt-buttom{
     width: 50px;
@@ -234,7 +240,7 @@ li{
     position: relative;
     top: 5px;
     left: 25px;
-    box-shadow: 7px 3px 10px #fa8072db;
+    // box-shadow: 7px 3px 10px #fa8072db;
 }
 .mym{
     position: relative;
@@ -270,12 +276,10 @@ li{
 }
 .more-muisc{
     display: inline-block;
-    width: 24%;
+    flex: 1;
     height: 75vh;
     /* background-color: rgb(255, 255, 255); */
-    position: relative;
-    left: 80px;
-    top: -300px;
+   
     border-radius: 20px;
 }
 .more-muisc-top{
@@ -286,7 +290,7 @@ li{
 .more-muisc-top .vip{
     width: 70%;
     height: 23px;
-    background-color:rgb(255, 255, 255);
+
     margin: 0 auto;
     border-radius: 10px;
     position: relative;
@@ -310,6 +314,7 @@ li{
 .more-muisc-singer{
     width: 100%;
     height: 80px;
+    display: flex;
     /* background-color: rgb(206, 148, 148); */
 }
 .more-singer{
@@ -323,17 +328,20 @@ li{
     width: 60%;
     height: 100%;
     /* background-color: #1eaec7; */
-   position: relative;
-   top: -30px;
+    flex: 1;
+    overflow: hidden;
+  
 }
 .singer-head{
     width: 50px;
     height: 50px;
     background-color: #fa8072;
     border-radius: 10px;
-    position: relative;
-    top: 10px;
-    left: 20%;
+    
+ 
+}
+.singer-naem{
+   
 }
 .singer-naem h4{
     margin-top: 10px;
@@ -341,7 +349,7 @@ li{
     
 }
 .singer-naem span{
-    display: block;
+ 
    color: #b0a7a7;
    font-size: 80%;
 }
@@ -349,7 +357,7 @@ li{
     margin-top: 10px;
     width: 100%;
     height: 320px;
-    background-color: rgb(255, 255, 255);
+
     border-radius: 20px;
 }
 </style>
