@@ -58,6 +58,10 @@
                     <div></div>
                     <div></div>
                   </div>
+
+                </div>
+                <div>
+                 <ArgCart></ArgCart>
                 </div>
              </div>
 
@@ -72,6 +76,9 @@
                     <div></div>
                   </div>
                 </div>
+                <div>
+                  <PackCart/>
+                </div>
              </div>
 
              <div class="cart-zx" >
@@ -85,6 +92,9 @@
                     <div></div>
                     <div></div>
                   </div>
+                </div>
+                <div>
+                  <ConsultCart></ConsultCart>
                 </div>
              </div>
 
@@ -212,8 +222,10 @@ import { defineComponent, defineAsyncComponent,Ref ,ref,watch } from 'vue'
 import { home_cart ,home_arg} from '@/util/type';
 import {Isjc} from "@/util/windows";
 import UserCart from "./usercart.vue";
-
+import ArgCart from "./ArgCart.vue"
 import { home_data } from "@/util/home";
+import PackCart from "./PackCart.vue"
+import ConsultCart from "./ConsultCart.vue"
   //鼠标横向滚动事件
 const scrollableDiv = ref<HTMLDivElement | null>(null);
 
@@ -554,7 +566,7 @@ const ArgData:Ref<home_arg[]>=ref([
       }
     }
     .cart-txl{
-      height: 300px;
+      
       
       
     }

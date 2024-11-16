@@ -11,6 +11,11 @@
   src: url('./static/font/two.ttf');
   
 }
+@font-face {
+  font-family: MyserverFonts;
+  src: url('./static/font/server.ttf');
+  
+}
 
 .icon, .iconfont {
   width: 1.2em;
