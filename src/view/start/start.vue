@@ -1,8 +1,5 @@
 <template>
-    <div class="page">
-
-      
-    </div>
+    123
 
 </template>
 
@@ -12,10 +9,6 @@
 </script>
 
 <style scoped>
-.page{
-    height: 80vh;
 
-    
-}
 
 </style>

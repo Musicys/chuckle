@@ -92,7 +92,7 @@ const leave = (el, done) => {
                    
                     
                     
-                    <div class="title" style="position: relative; margin-left: .5em;  padding:0 .5em;    border-radius: 5px;  font-size: 1.5em;">
+                    <div class="title" @click="util.start()" style="position: relative; margin-left: .5em;  padding:0 .5em;    border-radius: 5px;  font-size: 1.5em;">
                         
                         轻笑|tek
                     <div class="tilte-line">
@@ -106,7 +106,7 @@ const leave = (el, done) => {
                     <div class="router-tab" v-if="Ispc">
 
 
-                        <div class="top-sc" >                       
+                        <div class="top-sc"   >                       
                         <svg class="icon" aria-hidden="true">
                             <use xlink:href="#icon-sousuox"></use>
                         </svg>

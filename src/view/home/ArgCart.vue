@@ -10,6 +10,8 @@
 
 <script setup lang="ts">
 import {home_data} from "@/util/home"
+
+
 function getRandomColor(): string {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);

@@ -8,6 +8,18 @@ export const router = createRouter({
   history: createWebHistory(),  // history 模式
   routes: [
     
+    {
+      path: '/',
+      name: '',
+      
+      component: defineAsyncComponent(() => import("@/view/start/start.vue")),
+      // redirect: '/login',
+      meta: { title: '博客入口' },
+      children:[
+
+      ]
+      
+   },
  
     {
         path: '/home',
@@ -63,6 +75,18 @@ export const router = createRouter({
   component: defineAsyncComponent(() => import("@/view/mine/mine.vue")),
   // redirect: '/login',
   meta: { title: '关于我们' },
+  children:[
+
+  ]
+},
+//
+{
+  path: '/desc',
+  name: '/desc',
+  
+  component: defineAsyncComponent(() => import("@/view/desc/desc.vue")),
+  // redirect: '/login',
+  meta: { title: '博文' },
   children:[
 
   ]

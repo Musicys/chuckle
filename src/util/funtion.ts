@@ -14,5 +14,7 @@ const arg:Function=(obj={})=>{go("/arg",obj)}
 const tree:Function=(obj={})=>{go("/tree",obj)}
 const muisc:Function=(obj={})=>{go("/muisc",obj)}
 const mine:Function=(obj={})=>{go("/mine",obj)}
-export default {home,arg,tree,mine,muisc}
+const start:Function=(obj={})=> {  go("/",obj)}
+const desc:Function=(obj={})=> {  go("/desc",obj)}
+export default {home,arg,tree,mine,muisc,start,desc}
 

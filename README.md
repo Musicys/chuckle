@@ -32,10 +32,15 @@ resolvers: [ElementPlusResolver()],
 # Router
 [yarn add vue-router]
 
+# [markdown]
+[markdown-it ]
+[npm install vue-markdown]
+[npm install markdown-it]
+
 [首页]
 
 [标签]
-
+<img src="https://typora-forlogen.oss-cn-shenzhen.aliyuncs.com/img/20200713112834.png"/>
 [树洞]
 
 [音乐]

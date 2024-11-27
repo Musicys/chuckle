@@ -200,7 +200,7 @@
 
              </div>
              
-             <Cart v-for=" i in Data" :data="i" :key="i.id"></Cart> 
+             <Cart  @click="util.desc()" v-for=" i in Data" :data="i" :key="i.id"></Cart> 
 <!-- 分页 -->
               <div style=" background:none; border: none;" class="page-but">
                   <div class="select-page">1</div>
@@ -226,6 +226,8 @@ import ArgCart from "./ArgCart.vue"
 import { home_data } from "@/util/home";
 import PackCart from "./PackCart.vue"
 import ConsultCart from "./ConsultCart.vue"
+import util from "@/util/funtion.ts"
+import Cart from "./cart.vue"
   //鼠标横向滚动事件
 const scrollableDiv = ref<HTMLDivElement | null>(null);
 
@@ -269,11 +271,7 @@ const scrollToRight = () => {
 
 
 
-const Cart = defineAsyncComponent(() => import('./cart.vue'))
- 
-defineComponent({
-  components: { Cart }
-})
+
 
 const Data:Ref<home_cart[]>=ref([
   {
