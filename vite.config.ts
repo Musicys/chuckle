@@ -7,6 +7,11 @@ import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+
+  optimizeDeps: {
+    include: ['highlightjs-line-numbers.js']
+  },
+
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -22,6 +27,7 @@ export default defineConfig({
   plugins: [
     vue(),
     // ...
+    ,
     AutoImport({
       resolvers: [ElementPlusResolver()],
     }),
@@ -37,25 +43,25 @@ export default defineConfig({
       }
     }
   },
-  server:{
-    proxy:{
-       '/api':{
-           target:"http://localhost:8087/", //跨域地址
-           changeOrigin:true, //支持跨域
-           rewrite:(path) => path.replace(/^\/api/, "")//重写路径,替换/api
-       }
+  server: {
+    proxy: {
+      '/api': {
+        target: "http://localhost:8087/", //跨域地址
+        changeOrigin: true, //支持跨域
+        rewrite: (path) => path.replace(/^\/api/, "")//重写路径,替换/api
+      }
     }
- },
- resolve: {
-  // 设置文件./src路径为 @
-  alias: [
-    {
-      find: '@',
-      replacement: resolve(__dirname, './src')
-    }
-  ],
-  
-},
+  },
+  resolve: {
+    // 设置文件./src路径为 @
+    alias: [
+      {
+        find: '@',
+        replacement: resolve(__dirname, './src')
+      }
+    ],
+
+  },
 
 
 

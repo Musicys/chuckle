@@ -33,8 +33,6 @@ resolvers: [ElementPlusResolver()],
 [yarn add vue-router]
 
 # [markdown]
-[markdown-it ]
-[npm install vue-markdown]
 [npm install markdown-it]
 
 [首页]
@@ -42,7 +40,7 @@ resolvers: [ElementPlusResolver()],
 [标签]
 <img src="https://typora-forlogen.oss-cn-shenzhen.aliyuncs.com/img/20200713112834.png"/>
 [树洞]
-
+<img src="./ui/树洞.png">
 [音乐]
 
 <img src="./ui/image.png">
@@ -52,8 +50,18 @@ resolvers: [ElementPlusResolver()],
 [关于]
 
 
+# 看板娘
+[yarn add oh-my-live2d]
 
 
 # Sess
 
 [yarn add sass --dev]
+
+
+# 可视化
+[npm install @jiaminghi/data-view]
+
+
+
+

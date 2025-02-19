@@ -1,363 +1,363 @@
+<script setup lang="ts">
+import { ref, Ref, onMounted } from "vue"
+import MarkdownViewer from "@/view/desc/Markdownview.vue";
+import { tileSai } from "@/htpps/ai";
+import { open } from "@/util/el/tilte";
+import { aireadlost, aideletelost, aiupdatelost } from "@/util/localStorage/localStorage";
+//滚动到最后 默认
+
+const scrollContainer = ref(null);
+
+// 定义一个函数来滚动到容器底部
+const scrollToBottom = () => {
+    if (scrollContainer.value) {
+        // 使用 scrollIntoView 或者直接设置 scrollTop
+        // 方法1: 使用 scrollTo
+        scrollContainer.value.scrollTo({
+            top: scrollContainer.value.scrollHeight,
+            behavior: 'smooth' // 平滑滚动
+        });
+        // 方法2: 直接设置 scrollTop
+        // scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
+    }
+};
+
+
+//AI是否在回答 
+const ISai: Ref<Boolean> = ref(false);
+
+
+const musicnr: Ref<string> = ref("")
+
+const tileList: Ref<any> = ref([
+
+
+]
+
+)
+
+
+//删除lost和本地记录
+const deleteLIST: () => void = () => {
+    tileList.value = []
+    aideletelost()
+}
+const markdownContent: Ref<string> = ref("当然可以，这里是一个简单的JS递归示例：\n\n```javascript\nfunction countdown(num) {\n  if (num <= 0) {\n    console.log(\"Done!\");\n  } else {\n    console.log(num);\n    countdown(num - 1);\n  }\n}\n\ncountdown(5);\n```\n\n这个函数会从输入的数字开始倒数，直到倒数到0为止。你可以调用`countdown`函数并传入任何数字来测试它。希望这可以帮助到你！如果有其他问题或需要进一步帮助，请随时告诉我")
+
+
+
+const Enters: () => void = async () => {
+
+
+
+
+    let str = musicnr.value;
+    musicnr.value = ""
+    let preoes = 1;
+
+    if (!str.length || ISai.value) {
+        return
+    }
+    else {
+
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = d.getMonth() + 1; // 注意：getMonth() 返回的月份是从0开始的
+        const date = d.getDate();
+        const hours = d.getHours();
+        const minutes = d.getMinutes().toString().padStart(2, '0');
+        tileList.value.push({ title: str, preoes: preoes, time: `${year}-${month}-${date} ${hours}.${minutes}` })
+
+        ISai.value = true
+        setTimeout(() => {
+            scrollToBottom()
+        }, 100);
+        let data = await tileSai(str)
+
+
+
+        if (data.status != 200) {
+            ISai.value = false
+            return open("停止服务，请联系后台")
+
+        }
+
+
+        let str2 = data.data.choices[0].message.content
+        if (str2.length != 0) {
+            console.log(str2);
+
+            tileList.value.push({ title: str2, preoes: 2 })
+            ISai.value = false
+            setTimeout(() => {
+                scrollToBottom()
+            }, 500)
+        }
+        else {
+            ISai.value = false
+            return open("异常，请联系后台")
+        }
+
+
+
+        aiupdatelost({ ...tileList.value })
+
+
+    }
+
+
+
+}
+
+
+
+onMounted(() => {
+    //读
+    tileList.value = aireadlost() || []
+})
+
+
+
+
+
+</script>
+
+
 <template>
-    <div class="page">
-        <div class="cd-muisc" v-if="Ispc"  >
-            <div class="cd-muisc-top" >
-                <div class="muisc-userheader"></div>
-                <div class="cd-toptext">Hello <br>
-                <strong>设计灵感</strong>
-                </div>
-            </div>
-            <div class="cd-muisc-mian" >
-                <ul>
-                    发现音乐
-                    <li>首页</li>
-                    <li>专辑</li>
-                    <li>歌手</li>
-                    <li>博客</li>
-                </ul>
-            </div>
-            <div class="cd-muisc-footer" >
-                <ul>
-                    我的音乐
-                    <li>本地音乐</li>
-                    <li>我喜欢</li>
-                    <li>创建歌单</li>
-                </ul>
-            </div>
-        </div>
-        <div class="zt-muisc">
-            <div class="zt-music-top">
-                <div class="zt-but">
-                    <div></div>
-                    <div></div>
-                   
-                </div>
-                <div class="divleft">
-                    <input type="text" class="search" placeholder="   猜你喜欢...">
-                    <button class="zt-buttom" type="button" value=" ">搜索</button>
-                </div>
-            </div>
-            <div class="zt-music-main">
-                <div class="music-t">
-                </div>
-                <span class="mym">ones的专属好歌 ></span>
-            </div>
-            <div class="zt-music-footer">
-               <div class="muisc-footer-fl">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-               </div>
-               <div class="muisc-footer-day">
-               </div>
-            </div>
-        </div>
-        <div class="more-muisc" v-if="Ispc" >
-            <div class="more-muisc-top">
-               <div class="vip">开通会员</div>
-            </div>
-            <div class="more-muisc-mid">
-                <div class="muisc-song-zzr">
-                    <h4>音乐制作人</h4>
-                    <span class="more">查看更多</span>
-                </div>
-                <div class="more-muisc-singer">
-                    <div class="more-singer">
-                        <div class="singer-head"></div>
+    <div class="page-music" style="position: relative;  --mine--back2:#5AD2C9;  ">
+        <div @click="deleteLIST" class="music-but">清空缓存</div>
+        <div class="box">
+            <div class="box-top" ref="scrollContainer">
+                <!-- 内容 -->
+
+                <div v-for="(i, index) in tileList" :index="index" :class="{
+                    'mine-tile': i.preoes == 1,
+                    'ai-title': i.preoes == 2
+                }">
+                    <img v-if="i.preoes == 2" class="img"
+                        src="https://img.alicdn.com/imgextra/i1/O1CN01khO8o01EAwXZnPWhX_!!6000000000312-2-tps-144-144.png">
+                    <div class="ai-tile-nr" v-if="i.preoes == 2">
+                        <MarkdownViewer :markdownContent="i.title" />
                     </div>
-                    <div class="more-singer-xx">
-                        <div class="singer-naem">
-                            <h4>Jacob Jones</h4>
-                            <span>148.4万粉丝.254万播放量</span>
+
+                    <div class="mine-nr" v-if="i.preoes == 1">
+                        <div v-if="i.preoes == 1" class="box-time">{{ i.time }}</div>
+                        <p>{{ i.title }}</p>
+                    </div>
+                </div>
+                <div class="tile-ai" v-if="tileList.length == 0">
+                    <div class="log" style="">
+
+                        <img src="https://img.alicdn.com/imgextra/i1/O1CN01khO8o01EAwXZnPWhX_!!6000000000312-2-tps-144-144.png"
+                            alt="">
+                        <div>
+
+                            <div style="font-size: 1.5em;">通情、达义，你的全能AI助手</div>
+                            <div style="text-decoration: dashed; margin-top: .5em;">我可以帮你做这些事情，换一换</div>
                         </div>
+
                     </div>
-                    
                 </div>
-                <div class="more-muisc-singer">
-                    <div class="more-singer">
-                        <div class="singer-head"></div>
-                    </div>
-                    <div class="more-singer-xx">
-                        <div class="singer-naem">
-                            <h4>Jacob Jones</h4>
-                            <span>148.4万粉丝.254万播放量</span>
-                        </div>
-                    </div>
-                    
-                </div>
+
+
             </div>
-            <div class="more-muisc-footer"></div>
+            <div class="input " style="position: relative;  --x:18px;">
+                <el-icon style="position: absolute; left: var(--x); font-size: 1.4em;">
+                    <Search />
+                </el-icon>
+                <input @keyup.enter="Enters" placeholder="问一问" v-model="musicnr" type="text">
+                <el-icon @click="Enters"
+                    style="position: absolute; right:  var(--x); font-size: 1.4em;    cursor: pointer;">
+                    <Position />
+                </el-icon>
+
+            </div>
         </div>
     </div>
 </template>
 
-<script setup lang="ts">
-import {music_data  } from "@/util/music";
-import {Ispc} from "@/util/windows.ts"
-</script>
-
 <style lang="scss" scoped>
-.page{
-    height: 80vh;
-   
-    background: var(--cart-bgmuisc-bagk);
-    color: var(--cart-muisc-color);
-    
-    border-radius: 20px;
-    display: flex;
-     overflow: hidden;   
-     justify-content:space-around;
-     align-items: center;
-     &>div:nth-child(2){
-            margin: 1em;
-     }
-}
-ul{
-    position: relative;
-    top: 20px;
-    left: 15px;
-}
-li{
-    list-style: none;
-    margin: 15px;
-    color: #817e7e;
-    cursor: pointer;
-}
-.cd-muisc{
-    display: inline-block;
-    height: 70vh;
-    flex: 1;
-   
-  
-    border-radius: 20px;
-}
-.cd-muisc-top{
-    height: 15vh;
-    width: 100%;
-    /* background-color: red; */
-}
-.muisc-userheader{
-    width: 40%;
-    height: 50%;
-    background-color: #fa8072;
+.bordr {
+    color: var(--bk-font-color);
     border-radius: 10px;
-    position: relative;
-    left: 15px;
-    top: 10px;
+    background: var(--cart-back-color);
+    border: 3px solid var(--cart-border-color);
+    padding: 5px;
 }
-.cd-toptext{
-    margin-top: 5px;
-    position: relative;
-    left: 20px;
-    top: 10px;}
-.cd-muisc-mian{
-    width: 100%;
-    height: 25vh;
-    /* background-color: blue; */
+
+.box-time {
+    font-size: .8em
 }
-.cd-muisc-footer{
-    width: 100%;
-    height: 25vh;
-    /* background-color: green; */
+
+.img {
+    animation: totitle var(--time) ease-out forwards;
 }
-.zt-muisc{
-    display: inline-block;
-    flex: 3;
-    height: 75vh;
-  
- 
-    border-radius: 20px;
+
+@keyframes totitle {
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0%);
+    }
 }
-.zt-music-top{
-    width: 100%;
-    height: 50px;
 
 
-
-    /* background-color: red; */
-}
-.zt-but{
-    width: 15%;
-    height: 100%;
-    display: inline-block;
-    
-    
-}
-.zt-but div{
-    display: inline-block;
-    width: 20%;
-    height: 30%;
-    background-color: #817e7e;
-    border-radius: 50% ;
-    margin: 5px;
-    position: relative;
-    top: 10px;
-    left: 10px;
-}
-.divleft{
-    display: inline-block;
-    width: 85%;
-}
-.search{
-    width: 80%;
-    height: 25px;
-    border-radius: 30px;
-    border: 0px;
-    outline:none;
-    cursor:pointer;
-    position: relative;
-    top: 5px;
-    left: 10px;
-
-}
-.zt-buttom{
-    width: 50px;
-    height: 30px;
-    border-radius: 30px;
-    cursor:pointer;
-    outline:none;
-    border: none;
-    position: relative;
-    left: -40px;
-    top: 5px;
-    background-color: #fa8072;
-}
-.zt-music-main{
+.page-music {
+    --time: .5s;
+    @extend .bordr;
     width: 100%;
-    height: 300px;
-    /* background-color: red; */
-}
-.music-t{
-    width: 90%;
-    height: 80%;
-    background-color: #fa8072;
-    border-radius: 20px;
-    position: relative;
-    top: 5px;
-    left: 25px;
-    // box-shadow: 7px 3px 10px #fa8072db;
-}
-.mym{
-    position: relative;
-    top: 15px;
-    left: 32px;
-}
-.zt-music-footer{
-    width: 100%;
-    height: 200px;
-    /* background-color: red; */
-}
-.muisc-footer-fl{
-    display: inline-block;
-    width: 60%;
-    height: 100%;
-    /* background-color: red; */
-}
-.zt-music-footer .muisc-footer-fl div{
-    display: inline-flex;
-    width: 20%;
-    height: 70px;
-    background-color: #fa8072;
-    border-radius: 5px;
-    margin-left: 4% ;
-    margin-top: 4%;
-}
-.muisc-footer-day{
-    display: inline-block;
-    width: 38%;
-    height: 100%;
-    background-color: #fa8072;
-    border-radius: 20px;
-}
-.more-muisc{
-    display: inline-block;
-    flex: 1;
-    height: 75vh;
-    /* background-color: rgb(255, 255, 255); */
-   
-    border-radius: 20px;
-}
-.more-muisc-top{
-    width: 100%;
-    height: 40px;
-    /* background-color: red; */
-}
-.more-muisc-top .vip{
-    width: 70%;
-    height: 23px;
-
-    margin: 0 auto;
-    border-radius: 10px;
-    position: relative;
-    top: 10px;
-    font-size: 90%;
-    text-align: center;
-    color: #ff0000;
-}
-.more-muisc-mid{
-    width: 100%;
-    height: 180px;
-    /* background-color: red; */
-}
-.more{
-    display: block;
-    font-size: 80%;
-    color: #c3b2b2;
-    text-align: right;
-    cursor: pointer;
-}
-.more-muisc-singer{
-    width: 100%;
-    height: 80px;
+    height: 700px;
     display: flex;
-    /* background-color: rgb(206, 148, 148); */
-}
-.more-singer{
-    display: inline-block;
-    width: 30%;
-    height: 100%;
-    /* background-color: #fff; */
-}
-.more-singer-xx{
-    display: inline-block;
-    width: 60%;
-    height: 100%;
-    /* background-color: #1eaec7; */
-    flex: 1;
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
-  
-}
-.singer-head{
-    width: 50px;
-    height: 50px;
-    background-color: #fa8072;
-    border-radius: 10px;
-    
- 
-}
-.singer-naem{
-   
-}
-.singer-naem h4{
-    margin-top: 10px;
-    margin-bottom: 10px;
-    
-}
-.singer-naem span{
- 
-   color: #b0a7a7;
-   font-size: 80%;
-}
-.more-muisc-footer{
-    margin-top: 10px;
-    width: 100%;
-    height: 320px;
 
-    border-radius: 20px;
+    .music-but {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        background: var(--cart-border-color);
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 0 0 0 15px;
+
+    }
+
+    & p {
+        text-align: justify;
+        line-height: 30px;
+    }
+
+    .box {
+
+
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+        height: 90%;
+        justify-content: space-between;
+        align-items: center;
+
+        border-radius: 15px;
+
+
+        .box-top {
+
+            width: 100%;
+            height: 95%;
+            overflow-y: auto;
+
+            &::-webkit-scrollbar-thumb {
+                background: var(--mine--back2);
+                /* 滚动条的颜色 */
+            }
+
+            &::-webkit-scrollbar-track-piece {
+                background: var(--cart-back-color);
+                /* 水平滚动条轨道的背景颜色 */
+            }
+
+            .tile-ai {
+
+                width: 100%;
+                height: 100%;
+                display: flex;
+
+                justify-content: start;
+
+                .log {
+                    display: flex;
+                    margin-top: 30px;
+                    margin-left: 50px;
+
+                    &>img {
+                        width: 50px;
+                        height: 50px;
+                        margin-right: 1em;
+                    }
+                }
+            }
+
+            .ai-title {
+
+                display: flex;
+                --h: 45px;
+                margin-top: 1.5em;
+                margin-right: 1em;
+
+                & img {
+                    width: var(--h);
+                    height: var(--h);
+                    border-radius: 50%;
+
+
+                }
+
+                .ai-tile-nr {
+                    background: var(--mine--back2);
+                    padding: 5px 20px;
+                    color: black;
+                    border-radius: 15px;
+                    margin-left: 1em;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    animation: totitle var(--time) ease-out forwards;
+
+                }
+
+            }
+
+            .mine-tile {
+                margin-right: 50px;
+                animation: totitle var(--time) ease-out forwards;
+                display: flex;
+                justify-content: end;
+
+
+                &>.mine-nr {
+                    background: var(--mine--back2);
+                    padding: 5px 20px;
+                    color: black;
+                    border-radius: 15px;
+                    margin-top: 1em;
+
+
+                }
+
+            }
+
+        }
+
+        .input {
+            margin-top: 1em;
+            width: 100%;
+            max-height: 5%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            &>input {
+                color: black;
+                width: calc(100% - 82px);
+                padding: 10px 30px;
+                border: 1px solid rgba($color: #000000, $alpha: .5);
+                border-radius: 15px;
+                transition: border .5s;
+                background: var(--mine--back2);
+
+
+            }
+
+            &>input:hover {
+                border: 1px solid rgba($color: #FF74EE, $alpha: .5);
+            }
+        }
+    }
+
 }
 </style>

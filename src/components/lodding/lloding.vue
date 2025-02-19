@@ -1,9 +1,9 @@
 <template>
     <div class="loding fade-in">
         <img class="img" src="/src/static/t.jpg" alt="">
-       <div style="width: 100px;">
-       
-       </div>
+        <div style="width: 100px;">
+
+        </div>
         <span>加载中.....</span>
     </div>
 
@@ -15,8 +15,7 @@
 </script>
 
 <style scoped>
-
-.loding{
+.loding {
     width: 100vw;
     height: 100vh;
     position: fixed;
@@ -28,16 +27,18 @@
     background: #1A191B;
     flex-direction: column;
     font-family: 'MyCustomFonts', sans-serif;
-    .img{
+
+    .img {
         width: 100px;
         height: 100px;
         border-radius: 50%;
-        border: .1px solid var( --color-title);
+        border: .1px solid var(--color-title);
     }
-    span{
+
+    span {
         color: #fff;
         margin-top: 1.2em;
     }
-    
+
 }
 </style>
