@@ -3,9 +3,9 @@ import axios from 'axios';
 import config from '@/config';
 // 创建一个 Axios 实例
 const apiClient = axios.create({
-  baseURL:config.url, // 设置基础 URL
+  baseURL: config.url, // 设置基础 URL
   timeout: 20000, // 设置请求超时时间
- 
+
 });
 
 
@@ -35,7 +35,7 @@ apiClient.interceptors.response.use(
 
 
     //对时间进行格式
-    
+
 
 
     return response.data;
