@@ -10,41 +10,41 @@ https://musicbklog.pages.dev /(个人博客)
 `参考设计`
 
 https://www.qcqx.cn/
-## 使用库
-##Axios
+### 使用库
+`Axios`
 
 - yarn add axios
 - yarn add path-browserify
 
-##El组件
+`EL组件库`
 
 - yarn add element-plus
 - yarn add -D unplugin-vue-components unplugin-auto-import
 
-##El图标库
+`El图标库`
 
 ```全局注册```
-##图片懒加载
+`图片懒加载`
 
 - npm install vue-lazyload
 
-##Router
+`Router`
 
 - yarn add vue-router
 
-##[markdown]
+`[markdown]`
 
 - npm install markdown-it
 
-##看板娘
+`看板娘`
 
 - yarn add oh-my-live2d
 
-##Sess
+`Sess`
 
 - yarn add sass --dev
 
-##可视化
+`可视化`
 
 - npm install @jiaminghi/data-view
 
@@ -73,7 +73,7 @@ https://www.qcqx.cn/
 
 
 `git add . `
-`git commit -m'vite'`
+`git commit -m'html-vite'`
 `git push origin main`
 
 
