@@ -1,7 +1,6 @@
 # 前端 check_vue
-[musicbklog.pages.dev](个人博客)
 ##Vue 3 + TypeScript + Vite
-
+https://musicbklog.pages.dev /(个人博客)
 https://www.qcqx.cn/
 ## 使用库
 ##Axios
@@ -42,23 +41,23 @@ https://www.qcqx.cn/
 - npm install @jiaminghi/data-view
 
 ## 路由
-[首页]
+`首页`
 
 <img src="./img/image.png" alt="首页">
-[标签]
+`标签`
 
 <img src="./img/imagecopy.png" alt="标签">
 
 
-[问问]
+`问问`
 
 <img src="./img/imagecopy2.png" alt="问问">
 
-[留言]
+`留言`
 
 <img src="./img/imagecopy3.png" alt="留言">
 
-[关于]
+`关于`
 
 <img src="./img/imagecopy4.png" alt="关于">
 
