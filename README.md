@@ -1,31 +1,49 @@
 # 前端 check_vue
 [个人博客](musicbklog.pages.dev)
-# Vue 3 + TypeScript + Vite
+##Vue 3 + TypeScript + Vite
+
 https://www.qcqx.cn/
 ## 使用库
-# Axios 
-[yarn add axios]
-[yarn add path-browserify] 下载path
-### El组件
-[yarn add element-plus]
-[yarn add -D unplugin-vue-components unplugin-auto-import]
-#### el图标库
+##Axios
+
+- yarn add axios
+- yarn add path-browserify
+
+##El组件
+
+- yarn add element-plus
+- yarn add -D unplugin-vue-components unplugin-auto-import
+
+##El图标库
+
 ```全局注册```
-###  图片懒加载
-[npm install vue-lazyload]
-### Router
-[yarn add vue-router]
-### [markdown]
-[npm install markdown-it]
-### 看板娘
-[yarn add oh-my-live2d]
-### Sess
-[yarn add sass --dev]
-### 可视化
-[npm install @jiaminghi/data-view]
+##图片懒加载
+
+- npm install vue-lazyload
+
+##Router
+
+- yarn add vue-router
+
+##[markdown]
+
+- npm install markdown-it
+
+##看板娘
+
+- yarn add oh-my-live2d
+
+##Sess
+
+- yarn add sass --dev
+
+##可视化
+
+- npm install @jiaminghi/data-view
+
 ## 路由
 [首页]
- 
+
 <img src="./img/image.png" alt="首页">
 [标签]
 
