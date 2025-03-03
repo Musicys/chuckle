@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.ry.type.mapper.RyTypeMapper">
+
+    <resultMap type="RyType" id="RyTypeResult">
+        <result property="typeId"    column="type_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="typeName"    column="type_name"    />
+        <result property="typePic"    column="type_pic"    />
+        <result property="typePicType"    column="type_pic_type"    />
+        <result property="typePicLink"    column="type_pic_link"    />
+    </resultMap>
+
+    <sql id="selectRyTypeVo">
+        select type_id, create_by, create_time, update_by, update_time, type_name, type_pic, type_pic_type, type_pic_link from ry_type
+    </sql>
+
+    <select id="selectRyTypeList" parameterType="RyType" resultMap="RyTypeResult">
+        <include refid="selectRyTypeVo"/>
+        <where>
+            <if test="typeName != null  and typeName != ''"> and type_name like concat('%', #{typeName}, '%')</if>
+            <if test="typePic != null  and typePic != ''"> and type_pic = #{typePic}</if>
+            <if test="typePicType != null  and typePicType != ''"> and type_pic_type = #{typePicType}</if>
+            <if test="typePicLink != null  and typePicLink != ''"> and type_pic_link = #{typePicLink}</if>
+        </where>
+    </select>
+
+    <select id="selectRyTypeByTypeId" parameterType="Long" resultMap="RyTypeResult">
+        <include refid="selectRyTypeVo"/>
+        where type_id = #{typeId}
+    </select>
+    <select id="selectRYTypeByTypeName" resultType="com.ruoyi.ry.type.domain.RyType">
+        select * from ry_type where type_name = #{typeName}
+    </select>
+
+    <insert id="insertRyType" parameterType="RyType" useGeneratedKeys="true" keyProperty="typeId">
+        insert into ry_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="typeName != null and typeName != ''">type_name,</if>
+            <if test="typePic != null">type_pic,</if>
+            <if test="typePicType != null">type_pic_type,</if>
+            <if test="typePicLink != null">type_pic_link,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="typeName != null and typeName != ''">#{typeName},</if>
+            <if test="typePic != null">#{typePic},</if>
+            <if test="typePicType != null">#{typePicType},</if>
+            <if test="typePicLink != null">#{typePicLink},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRyType" parameterType="RyType">
+        update ry_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="typeName != null and typeName != ''">type_name = #{typeName},</if>
+            <if test="typePic != null">type_pic = #{typePic},</if>
+            <if test="typePicType != null">type_pic_type = #{typePicType},</if>
+            <if test="typePicLink != null">type_pic_link = #{typePicLink},</if>
+        </trim>
+        where type_id = #{typeId}
+    </update>
+
+    <delete id="deleteRyTypeByTypeId" parameterType="Long">
+        delete from ry_type where type_id = #{typeId}
+    </delete>
+
+    <delete id="deleteRyTypeByTypeIds" parameterType="String">
+        delete from ry_type where type_id in
+        <foreach item="typeId" collection="array" open="(" separator="," close=")">
+            #{typeId}
+        </foreach>
+    </delete>
+</mapper>

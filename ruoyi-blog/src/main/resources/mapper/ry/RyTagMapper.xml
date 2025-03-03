@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.ry.tag.mapper.RyTagMapper">
+    
+    <resultMap type="RyTag" id="RyTagResult">
+        <result property="tagId"    column="tag_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="tagName"    column="tag_name"    />
+    </resultMap>
+
+    <sql id="selectRyTagVo">
+        select tag_id, create_by, create_time, update_by, update_time, tag_name from ry_tag
+    </sql>
+
+    <select id="selectRyTagList" parameterType="RyTag" resultMap="RyTagResult">
+        <include refid="selectRyTagVo"/>
+        <where>  
+            <if test="tagName != null  and tagName != ''"> and tag_name like concat('%', #{tagName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectRyTagByTagId" parameterType="Long" resultMap="RyTagResult">
+        <include refid="selectRyTagVo"/>
+        where tag_id = #{tagId}
+    </select>
+
+    <insert id="insertRyTag" parameterType="RyTag" useGeneratedKeys="true" keyProperty="tagId">
+        insert into ry_tag
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="tagName != null and tagName != ''">tag_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="tagName != null and tagName != ''">#{tagName},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRyTag" parameterType="RyTag">
+        update ry_tag
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="tagName != null and tagName != ''">tag_name = #{tagName},</if>
+        </trim>
+        where tag_id = #{tagId}
+    </update>
+
+    <delete id="deleteRyTagByTagId" parameterType="Long">
+        delete from ry_tag where tag_id = #{tagId}
+    </delete>
+
+    <delete id="deleteRyTagByTagIds" parameterType="String">
+        delete from ry_tag where tag_id in 
+        <foreach item="tagId" collection="array" open="(" separator="," close=")">
+            #{tagId}
+        </foreach>
+    </delete>
+</mapper>
