@@ -1,6 +1,11 @@
 # 前端 check_vue
 ##Vue 3 + TypeScript + Vite
 https://musicbklog.pages.dev /(个人博客)
+
+<br>
+<hr>
+
+
 https://www.qcqx.cn/
 ## 使用库
 ##Axios
@@ -44,6 +49,7 @@ https://www.qcqx.cn/
 `首页`
 
 <img src="./img/image.png" alt="首页">
+
 `标签`
 
 <img src="./img/imagecopy.png" alt="标签">
