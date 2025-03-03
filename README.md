@@ -1,5 +1,5 @@
 # 前端 check_vue
-[个人博客](musicbklog.pages.dev)
+[musicbklog.pages.dev](个人博客)
 ##Vue 3 + TypeScript + Vite
 
 https://www.qcqx.cn/
