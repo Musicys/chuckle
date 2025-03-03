@@ -1,10 +1,13 @@
 # 前端 check_vue
 ##Vue 3 + TypeScript + Vite
-https://musicbklog.pages.dev /(个人博客)
 
 <br>
+https://musicbklog.pages.dev /(个人博客)
+
+
 <hr>
 
+`参考设计`
 
 https://www.qcqx.cn/
 ## 使用库
@@ -69,14 +72,17 @@ https://www.qcqx.cn/
 
 
 
+`git add . `
+`git commit -m'vite'`
+`git push origin main`
 
 
 
 
-
-
+<hr/>
 
 # 后端 
+
 
 
 
