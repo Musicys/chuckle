@@ -1,66 +1,62 @@
+# 前端 check_vue
+[个人博客](musicbklog.pages.dev)
 # Vue 3 + TypeScript + Vite
-参考
 https://www.qcqx.cn/
+## 使用库
 # Axios 
 [yarn add axios]
 [yarn add path-browserify] 下载path
-# El组件
+### El组件
 [yarn add element-plus]
-
-[yarn add -D unplugin-vue-components unplugin-auto-import]自动导入
-[]
-
-## el图标库
-
-
-``` 
-plugins: [
-// ...
-AutoImport({
-resolvers: [ElementPlusResolver()],
-}),
-Components({
-resolvers: [ElementPlusResolver()],
-}),
-
-
-
-```
+[yarn add -D unplugin-vue-components unplugin-auto-import]
+#### el图标库
 ```全局注册```
-##  图片懒加载
+###  图片懒加载
 [npm install vue-lazyload]
-# Router
+### Router
 [yarn add vue-router]
-
-# [markdown]
+### [markdown]
 [npm install markdown-it]
-
+### 看板娘
+[yarn add oh-my-live2d]
+### Sess
+[yarn add sass --dev]
+### 可视化
+[npm install @jiaminghi/data-view]
+## 路由
 [首页]
-
+ 
+<img src="./img/image.png" alt="首页">
 [标签]
-<img src="https://typora-forlogen.oss-cn-shenzhen.aliyuncs.com/img/20200713112834.png"/>
-[树洞]
-<img src="./ui/树洞.png">
-[音乐]
 
-<img src="./ui/image.png">
+<img src="./img/imagecopy.png" alt="标签">
 
 
+[问问]
+
+<img src="./img/imagecopy2.png" alt="问问">
+
+[留言]
+
+<img src="./img/imagecopy3.png" alt="留言">
 
 [关于]
 
-
-# 看板娘
-[yarn add oh-my-live2d]
+<img src="./img/imagecopy4.png" alt="关于">
 
 
-# Sess
-
-[yarn add sass --dev]
 
 
-# 可视化
-[npm install @jiaminghi/data-view]
+
+
+
+
+
+
+# 后端 
+
+
+
 
 
 
