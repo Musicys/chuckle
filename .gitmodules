@@ -1,0 +1,3 @@
+[submodule "check_backend/blogproject_new"]
+	path = check_backend/blogproject_new
+	url = https://gitee.com/ihhhhoo/blogproject
