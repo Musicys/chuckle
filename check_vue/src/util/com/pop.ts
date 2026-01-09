@@ -1,14 +1,11 @@
-import { Ref, ref } from "vue";
+import { Ref, ref } from 'vue';
 
-export const Ispop: Ref<boolean> = ref(false)
-
+export const Ispop: Ref<boolean> = ref(false);
 
 export const startpop: () => void = () => {
-    Ispop.value = true
-}
+   Ispop.value = true;
+};
 
 export const endpop: () => void = () => {
-    Ispop.value = false
-}
-
-
+   Ispop.value = false;
+};

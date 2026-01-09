@@ -1,10 +1,15 @@
 # Vue 3 + TypeScript + Vite
+
 参考
 https://www.qcqx.cn/
-# Axios 
+
+# Axios
+
 [yarn add axios]
 [yarn add path-browserify] 下载path
+
 # El组件
+
 [yarn add element-plus]
 
 [yarn add -D unplugin-vue-components unplugin-auto-import]自动导入
@@ -12,8 +17,7 @@ https://www.qcqx.cn/
 
 ## el图标库
 
-
-``` 
+```
 plugins: [
 // ...
 AutoImport({
@@ -26,13 +30,19 @@ resolvers: [ElementPlusResolver()],
 
 
 ```
-```全局注册```
-##  图片懒加载
+
+`全局注册`
+
+## 图片懒加载
+
 [npm install vue-lazyload]
+
 # Router
+
 [yarn add vue-router]
 
 # [markdown]
+
 [npm install markdown-it]
 
 [首页]
@@ -45,23 +55,16 @@ resolvers: [ElementPlusResolver()],
 
 <img src="./ui/image.png">
 
-
-
 [关于]
 
-
 # 看板娘
-[yarn add oh-my-live2d]
 
+[yarn add oh-my-live2d]
 
 # Sess
 
 [yarn add sass --dev]
 
-
 # 可视化
+
 [npm install @jiaminghi/data-view]
-
-
-
-

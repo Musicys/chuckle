@@ -3,7 +3,7 @@
 import hljs from 'highlight.js';
 
 declare module 'highlight.js' {
-  interface HLJSApi {
-    lineNumbersBlock: (block: HTMLElement) => void;
-  }
+   interface HLJSApi {
+      lineNumbersBlock: (block: HTMLElement) => void;
+   }
 }

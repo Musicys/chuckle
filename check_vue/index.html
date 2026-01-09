@@ -1,37 +1,31 @@
 <!doctype html>
 <html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>博客</title>
+   </head>
+   <script src="https://unpkg.com/oh-my-live2d@latest"></script>
 
-  <title>博客</title>
-</head>
-<script src="https://unpkg.com/oh-my-live2d@latest"></script>
+   <body>
+      <div id="app"></div>
+      <script type="module" src="/src/main.ts"></script>
+   </body>
 
-
-<body>
-  <div id="app"></div>
-  <script type="module" src="/src/main.ts"></script>
-</body>
-
-<script>
-  OML2D.loadOml2d({
-    models: [
-      {
-        path: 'https://model.hacxy.cn/HK416-1-normal/model.json',
-        position: [0, 60],
-        scale: 0.08,
-        stageStyle: {
-          height: 450
-        }
-
-
-
-      }
-    ]
-  });
-</script>
-
+   <script>
+      OML2D.loadOml2d({
+         models: [
+            {
+               path: 'https://model.hacxy.cn/HK416-1-normal/model.json',
+               position: [0, 60],
+               scale: 0.08,
+               stageStyle: {
+                  height: 450
+               }
+            }
+         ]
+      });
+   </script>
 </html>
