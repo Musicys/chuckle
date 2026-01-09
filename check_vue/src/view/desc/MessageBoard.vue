@@ -14,7 +14,7 @@
       <span>3评论 </span>
    </div>
 
-   <div class="pr-list" v-for="i in 3">
+   <div class="pr-list" v-for="_ in 3">
       <span style="border: none" class="pr_list_img">
          <img
             v-lazy="
@@ -36,7 +36,7 @@
          </div>
          <div>真帅</div>
          <CommentBox />
-         <div class="pr_list_two" v-for="i in 3">
+         <div class="pr_list_two" v-for="_ in 3">
             <div>
                <img
                   v-lazy="
@@ -149,7 +149,6 @@ import CommentBox from './CommentBox.vue';
 
       & > div:nth-child(1) {
          display: flex;
-
          justify-content: space-between;
          align-items: center;
          width: 100%;

@@ -11,9 +11,7 @@
          </div>
          <div class="box ml-box" ref="desc_mr">
             <div class="left-top">
-               <el-icon>
-                  <Memo /> </el-icon
-               >目录
+               <el-icon> <Memo /> </el-icon>目录
             </div>
 
             <div class="ml">

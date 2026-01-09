@@ -19,7 +19,7 @@
             "></div>
 
          <div class="but-nr">
-            <div class="cart" v-for="i in 20">
+            <div class="cart" v-for="_ in 20">
                <div class="tile">
                   %80%9a%e7%94%a8-apiresponse)，但我试了后，响应还是缺少了除data字段外的其它字段。不过思路确实是如此，封装一个统一的装饰器，简化标注操作。
                   先定义响应的dto类型，注意文件名后缀需要是 **.dto.ts**，否则

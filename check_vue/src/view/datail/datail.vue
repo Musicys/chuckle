@@ -22,7 +22,7 @@
       <div>
          <div class="dacat-time">2024</div>
          <div class="dacat">
-            <div class="dacat-cart" v-for="i in 3">
+            <div class="dacat-cart" v-for="_ in 3">
                <div class="dacat-cart-img">
                   <img
                      src="https://tse4-mm.cn.bing.net/th/id/OIP-C.i0PxkbYvoZKnJbU4U0vJHQHaEK?rs=1&pid=ImgDetMain"
