@@ -1,42 +1,32 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "strict": false, // 关闭所有严格类型检查
-    "noImplicitAny": false, // 允许隐式 any 类型
-    "noImplicitThis": false, // 允许隐式 this 类型
-    "alwaysStrict": false, // 不强制使用严格模式
-    "noImplicitReturns": false, // 不强制所有代码路径都有返回值
-    "noFallthroughCasesInSwitch": false, // 允许 switch 语句中遗漏的 case 语句
-    "skipLibCheck": true, // 跳过库文件的类型检查
-    "noUnusedLocals": false, // 允许未使用的局部变量
-    "noUnusedParameters": false, // 允许未使用的函数参数
-    "noEmitOnError": false, // 允许在有错误的情况下输出文件
-    "declaration": false,
-    "module": "ESNext",
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "preserve",
-    /* Linting */
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue"
-  ],
+   "compilerOptions": {
+      "target": "ES2020",
+      "useDefineForClassFields": true,
+      "strict": false, // 关闭所有严格类型检查
+      "noImplicitAny": false, // 允许隐式 any 类型
+      "noImplicitThis": false, // 允许隐式 this 类型
+      "alwaysStrict": false, // 不强制使用严格模式
+      "noImplicitReturns": false, // 不强制所有代码路径都有返回值
+      "noFallthroughCasesInSwitch": false, // 允许 switch 语句中遗漏的 case 语句
+      "skipLibCheck": true, // 跳过库文件的类型检查
+      "noUnusedLocals": false, // 允许未使用的局部变量
+      "noUnusedParameters": false, // 允许未使用的函数参数
+      "noEmitOnError": false, // 允许在有错误的情况下输出文件
+      "declaration": false,
+      "module": "ESNext",
+      "lib": ["ES2020", "DOM", "DOM.Iterable"],
+      /* Bundler mode */
+      "moduleResolution": "bundler",
+      "allowImportingTsExtensions": true,
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "noEmit": true,
+      "jsx": "preserve",
+      /* Linting */
+      "baseUrl": ".",
+      "paths": {
+         "@/*": ["src/*"]
+      }
+   },
+   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

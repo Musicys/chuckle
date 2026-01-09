@@ -8,15 +8,13 @@ extends baseMapper<实体类>
     .deletebyMap({age:23}   map)
     .deleteBathids(arr)
     .updateByid(实例类);
-    
+
     .seletctByid(1L)；单个数据
     .selectBatchId(arrid)返回list
     .selectMap(new map[{age:200},{"nmae":"张三"}])
     .selectList(条件构造器||null)
-    
+
     page分页功能
-    
-    
 
 Service
 
@@ -24,7 +22,6 @@ Service
 
     cout 查询总记录数
     save 添加数据
-    
 
 注解
 
@@ -32,19 +29,13 @@ Service
 
 作用在类上
 
-
-
 @TableId（value="数据库主键字段"，type=idType.auto）主键自增
 
- 指定属性是主键
-
-
+指定属性是主键
 
 @TableFeild(value="")
 
 指定属性 丰主键
-
-
 
 @TableLogic 逻辑删除
 
@@ -52,37 +43,35 @@ Service
 
 QueryWrapper
 
-eq	等于	例：eq(“name”,“张子”) ===> name = ‘张子’
+eq 等于 例：eq(“name”,“张子”) ===> name = ‘张子’
 
-ne	不等于	例：ne(“name”,“张子”) ===> name <> ‘张子’
+ne 不等于 例：ne(“name”,“张子”) ===> name <> ‘张子’
 
-gt	大于	例：gt(“age”,“18”) ===> age>18
+gt 大于 例：gt(“age”,“18”) ===> age>18
 
-lt	小于	例：lt(“age”,“18”) ===> age<18
+lt 小于 例：lt(“age”,“18”) ===> age<18
 
-between	在值1到值2之间	例：between(“age”,18,30) ===> 18<age<30’
+between 在值1到值2之间 例：between(“age”,18,30) ===> 18<age<30’
 
-like	模糊查询	例：like(“name”,“张”) ===> name like ‘%张%’
+like 模糊查询 例：like(“name”,“张”) ===> name like ‘%张%’
 
-isNull	字段为NULL	例：isNull(“name”) ===> name is null
+isNull 字段为NULL 例：isNull(“name”) ===> name is null
 
-
-
-  EQ  	equal                	等于  
-  NE  	not equal            	不等于 
-  GT  	greater than         	大于  
-  LT  	less than            	小于  
-  GE  	greater than or equal	大于等于
-  LE  	less than or equal   	小于等于
+EQ equal 等于  
+ NE not equal 不等于
+GT greater than 大于  
+ LT less than 小于  
+ GE greater than or equal 大于等于
+LE less than or equal 小于等于
 
 插件
 
     @Configuration
-    
+
     public class MybatisPlusConfig {
         @Bean
         public MybatisPlusInterceptor mybatisPlusInterceptor(){
-    
+
             MybatisPlusInterceptor interceptor=new MybatisPlusInterceptor();
             //分页插件
             interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
@@ -91,7 +80,6 @@ isNull	字段为NULL	例：isNull(“name”) ===> name is null
             return  interceptor;
         }
     }
-    
 
 分页插件
 
@@ -107,16 +95,8 @@ isNull	字段为NULL	例：isNull(“name”) ===> name is null
 
 版本号注解
 
-
-
 通用枚举
-
-
-
-
 
 代码生成器
 
 快速搭建模板
-
-

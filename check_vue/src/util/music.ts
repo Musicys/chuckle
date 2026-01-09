@@ -1,6 +1,3 @@
+import { ref } from 'vue';
 
-import {ref} from "vue"
-
-export const music_data=ref({
- 
-})
+export const music_data = ref({});
