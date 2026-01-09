@@ -4,6 +4,7 @@ import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import { resolve } from 'path';
+import eslintPlugin from 'vite-plugin-eslint';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -25,8 +26,9 @@ export default defineConfig({
 
    plugins: [
       vue(),
-      ,
-      // ...
+      eslintPlugin({
+         include: ['src/**/*.{vue,js,ts,jsx,tsx}']
+      }),
       AutoImport({
          resolvers: [ElementPlusResolver()]
       }),

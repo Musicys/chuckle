@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, Ref } from 'vue';
+import { ref, Ref } from 'vue';
 import debounce from 'lodash/debounce';
 let PCWiht: number = 928;
 

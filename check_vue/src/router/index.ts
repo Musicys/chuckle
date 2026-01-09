@@ -2,7 +2,7 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
 
-import { ref, Ref } from 'vue';
+import { ref } from 'vue';
 
 import routes from './router';
 export const router = createRouter({
@@ -33,8 +33,6 @@ router.beforeEach((to, from, next) => {
 
 export const Isindex = ref(true);
 
-router.afterEach((to, from) => {
-   // console.log(to, from)
-
+router.afterEach(() => {
    console.log('afterEach');
 });

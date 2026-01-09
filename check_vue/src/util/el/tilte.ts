@@ -6,6 +6,6 @@ export const open = str => {
       // if you want to disable its autofocus
       // autofocus: false,
       confirmButtonText: '确定',
-      callback: (action: Action) => {}
+      callback: () => {}
    });
 };

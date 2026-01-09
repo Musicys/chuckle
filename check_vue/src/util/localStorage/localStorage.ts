@@ -4,7 +4,7 @@ interface localhost {
 }
 
 const localconfig: localhost = {
-   APlOSTUSERXRSEQR: `APlOSTUSERXRSEQR`
+   APlOSTUSERXRSEQR: 'APlOSTUSERXRSEQR'
 };
 
 const readLost: (stirng) => any[] = tilte => {

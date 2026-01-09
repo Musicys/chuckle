@@ -44,6 +44,7 @@ onMounted(() => {
    height: 100%;
 
    position: relative;
+
    .main {
       position: absolute;
       left: 0;

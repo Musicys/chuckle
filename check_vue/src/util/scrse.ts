@@ -1,4 +1,4 @@
-import { ref, Ref, onMounted } from 'vue';
+import { ref, Ref } from 'vue';
 
 export const desc_mr: Ref<Document> = ref();
 

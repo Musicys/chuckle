@@ -74,10 +74,6 @@ echarts.use([
    CanvasRenderer
 ]);
 
-const option: ECOption = {
-   // ...
-};
-
 const app = createApp(App);
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
