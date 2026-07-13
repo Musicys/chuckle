@@ -71,7 +71,9 @@
 </template>
 
 <script setup lang="ts">
-import { music } from '@/util/user';
+import { storeToRefs } from 'pinia';
+import { useUserStore } from '@/store/user';
+const { user: music } = storeToRefs(useUserStore());
 </script>
 
 <style scoped>

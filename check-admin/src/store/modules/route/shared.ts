@@ -292,6 +292,10 @@ export function getBreadcrumbsByRoute(
     }
 
     if (menu.key === activeKey) {
+      if (!key) {
+        return [transformMenuToBreadcrumb(menu)];
+      }
+
       const ROUTE_DEGREE_SPLITTER = '_';
 
       const parentKey = key.split(ROUTE_DEGREE_SPLITTER).slice(0, -1).join(ROUTE_DEGREE_SPLITTER);

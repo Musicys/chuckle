@@ -4,7 +4,6 @@ import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import { resolve } from 'path';
-import eslintPlugin from 'vite-plugin-eslint';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -26,9 +25,6 @@ export default defineConfig({
 
    plugins: [
       vue(),
-      eslintPlugin({
-         include: ['src/**/*.{vue,js,ts,jsx,tsx}']
-      }),
       AutoImport({
          resolvers: [ElementPlusResolver()]
       }),
@@ -45,9 +41,11 @@ export default defineConfig({
       }
    },
    server: {
+      open: true,
+      port: 8084,
       proxy: {
          '/api': {
-            target: 'http://localhost:8087/', //跨域地址
+            target: 'http://localhost:8088/api', //跨域地址
             changeOrigin: true, //支持跨域
             rewrite: path => path.replace(/^\/api/, '') //重写路径,替换/api
          }

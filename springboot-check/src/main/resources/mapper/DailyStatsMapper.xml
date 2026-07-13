@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yupi.springbootinit.mapper.DailyStatsMapper">
+
+    <resultMap id="BaseResultMap" type="com.yupi.springbootinit.model.domain.DailyStats">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="statDate" column="stat_date" jdbcType="DATE"/>
+            <result property="pv" column="pv" jdbcType="INTEGER"/>
+            <result property="uv" column="uv" jdbcType="INTEGER"/>
+            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+            <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,stat_date,pv,
+        uv,created_at,updated_at
+    </sql>
+</mapper>

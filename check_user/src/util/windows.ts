@@ -42,5 +42,4 @@ console.log('开启监听');
 
 window.addEventListener('resize', handleResize);
 
-// 在组件卸载时移除事件监听
 // window.removeEventListener('resize', handleResize);

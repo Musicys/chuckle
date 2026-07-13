@@ -1,17 +1,17 @@
-import { computed, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import { useContext } from '@sa/hooks';
-import type { RouteKey } from '@elegant-router/types';
-import { useRouteStore } from '@/store/modules/route';
-import { useThemeStore } from '@/store/modules/theme';
-import { useRouterPush } from '@/hooks/common/router';
+import { computed, ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { useContext } from "@sa/hooks";
+import type { RouteKey } from "@elegant-router/types";
+import { useRouteStore } from "@/store/modules/route";
+import { useThemeStore } from "@/store/modules/theme";
+import { useRouterPush } from "@/hooks/common/router";
 
 export const [provideMixMenuContext, useMixMenuContext] = useContext(
   {
-    name: 'MixMenu',
-    key: Symbol.for('MixMenu')
+    name: "MixMenu",
+    key: Symbol.for("MixMenu"),
   },
-  useMixMenu
+  useMixMenu,
 );
 
 function useMixMenu() {
@@ -24,21 +24,25 @@ function useMixMenu() {
   const allMenus = computed<App.Global.Menu[]>(() => routeStore.menus);
 
   const firstLevelMenus = computed<App.Global.Menu[]>(() =>
-    routeStore.menus.map(menu => {
+    routeStore.menus.map((menu) => {
       const { children: _, ...rest } = menu;
 
       return rest;
-    })
+    }),
   );
 
-  const activeFirstLevelMenuKey = ref('');
+  const activeFirstLevelMenuKey = ref("");
 
   function setActiveFirstLevelMenuKey(key: string) {
     activeFirstLevelMenuKey.value = key;
   }
 
   function getActiveFirstLevelMenuKey() {
-    const [firstLevelRouteName] = selectedKey.value.split('_');
+    if (!selectedKey.value) {
+      setActiveFirstLevelMenuKey("");
+      return;
+    }
+    const [firstLevelRouteName] = selectedKey.value.split("_");
 
     setActiveFirstLevelMenuKey(firstLevelRouteName);
   }
@@ -48,7 +52,9 @@ function useMixMenu() {
       return false;
     }
 
-    const findItem = allMenus.value.find(item => item.key === activeFirstLevelMenuKey.value);
+    const findItem = allMenus.value.find(
+      (item) => item.key === activeFirstLevelMenuKey.value,
+    );
 
     return Boolean(findItem?.children?.length);
   });
@@ -62,20 +68,26 @@ function useMixMenu() {
   }
 
   const secondLevelMenus = computed<App.Global.Menu[]>(
-    () => allMenus.value.find(menu => menu.key === activeFirstLevelMenuKey.value)?.children || []
+    () =>
+      allMenus.value.find((menu) => menu.key === activeFirstLevelMenuKey.value)
+        ?.children || [],
   );
 
-  const activeSecondLevelMenuKey = ref('');
+  const activeSecondLevelMenuKey = ref("");
 
   function setActiveSecondLevelMenuKey(key: string) {
     activeSecondLevelMenuKey.value = key;
   }
 
   function getActiveSecondLevelMenuKey() {
-    const keys = selectedKey.value.split('_');
+    if (!selectedKey.value) {
+      setActiveSecondLevelMenuKey("");
+      return;
+    }
+    const keys = selectedKey.value.split("_");
 
     if (keys.length < 2) {
-      setActiveSecondLevelMenuKey('');
+      setActiveSecondLevelMenuKey("");
       return;
     }
 
@@ -91,7 +103,9 @@ function useMixMenu() {
       return false;
     }
 
-    const findItem = secondLevelMenus.value.find(item => item.key === activeSecondLevelMenuKey.value);
+    const findItem = secondLevelMenus.value.find(
+      (item) => item.key === activeSecondLevelMenuKey.value,
+    );
 
     return Boolean(findItem?.children?.length);
   });
@@ -105,13 +119,19 @@ function useMixMenu() {
   }
 
   const childLevelMenus = computed<App.Global.Menu[]>(
-    () => secondLevelMenus.value.find(menu => menu.key === activeSecondLevelMenuKey.value)?.children || []
+    () =>
+      secondLevelMenus.value.find(
+        (menu) => menu.key === activeSecondLevelMenuKey.value,
+      )?.children || [],
   );
 
   const hasChildLevelMenus = computed(() => childLevelMenus.value.length > 0);
 
   function getDeepestLevelMenuKey(): RouteKey | null {
-    if (!secondLevelMenus.value.length || !themeStore.sider.autoSelectFirstMenu) {
+    if (
+      !secondLevelMenus.value.length ||
+      !themeStore.sider.autoSelectFirstMenu
+    ) {
       return null;
     }
 
@@ -149,7 +169,7 @@ function useMixMenu() {
         getActiveSecondLevelMenuKey();
       }
     },
-    { immediate: true }
+    { immediate: true },
   );
 
   return {
@@ -168,7 +188,7 @@ function useMixMenu() {
     childLevelMenus,
     hasChildLevelMenus,
     getDeepestLevelMenuKey,
-    activeDeepestLevelMenuKey
+    activeDeepestLevelMenuKey,
   };
 }
 
@@ -185,6 +205,6 @@ export function useMenu() {
   });
 
   return {
-    selectedKey
+    selectedKey,
   };
 }

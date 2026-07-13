@@ -21,7 +21,9 @@
 </template>
 
 <script setup lang="ts">
-import { home_data } from '@/util/home';
+import { storeToRefs } from 'pinia';
+import { useHomeStore } from '@/store/home';
+const { home_data } = storeToRefs(useHomeStore());
 </script>
 
 <style lang="scss" scoped>

@@ -32,7 +32,7 @@ spring:
   # DataSource Config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/voluntary_db
+    url: jdbc:mysql://localhost:3306/check_blog
     username: root
     password: ${DB_PASSWORD:123456}
   #/

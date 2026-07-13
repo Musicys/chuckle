@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yupi.springbootinit.mapper.BloggerInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.yupi.springbootinit.model.domain.BloggerInfo">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+            <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+            <result property="blogTitle" column="blog_title" jdbcType="VARCHAR"/>
+            <result property="qq" column="qq" jdbcType="VARCHAR"/>
+            <result property="github" column="github" jdbcType="VARCHAR"/>
+            <result property="gitee" column="gitee" jdbcType="VARCHAR"/>
+            <result property="bilibili" column="bilibili" jdbcType="VARCHAR"/>
+            <result property="birthDate" column="birth_date" jdbcType="DATE"/>
+            <result property="gender" column="gender" jdbcType="TINYINT"/>
+            <result property="occupation" column="occupation" jdbcType="VARCHAR"/>
+            <result property="tags" column="tags" jdbcType="VARCHAR"/>
+            <result property="hobbies" column="hobbies" jdbcType="VARCHAR"/>
+            <result property="games" column="games" jdbcType="VARCHAR"/>
+            <result property="latitude" column="latitude" jdbcType="DECIMAL"/>
+            <result property="longitude" column="longitude" jdbcType="DECIMAL"/>
+            <result property="address" column="address" jdbcType="VARCHAR"/>
+            <result property="announcement" column="announcement" jdbcType="VARCHAR"/>
+            <result property="config" column="config" jdbcType="VARCHAR"/>
+            <result property="isUsed" column="is_used" jdbcType="TINYINT"/>
+            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+            <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,avatar,nickname,
+        blog_title,qq,github,
+        gitee,bilibili,birth_date,
+        gender,occupation,tags,
+        hobbies,games,latitude,
+        longitude,address,announcement,
+        config,is_used,created_at,
+        updated_at
+    </sql>
+</mapper>

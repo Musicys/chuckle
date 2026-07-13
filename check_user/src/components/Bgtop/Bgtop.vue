@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import util from '@/util/funtion';
+import util from '@/util/function';
+import { storeToRefs } from 'pinia';
+import { useAppStore } from '@/store';
 import { Ispc } from '@/util/windows';
-import { handleClose } from '@/util/slot';
 import Pop from '@/components/pop.vue';
 import { IsScroll } from '@/util/scrse';
-import { startpop, Ispop } from '@/util/com/pop';
+const appStore = useAppStore();
+const { Ispop } = storeToRefs(appStore);
+const { handleClose, startpop } = appStore;
 // IsTab 下滑css
 
 const IsTab = ref(true);
@@ -66,7 +69,6 @@ const leave = (el, done) => {
             <el-icon class="router">
                <Operation />
             </el-icon>
-
             <div
                class="title"
                @click="util.start()"
@@ -114,7 +116,7 @@ const leave = (el, done) => {
                   <span>留言板</span>
                </div>
                <!--  -->
-               <div class="top-sc" @click="util.muisc()">
+               <div class="top-sc" @click="util.music()">
                   <svg class="icon" aria-hidden="true">
                      <use xlink:href="#icon-rengongzhinengjiqiren"></use>
                   </svg>

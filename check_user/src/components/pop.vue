@@ -40,7 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { endpop } from '@/util/com/pop';
+import { useAppStore } from '@/store';
+const { endpop } = useAppStore();
 </script>
 
 <style lang="scss" scoped>

@@ -40,6 +40,33 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'article',
+    path: '/article',
+    component: 'layout.base$view.article',
+    meta: {
+      title: 'article',
+      i18nKey: 'route.article'
+    }
+  },
+  {
+    name: 'category',
+    path: '/category',
+    component: 'layout.base$view.category',
+    meta: {
+      title: 'category',
+      i18nKey: 'route.category'
+    }
+  },
+  {
+    name: 'comment',
+    path: '/comment',
+    component: 'layout.base$view.comment',
+    meta: {
+      title: 'comment',
+      i18nKey: 'route.comment'
+    }
+  },
+  {
     name: 'home',
     path: '/home',
     component: 'layout.base$view.home',
@@ -73,6 +100,15 @@ export const generatedRoutes: GeneratedRoute[] = [
       i18nKey: 'route.login',
       constant: true,
       hideInMenu: true
+    }
+  },
+  {
+    name: 'tag',
+    path: '/tag',
+    component: 'layout.base$view.tag',
+    meta: {
+      title: 'tag',
+      i18nKey: 'route.tag'
     }
   }
 ];

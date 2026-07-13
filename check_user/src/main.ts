@@ -1,6 +1,8 @@
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import './style.scss';
 import { router } from './router';
+import './permission';
 import App from '@/App.vue';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 //阿里图标
@@ -74,7 +76,9 @@ echarts.use([
    CanvasRenderer
 ]);
 
+const pinia = createPinia();
 const app = createApp(App);
+app.use(pinia);
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
    app.component(key, component);

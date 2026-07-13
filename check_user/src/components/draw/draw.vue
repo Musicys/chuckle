@@ -1,7 +1,10 @@
 <script lang="ts" setup>
-import { drawer } from '@/util/slot';
-import { music } from '@/util/user';
-import util from '@/util/funtion';
+import { storeToRefs } from 'pinia';
+import { useAppStore } from '@/store';
+import { useUserStore } from '@/store/user';
+import util from '@/util/function';
+const { drawer } = storeToRefs(useAppStore());
+const { user: music } = storeToRefs(useUserStore());
 </script>
 
 <template>
@@ -92,7 +95,7 @@ import util from '@/util/funtion';
                </svg>
                <span>留言板</span>
             </el-menu-item>
-            <el-menu-item index="4" @click="util.muisc">
+            <el-menu-item index="4" @click="util.music">
                <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-rengongzhinengjiqiren"></use>
                </svg>

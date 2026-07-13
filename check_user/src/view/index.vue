@@ -1,29 +1,28 @@
 <script setup lang="ts">
 import Bgtop from '@/components/Bgtop/Bgtop.vue';
-
-import { Isindex } from '@/router';
+import { storeToRefs } from 'pinia';
+import { useAppStore } from '@/store';
+const { Isindex } = storeToRefs(useAppStore());
 //监视scroll组件
 import Monitor from '@/components/monitor/monitor.vue';
 </script>
 
 <template>
    <!-- 头 -->
-
-   <aPlayer></aPlayer>
-
-   <Bgtop></Bgtop>
-   <!-- 一级路由+路由切换动画 -->
-
-   <Monitor></Monitor>
-   <div class="box">
-      <transition name="slide-fade">
-         <keep-alive>
-            <router-view v-show="Isindex" />
-         </keep-alive>
-      </transition>
+   <div class="page" style="height: 100vh; overflow: auto">
+      <aPlayer></aPlayer>
+      <Bgtop></Bgtop>
+      <!-- 一级路由+路由切换动画 -->
+      <Monitor></Monitor>
+      <div class="box">
+         <transition name="slide-fade">
+            <keep-alive>
+               <router-view v-show="Isindex" />
+            </keep-alive>
+         </transition>
+      </div>
+      <Monitor />
    </div>
-   <Monitor />
-
    <!-- 公共组件 -->
 </template>
 
@@ -50,6 +49,7 @@ import Monitor from '@/components/monitor/monitor.vue';
    max-width: 1300px;
    font-family: 'MyCustomFonts', sans-serif;
    padding-bottom: 50px;
+   margin-top: 50px;
 
    opacity: 0.9;
 }

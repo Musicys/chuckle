@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import index from '@/view/index.vue';
 import Lloding from '@/components/lodding/lloding.vue';
-import { Isindex } from '@/router/index';
+import { storeToRefs } from 'pinia';
+import { useAppStore } from '@/store';
+const { Isindex } = storeToRefs(useAppStore());
 import Draw from '@/components/draw/draw.vue';
 import '@/util/windows';
-
 import { handleScroll } from '@/util/scrse';
 import { onMounted } from 'vue';
+import { useUserStore } from '@/store/user';
 
-onMounted(() => {
+onMounted(async () => {
    console.log('欢迎来到我的博客');
+   useUserStore().fetchBloggerInfo();
 });
 </script>
 
 <template>
    <Draw />
    <div class="page">
-      <div class="page-zz" @scroll="handleScroll">
+      <div class="page-zqdongz" @scroll="handleScroll">
          <index></index>
       </div>
    </div>
@@ -43,7 +46,6 @@ onMounted(() => {
             /* 增大网格线宽度 */ rgba(0, 0, 0, 0.5) 10px,
             /* 增加网格线的颜色对比 */ rgba(0, 0, 0, 0.5) 11px
          );
-   // background-image: url("https://img.yanlutong.com/uploadimg/ico/2020/1222/1608630331988227.jpg");
 
    background-size:
       100% 100%,
@@ -59,7 +61,7 @@ onMounted(() => {
    background-attachment: fixed;
 
    /* 背景图片固定在视口，不随内容滚动 */
-   .page-zz {
+   .page-zqdongz {
       background: var(--page);
       width: 100vw;
       overflow-y: auto;
