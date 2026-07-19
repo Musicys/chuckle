@@ -12,8 +12,10 @@
 - [8. 评论管理模块](#8-评论管理模块)
 - [9. 标签管理模块](#9-标签管理模块)
 - [10. 分类管理模块](#10-分类管理模块)
-- [11. API 命名规范](#11-api-命名规范)
-- [12. 错误处理机制](#12-错误处理机制)
+- [11. 博主信息管理模块](#11-博主信息管理模块)
+- [12. 图片管理模块](#12-图片管理模块)
+- [13. API 命名规范](#13-api-命名规范)
+- [14. 错误处理机制](#14-错误处理机制)
 
 ---
 
@@ -565,7 +567,254 @@ interface CategoryListResult {
 
 ---
 
-## 11. API 命名规范
+## 11. 博主信息管理模块
+
+### 接口列表
+
+对接后端接口文档 `springboot-check/doc/admin_api/blogger-info.md`
+
+| 接口         | 路径                     | 方法 | 文件         |
+| ------------ | ------------------------ | ---- | ------------ |
+| 新增博主信息 | `/admin/blogger/add`     | POST | `blogger.ts` |
+| 更新博主信息 | `/admin/blogger/update`  | POST | `blogger.ts` |
+| 获取博主详情 | `/admin/blogger/get`     | GET  | `blogger.ts` |
+| 分页查询列表 | `/admin/blogger/list`    | POST | `blogger.ts` |
+| 删除博主信息 | `/admin/blogger/delete`  | POST | `blogger.ts` |
+| 设置启用状态 | `/admin/blogger/setUsed` | POST | `blogger.ts` |
+
+### 请求参数
+
+**新增博主信息**
+
+```typescript
+interface AddBloggerParams {
+  avatar?: string; // 头像URL
+  nickname: string; // 昵称（必填）
+  blogTitle?: string; // 博客标题
+  qq?: string; // QQ邮箱
+  github?: string; // GitHub地址
+  gitee?: string; // Gitee地址
+  bilibili?: string; // B站地址
+  birthDate?: string; // 出生日期
+  gender?: number; // 性别（1=男 0=女）
+  occupation?: string; // 职业
+  tags?: string; // 标签JSON数组
+  hobbies?: string; // 爱好JSON数组
+  games?: string; // 游戏JSON数组
+  latitude?: number; // 纬度
+  longitude?: number; // 经度
+  address?: string; // 地址
+  announcement?: string; // 站点公告
+  config?: string; // 配置JSON
+}
+```
+
+**更新博主信息**
+
+```typescript
+interface UpdateBloggerParams {
+  id: number; // 博主ID（必填）
+  avatar?: string; // 头像URL
+  nickname?: string; // 昵称
+  blogTitle?: string; // 博客标题
+  qq?: string; // QQ邮箱
+  github?: string; // GitHub地址
+  gitee?: string; // Gitee地址
+  bilibili?: string; // B站地址
+  birthDate?: string; // 出生日期
+  gender?: number; // 性别
+  occupation?: string; // 职业
+  tags?: string; // 标签JSON数组
+  hobbies?: string; // 爱好JSON数组
+  games?: string; // 游戏JSON数组
+  latitude?: number; // 纬度
+  longitude?: number; // 经度
+  address?: string; // 地址
+  announcement?: string; // 站点公告
+  config?: string; // 配置JSON
+}
+```
+
+**分页查询**
+
+```typescript
+interface BloggerListParams {
+  current?: number; // 当前页（默认1）
+  pageSize?: number; // 每页条数（默认10）
+  id?: number; // 主键精确匹配
+  nickname?: string; // 昵称模糊搜索
+  blogTitle?: string; // 博客标题模糊搜索
+  isUsed?: number; // 是否启用筛选（0=不使用 1=使用）
+}
+```
+
+### 响应结构
+
+**博主信息**
+
+```typescript
+interface BloggerInfo {
+  id: number; // 主键ID
+  avatar: string; // 头像URL
+  nickname: string; // 昵称
+  blogTitle: string; // 博客标题
+  qq: string; // QQ邮箱
+  github: string; // GitHub地址
+  gitee: string; // Gitee地址
+  bilibili: string; // B站地址
+  birthDate: string; // 出生日期
+  gender: number; // 性别（1=男 0=女）
+  occupation: string; // 职业
+  tags: string; // 标签JSON数组
+  hobbies: string; // 爱好JSON数组
+  games: string; // 游戏JSON数组
+  latitude: number; // 纬度
+  longitude: number; // 经度
+  address: string; // 地址
+  announcement: string; // 站点公告
+  config: string; // 配置JSON
+  isUsed: number; // 是否启用（0=不使用 1=使用）
+  createdAt: string; // 创建时间
+  updatedAt: string; // 更新时间
+}
+```
+
+**分页查询结果**
+
+```typescript
+interface BloggerListResult {
+  records: BloggerInfo[]; // 博主信息列表
+  total: number; // 总条数
+  current: number; // 当前页
+  size: number; // 每页条数
+}
+```
+
+---
+
+## 12. 图片管理模块
+
+### 接口列表
+
+对接后端接口文档 `springboot-check/doc/admin_api/images.md`
+
+| 接口         | 路径                  | 方法 | 文件       |
+| ------------ | --------------------- | ---- | ---------- |
+| 上传图片     | `/admin/image/upload` | POST | `image.ts` |
+| 更新图片信息 | `/admin/image/update` | POST | `image.ts` |
+| 获取图片详情 | `/admin/image/get`    | GET  | `image.ts` |
+| 分页查询列表 | `/admin/image/list`   | POST | `image.ts` |
+| 删除图片     | `/admin/image/delete` | POST | `image.ts` |
+
+### 请求参数
+
+**上传图片**（multipart/form-data）
+
+| 字段   | 类型   | 必填 | 说明                                               |
+| ------ | ------ | ---- | -------------------------------------------------- |
+| file   | File   | 是   | 上传的图片文件                                     |
+| source | string | 否   | 图片来源，默认 `blog`（`article`/`avatar`/`blog`） |
+| remark | string | 否   | 备注                                               |
+
+**更新图片信息**
+
+```typescript
+interface UpdateImageParams {
+  id: number; // 图片ID（必填）
+  remark?: string; // 备注
+}
+```
+
+**分页查询**
+
+```typescript
+interface ImageListParams {
+  current?: number; // 当前页（默认1）
+  pageSize?: number; // 每页条数（默认10）
+  originalName?: string; // 原始文件名模糊搜索
+  fileType?: string; // 文件类型精确匹配
+  source?: string; // 来源精确匹配
+}
+```
+
+### 响应结构
+
+**图片信息**
+
+```typescript
+interface ImageInfo {
+  id: number; // 主键ID
+  originalName: string; // 原始文件名
+  url: string; // 图片URL
+  storagePath?: string; // 存储路径
+  fileSize: number; // 文件大小（字节）
+  fileType: string; // 文件类型
+  width: number; // 图片宽度
+  height: number; // 图片高度
+  md5?: string; // MD5值（去重）
+  source: string; // 来源
+  remark: string; // 备注
+  createdAt: string; // 创建时间
+  updatedAt?: string; // 更新时间
+}
+```
+
+**分页查询结果**
+
+```typescript
+interface ImageListResult {
+  records: ImageInfo[]; // 图片列表
+  total: number; // 总条数
+  current: number; // 当前页
+  size: number; // 每页条数
+}
+```
+
+### 图床组件
+
+**ImageSelector 组件**
+
+路径：`src/components/common/image-selector.vue`
+
+**Props**
+
+| 属性       | 类型    | 默认值 | 说明                                             |
+| ---------- | ------- | ------ | ------------------------------------------------ |
+| modelValue | string  | -      | 绑定值：单选为URL字符串，多选为URL数组JSON字符串 |
+| multiple   | boolean | false  | 是否多选模式                                     |
+| source     | string  | -      | 图片来源筛选（`blog`/`article`/`avatar`）        |
+
+**使用示例**
+
+```vue
+<template>
+  <ImageSelector v-model="imageUrl" :multiple="false" source="article" />
+</template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import ImageSelector from "@/components/common/image-selector.vue";
+
+const imageUrl = ref("");
+</script>
+```
+
+```vue
+<template>
+  <ImageSelector v-model="imageUrls" :multiple="true" source="blog" />
+</template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import ImageSelector from "@/components/common/image-selector.vue";
+
+const imageUrls = ref('["url1", "url2"]');
+</script>
+```
+
+---
+
+## 13. API 命名规范
 
 ### 函数命名
 
@@ -600,7 +849,7 @@ userManagement.ts;
 
 ---
 
-## 12. 错误处理机制
+## 14. 错误处理机制
 
 ### 请求拦截
 
@@ -640,7 +889,7 @@ export function showErrorMsg(state, message) {
 
 ---
 
-## 13. 页面开发规范
+## 15. 页面开发规范
 
 ### 页面组件结构
 

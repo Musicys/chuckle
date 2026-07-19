@@ -1,10 +1,11 @@
 <template>
    <div class="pr">
       <div style="margin-bottom: 1em">
-         <span> 名称:music </span>
-         <span> 邮箱 :REDACTED_QQ_EMAIL</span>
+         <span> 名称:{{ nickname }} </span>
+         <span> 邮箱 :{{ email }}</span>
       </div>
       <textarea
+         v-model="content"
          @input="updateCharacterCount"
          placeholder="来评论交流吧,博主可能会邮箱回复哦！"
          name=""
@@ -12,7 +13,7 @@
          id="commentTextarea"></textarea>
       <div class="pr_but" style="justify-content: end">
          <span>{{ characterCount }} / 400 字</span>
-         <button class="but">提交</button>
+         <button class="but" @click="handleSubmit">提交</button>
       </div>
    </div>
 </template>
@@ -20,13 +21,37 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-// 定义一个响应式变量来存储字数
+const props = defineProps<{
+   nickname?: string;
+   email?: string;
+}>();
+
+const emit = defineEmits<{
+   (e: 'submit', data: { nickname: string; email?: string; content: string }): void;
+}>();
+
+const nickname = ref(props.nickname || '游客');
+const email = ref(props.email || '');
+const content = ref('');
 const characterCount = ref(0);
 
-// 定义一个函数来更新字数
 const updateCharacterCount = (event: Event) => {
    const textarea = event.target as HTMLTextAreaElement;
    characterCount.value = textarea.value.length;
+};
+
+const handleSubmit = () => {
+   if (!content.value.trim()) {
+      alert('请输入评论内容');
+      return;
+   }
+   emit('submit', {
+      nickname: nickname.value,
+      email: email.value || undefined,
+      content: content.value
+   });
+   content.value = '';
+   characterCount.value = 0;
 };
 </script>
 

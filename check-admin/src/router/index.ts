@@ -40,6 +40,23 @@ export const customRoutes: RouteRecordRaw[] = [
       },
     ],
   },
+  {
+    name: "blogger_edit",
+    path: "/blogger/edit/:id?",
+    component: BaseLayout,
+    meta: {
+      title: "blogger-edit",
+      i18nKey: "route.blogger",
+      hideInMenu: true,
+      activeMenu: "blogger",
+    },
+    children: [
+      {
+        path: "",
+        component: () => import("@/views/blogger/edit.vue"),
+      },
+    ],
+  },
 ];
 
 export const router = createRouter({

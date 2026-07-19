@@ -235,6 +235,7 @@ const local: App.I18n.Schema = {
     comment: "评论管理",
     tag: "标签管理",
     category: "分类管理",
+    blogger: "博主信息",
   },
   page: {
     login: {

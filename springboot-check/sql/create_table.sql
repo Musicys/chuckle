@@ -60,6 +60,7 @@ CREATE TABLE `articles` (
     `title`         VARCHAR(200)  NOT NULL COMMENT '文章标题',
     `content`       LONGTEXT      NOT NULL COMMENT 'Markdown 正文',
     `summary`       VARCHAR(500)  NOT NULL DEFAULT '' COMMENT '文章简介',
+    `cover`         VARCHAR(500)  NOT NULL DEFAULT '' COMMENT '封面URL',
     `category_id`   INT UNSIGNED  DEFAULT NULL COMMENT '分类ID',
     `word_count`    INT UNSIGNED  NOT NULL DEFAULT 0 COMMENT '字数',
     `read_count`    INT UNSIGNED  NOT NULL DEFAULT 0 COMMENT '阅读量（PV）',
@@ -166,3 +167,9 @@ CREATE TABLE `system_settings` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_key` (`setting_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统设置表';
+
+
+-- 11. 图床文件表（图片管理）
+
+
+

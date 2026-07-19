@@ -48,7 +48,7 @@ const detail = (id: string | number): void => {
 };
 
 const desc = (id: string | number): void => {
-   go('/desc', { query: { id: id + '' } });
+   go('/desc/' + id);
 };
 
 const descMl = (str: string): void => {

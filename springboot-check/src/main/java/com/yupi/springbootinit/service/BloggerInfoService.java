@@ -1,6 +1,7 @@
 package com.yupi.springbootinit.service;
 
 import com.yupi.springbootinit.model.domain.BloggerInfo;
+import com.yupi.springbootinit.model.vo.HomepageVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -17,4 +18,10 @@ public interface BloggerInfoService extends IService<BloggerInfo> {
      * @param id 要启用的博主信息ID
      */
     void setUsed(Integer id);
+
+    /**
+     * 获取首页聚合数据
+     * 包含：最近文章、标签统计、按年文章统计、站点概览
+     */
+    HomepageVO getHomepage();
 }

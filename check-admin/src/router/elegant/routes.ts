@@ -49,6 +49,15 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'blogger',
+    path: '/blogger',
+    component: 'layout.base$view.blogger',
+    meta: {
+      title: 'blogger',
+      i18nKey: 'route.blogger'
+    }
+  },
+  {
     name: 'category',
     path: '/category',
     component: 'layout.base$view.category',

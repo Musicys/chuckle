@@ -8,7 +8,7 @@
       </el-icon>
    </div>
    <div>
-      <CommentBox />
+      <CommentBox @submit="handleSubmit" />
    </div>
    <div class="tilte">
       <span>3评论 </span>
@@ -68,6 +68,18 @@
 
 <script setup lang="ts">
 import CommentBox from './CommentBox.vue';
+
+defineProps<{
+   articleId?: number;
+}>();
+
+const emit = defineEmits<{
+   (e: 'submit', data: { nickname: string; email?: string; content: string }): void;
+}>();
+
+const handleSubmit = (data: { nickname: string; email?: string; content: string }) => {
+   emit('submit', data);
+};
 </script>
 
 <style lang="scss" scoped>

@@ -122,6 +122,24 @@ async function handleDelete(row: Api.Article.ArticleInfo) {
 }
 
 const columns = [
+  {
+    title: "封面",
+    key: "cover",
+    width: 80,
+    render(row: Api.Article.ArticleInfo) {
+      return row.cover
+        ? h("img", {
+            src: row.cover,
+            style: {
+              width: "60px",
+              height: "40px",
+              objectFit: "cover",
+              borderRadius: "4px",
+            },
+          })
+        : "-";
+    },
+  },
   { title: "标题", key: "title", ellipsis: true },
   { title: "分类", key: "categoryName" },
   {

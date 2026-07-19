@@ -86,9 +86,13 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.use(router);
 
 app.use(hljsVuePlugin);
+import loading from './static/lding.gif';
 app.use(VueLazyload, {
-   loading: 'https://img.zcool.cn/community/0115bb5715c7356ac725134349d24b.gif', // 加载中的图片
-   error: 'https://img.zcool.cn/community/0115bb5715c7356ac725134349d24b.gif' // 加载失败的图片
+   loading,
+   error: loading,
+   throttleWait: 200,
+   preLoad: 0.1,
+   attempt: 1
 });
 
 app.mount('#app');

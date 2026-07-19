@@ -2,6 +2,7 @@
    <div class="mackpage">
       <img
          v-lazy="
+            article?.cover ||
             'https://pic1.zhimg.com/v2-4fd3f2bb57d4bcc195e3d3cf092a7dd7_r.jpg'
          "
          alt="" />
@@ -12,13 +13,14 @@
                <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-yuedu"></use>
                </svg>
-
-               学习笔记
+               {{ article?.category?.name || '学习笔记' }}
             </div>
-            <div style="margin-left: 1em">#备忘录</div>
+            <div style="margin-left: 1em">
+               #{{ article?.tags?.[0]?.name || '备忘录' }}
+            </div>
          </div>
          <div>
-            编码备忘录
+            {{ article?.title || '编码备忘录' }}
 
             <svg class="icon" aria-hidden="true">
                <use xlink:href="#icon-lianjie2"></use>
@@ -30,14 +32,14 @@
                   <svg class="icon" aria-hidden="true">
                      <use xlink:href="#icon-shalou"></use>
                   </svg>
-                  发表于 :2023-10-18
+                  发表于: {{ article?.createdAt || '2023-10-18' }}
                </div>
 
                <div>
                   <svg class="icon" aria-hidden="true">
                      <use xlink:href="#icon-bi"></use>
                   </svg>
-                  更新于2023-10-18
+                  更新于 {{ article?.updatedAt || '2023-10-18' }}
                </div>
             </div>
 
@@ -46,26 +48,26 @@
                   <svg class="icon" aria-hidden="true">
                      <use xlink:href="#icon-shujutongji"></use>
                   </svg>
-                  字数总计:1.4k
+                  字数总计:{{ formatNumber(article?.wordCount || 0) }}
                </div>
                <div>
                   <svg class="icon" aria-hidden="true">
                      <use xlink:href="#icon-shujutongji"></use>
                   </svg>
-                  阅读时长:6分钟
+                  阅读时长:{{ Math.ceil((article?.wordCount || 0) / 300) }}分钟
                </div>
 
                <div>
                   <svg class="icon" aria-hidden="true">
                      <use xlink:href="#icon-icons_yueduliang"></use>
                   </svg>
-                  阅读量:1108
+                  阅读量:{{ article?.readCount || 0 }}
                </div>
                <div>
                   <svg class="icon" aria-hidden="true">
                      <use xlink:href="#icon-pinglun"></use>
                   </svg>
-                  评论数:3
+                  评论数:{{ article?.commentCount || 0 }}
                </div>
             </div>
          </div>
@@ -73,7 +75,20 @@
    </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+defineProps<{
+   article?: any;
+}>();
+
+function formatNumber(num: number): string {
+   if (num >= 10000) {
+      return (num / 10000).toFixed(1) + 'w';
+   } else if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'k';
+   }
+   return num.toString();
+}
+</script>
 
 <style lang="scss" scoped>
 .mackpage {

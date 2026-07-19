@@ -9,6 +9,7 @@
             <result property="title" column="title" jdbcType="VARCHAR"/>
             <result property="content" column="content" jdbcType="VARCHAR"/>
             <result property="summary" column="summary" jdbcType="VARCHAR"/>
+            <result property="cover" column="cover" jdbcType="VARCHAR"/>
             <result property="categoryId" column="category_id" jdbcType="INTEGER"/>
             <result property="wordCount" column="word_count" jdbcType="INTEGER"/>
             <result property="readCount" column="read_count" jdbcType="INTEGER"/>
@@ -21,8 +22,25 @@
 
     <sql id="Base_Column_List">
         id,title,content,
-        summary,category_id,word_count,
+        summary,cover,category_id,word_count,
         read_count,comment_count,status,
         is_delete,created_at,updated_at
     </sql>
+
+    <select id="listArticleCountByYear" resultType="java.util.Map">
+        SELECT YEAR(created_at) AS `year`, COUNT(*) AS article_count
+        FROM articles
+        WHERE `status` = 1 AND is_delete = 0
+        GROUP BY YEAR(created_at)
+        ORDER BY `year` DESC
+    </select>
+
+    <select id="getSiteInfo" resultType="java.util.Map">
+        SELECT MIN(created_at)     AS site_uptime,
+               COUNT(*)            AS total_articles,
+               MAX(created_at)     AS last_updated,
+               SUM(word_count)     AS total_words
+        FROM articles
+        WHERE `status` = 1 AND is_delete = 0
+    </select>
 </mapper>

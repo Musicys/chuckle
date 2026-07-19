@@ -1,82 +1,136 @@
 <template>
-   <div class="page-start">
-      <div class="top">
-         <img
-            src="https://tse3-mm.cn.bing.net/th/id/OIP-C.U1UG7FN50qzrntU8he3s9wAAAA?rs=1&pid=ImgDetMain"
-            alt="" />
-      </div>
-      <div class="center">
-         <div>{{ currentTitle }}</div>
-         <div><元神启动!></div>
-      </div>
-      <div class="botom">
-         <div class="icons">
-            <a :href="music.GitHubUrl" target="_blank">
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-github"></use>
-               </svg>
-            </a>
-         </div>
-         <div class="icons">
-            <a :href="music.CsdnUrl" target="_blank">
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-csdn"></use>
-               </svg>
-            </a>
-         </div>
-         <div class="icons">
-            <a :href="music.QqUrl" target="_blank">
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-QQ"></use>
-               </svg>
-            </a>
-         </div>
-         <div class="icons">
-            <a :href="music.Bilbilurl" target="_blank">
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-Bzhan"></use>
-               </svg>
-            </a>
-         </div>
-         <div class="icons">
-            <a href="/muisc">
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-rengongzhinengjiqiren"></use>
-               </svg>
-            </a>
-         </div>
+   <div class="scroll-wrapper">
+      <div
+         class="scroll-content"
+         :style="{ transform: `translateY(-${currentIndex * 100}vh)` }">
+         <section
+            class="screen screen1"
+            :class="{ active: currentIndex === 0 }">
+            <div class="screen-content">
+               <div class="top">
+                  <img :src="user.userImg" alt="头像" />
+               </div>
+               <div class="center">
+                  <div class="title">{{ currentTitle }}</div>
+                  <div class="subtitle">{{ user.drawtilte }}</div>
+               </div>
+               <div class="bottom">
+                  <div class="icons">
+                     <a
+                        :href="user.GitHubUrl"
+                        target="_blank"
+                        v-if="user.GitHubUrl">
+                        <svg class="icon" aria-hidden="true">
+                           <use xlink:href="#icon-github"></use>
+                        </svg>
+                     </a>
+                  </div>
+                  <div class="icons">
+                     <a
+                        :href="user.CsdnUrl"
+                        target="_blank"
+                        v-if="user.CsdnUrl">
+                        <svg class="icon" aria-hidden="true">
+                           <use xlink:href="#icon-csdn"></use>
+                        </svg>
+                     </a>
+                  </div>
+                  <div class="icons">
+                     <a :href="user.QqUrl" target="_blank" v-if="user.QqUrl">
+                        <svg class="icon" aria-hidden="true">
+                           <use xlink:href="#icon-QQ"></use>
+                        </svg>
+                     </a>
+                  </div>
+                  <div class="icons">
+                     <a
+                        :href="user.Bilbilurl"
+                        target="_blank"
+                        v-if="user.Bilbilurl">
+                        <svg class="icon" aria-hidden="true">
+                           <use xlink:href="#icon-Bzhan"></use>
+                        </svg>
+                     </a>
+                  </div>
+                  <div class="icons">
+                     <a href="/muisc">
+                        <svg class="icon" aria-hidden="true">
+                           <use xlink:href="#icon-rengongzhinengjiqiren"></use>
+                        </svg>
+                     </a>
+                  </div>
+               </div>
+               <div class="scroll-hint">
+                  <svg
+                     class="arrow"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+                     <path d="M12 5v14M5 12l7 7 7-7" />
+                  </svg>
+               </div>
+            </div>
+         </section>
+
+         <section
+            class="screen screen2"
+            :class="{ active: currentIndex === 1 }">
+            <PhotoWall v-if="currentIndex >= 1" />
+         </section>
+
+         <section
+            class="screen screen3"
+            :class="{ active: currentIndex === 2 }">
+            <Portfolio v-if="currentIndex >= 2" />
+         </section>
+
+         <section
+            class="screen screen4"
+            :class="{ active: currentIndex === 3 }">
+            <FriendLinks v-if="currentIndex >= 3" />
+         </section>
       </div>
    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/store/user';
-const { user: music } = storeToRefs(useUserStore());
-// 定义要显示的完整文本和当前显示的文本
-const title = music.value.StartTilte;
+
+const { user } = storeToRefs(useUserStore());
+
+const PhotoWall = defineAsyncComponent(
+   () => import('./components/PhotoWall.vue')
+);
+const Portfolio = defineAsyncComponent(
+   () => import('./components/Portfolio.vue')
+);
+const FriendLinks = defineAsyncComponent(
+   () => import('./components/FriendLinks.vue')
+);
+
 const currentTitle = ref('');
-let intervalId = null; // 用于存储定时器ID
+const currentIndex = ref(0);
+const lastScrollTime = ref(new Date());
+const animationDuration = 700;
+const totalScreens = 4;
+let intervalId: ReturnType<typeof setInterval> | null = null;
 
-// 打字机效果函数
-const typeWriter = (text, speed) => {
+const typeWriter = (text: string, speed: number) => {
    let index = 0;
-
    intervalId = setInterval(() => {
       if (index < text.length) {
-         // 每次添加一个字符到currentTitle
          currentTitle.value += text.charAt(index);
          index++;
       } else {
-         // 完成后清除定时器
          currentTitle.value = text.charAt(1);
          index = 1;
       }
    }, speed);
 };
 
-// 清理函数，用于在组件卸载前停止定时器
 const cleanup = () => {
    if (intervalId !== null) {
       clearInterval(intervalId);
@@ -84,84 +138,214 @@ const cleanup = () => {
    }
 };
 
+const handleWheel = (e: WheelEvent) => {
+   if (
+      new Date().getTime() - lastScrollTime.value.getTime() <
+      animationDuration
+   )
+      return;
+
+   const delta = e.deltaY || -e.wheelDeltaY;
+
+   if (delta > 0 && currentIndex.value < totalScreens - 1) {
+      currentIndex.value++;
+   } else if (delta < 0 && currentIndex.value > 0) {
+      currentIndex.value--;
+   } else {
+      return;
+   }
+
+   lastScrollTime.value = new Date();
+};
+
 onMounted(() => {
-   // 调用typeWriter函数，开始打字机效果
-   typeWriter(title, 200); // 你可以调整速度参数以改变打字速度
+   const title = user.value.StartTilte;
+   typeWriter(title, 200);
+   window.addEventListener('wheel', handleWheel);
 });
 
 onBeforeUnmount(() => {
-   // 在组件卸载前调用清理函数
    cleanup();
+   window.removeEventListener('wheel', handleWheel);
 });
 </script>
 
 <style scoped>
-.page-start {
-   width: 100%;
-   height: 70vh;
+.scroll-wrapper {
+   height: 100vh;
    overflow: hidden;
+   position: absolute;
+   left: 0;
+   top: 0;
+   width: 100vw;
+}
 
+.scroll-content {
+   transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+   transform: translateZ(0);
+   -webkit-transform: translateZ(0);
+   -webkit-backface-visibility: hidden;
+   backface-visibility: hidden;
+   will-change: transform;
+}
+
+.screen {
+   height: 100vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   position: relative;
+   color: var(--bk-font-color);
+}
+
+.screen-content {
+   width: 100%;
+   padding: 50px 40px 100px 40px;
+   text-align: center;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   flex-direction: column;
+   height: 100%;
+   box-sizing: border-box;
+}
+
+.screen.active .section-title {
+   animation: fadeInUp 0.5s ease-out forwards;
+   transform: translateZ(0);
+   will-change: transform, opacity;
+}
+
+.screen.active .portfolio-item,
+.screen.active .link-item {
+   animation: fadeInUp 0.4s ease-out forwards;
+   transform: translateZ(0);
+   -webkit-transform: translateZ(0);
+   -webkit-backface-visibility: hidden;
+   backface-visibility: hidden;
+   will-change: transform, opacity;
+}
+
+@keyframes fadeInUp {
+   from {
+      opacity: 0;
+      transform: translateY(20px) translateZ(0);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0) translateZ(0);
+   }
+}
+
+.screen1 {
    display: flex;
    justify-content: center;
    align-items: center;
-   flex-direction: column;
+}
 
-   & > div {
-      margin-top: 1em;
+.screen1 .top img {
+   width: 150px;
+   height: 150px;
+   border-radius: 50%;
+   border: 4px solid rgba(255, 255, 255, 0.5);
+   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.screen1 .center {
+   margin-top: 30px;
+}
+
+.screen1 .center .title {
+   font-size: 2rem;
+   font-weight: 600;
+   margin-bottom: 10px;
+}
+
+.screen1 .center .subtitle {
+   font-size: 1.2rem;
+   opacity: 0.8;
+}
+
+.screen1 .bottom {
+   display: flex;
+   justify-content: center;
+   gap: 20px;
+   margin-top: 40px;
+}
+
+.screen1 .bottom .icons {
+   width: 50px;
+   height: 50px;
+   border-radius: 50%;
+   background: var(--back-op-color);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   transition: all 0.3s ease;
+   cursor: pointer;
+}
+
+.screen1 .bottom .icons:hover {
+   background: rgba(255, 255, 255, 0.4);
+   transform: translateY(-5px);
+}
+
+.screen1 .bottom .icons .icon {
+   font-size: 1.5rem;
+}
+
+.scroll-hint {
+   position: absolute;
+   bottom: 40px;
+   animation: bounce 2s infinite;
+}
+
+.scroll-hint .arrow {
+   width: 30px;
+   height: 30px;
+}
+
+@keyframes bounce {
+   0%,
+   20%,
+   50%,
+   80%,
+   100% {
+      transform: translateY(0);
+   }
+   40% {
+      transform: translateY(10px);
+   }
+   60% {
+      transform: translateY(5px);
+   }
+}
+
+@media (max-width: 768px) {
+   .screen-content {
+      padding: 20px;
    }
 
-   .top {
-      & > img {
-         width: 150px;
-         height: 150px;
-         border-radius: 50%;
-         box-shadow: 0 0 black 0.5;
-      }
+   .screen1 .top img {
+      width: 100px;
+      height: 100px;
    }
 
-   .center {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-
-      & > div:nth-child(1) {
-         font-size: 1.5em;
-      }
-
-      & > div:nth-child(2) {
-         font-size: 1em;
-         margin-top: 0.5em;
-      }
+   .screen1 .center .title {
+      font-size: 1.5rem;
    }
 
-   .botom {
-      width: 300px;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-      --h: 30px;
+   .screen1 .center .subtitle {
+      font-size: 1rem;
+   }
 
-      .icons {
-         padding: 1px;
-         width: 50px;
-         height: 50px;
-         border-radius: 50%;
-         display: flex;
-         justify-content: center;
-         align-items: center;
+   .screen1 .bottom {
+      gap: 15px;
+   }
 
-         .icon {
-            font-size: 1.5em;
-         }
-      }
-
-      & img {
-         width: var(--h);
-         height: var(--h);
-         border-radius: 50%;
-
-         border: 8px solid rgba(255, 255, 255, 0.5);
-      }
+   .screen1 .bottom .icons {
+      width: 40px;
+      height: 40px;
    }
 }
 </style>

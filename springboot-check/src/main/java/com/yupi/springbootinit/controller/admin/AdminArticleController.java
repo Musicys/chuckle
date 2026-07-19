@@ -1,3 +1,4 @@
+
 package com.yupi.springbootinit.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -80,6 +81,7 @@ public class AdminArticleController {
         article.setTitle(request.getTitle());
         article.setContent(request.getContent());
         article.setSummary(request.getSummary() != null ? request.getSummary() : "");
+        article.setCover(request.getCover());
         article.setCategoryId(request.getCategoryId());
         article.setStatus(request.getStatus() != null ? request.getStatus() : 0);
         article.setWordCount(request.getContent().length());
@@ -126,6 +128,9 @@ public class AdminArticleController {
         }
         if (request.getSummary() != null) {
             article.setSummary(request.getSummary());
+        }
+        if (request.getCover() != null) {
+            article.setCover(request.getCover());
         }
         if (request.getCategoryId() != null) {
             article.setCategoryId(request.getCategoryId());

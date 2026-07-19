@@ -55,7 +55,7 @@ export default [
    },
    //
    {
-      path: '/desc',
+      path: '/desc/:id?',
       name: '/desc',
 
       component: defineAsyncComponent(() => import('@/view/desc/index.vue')),

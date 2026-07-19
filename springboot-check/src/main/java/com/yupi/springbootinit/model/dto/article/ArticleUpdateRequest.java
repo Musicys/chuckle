@@ -22,6 +22,9 @@ public class ArticleUpdateRequest {
     @ApiModelProperty(value = "文章简介")
     private String summary;
 
+    @ApiModelProperty(value = "封面URL")
+    private String cover;
+
     @ApiModelProperty(value = "分类ID")
     private Integer categoryId;
 
@@ -61,6 +64,14 @@ public class ArticleUpdateRequest {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public Integer getCategoryId() {

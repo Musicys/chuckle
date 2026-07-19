@@ -239,6 +239,7 @@ const local: App.I18n.Schema = {
     comment: "Comment Management",
     tag: "Tag Management",
     category: "Category Management",
+    blogger: "Blogger Info",
   },
   page: {
     login: {

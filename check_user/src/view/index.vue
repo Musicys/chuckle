@@ -43,14 +43,10 @@ import Monitor from '@/components/monitor/monitor.vue';
 }
 
 .box {
-   padding-top: 10px;
    width: 80%;
    margin: auto;
    max-width: 1300px;
    font-family: 'MyCustomFonts', sans-serif;
-   padding-bottom: 50px;
-   margin-top: 50px;
-
    opacity: 0.9;
 }
 </style>

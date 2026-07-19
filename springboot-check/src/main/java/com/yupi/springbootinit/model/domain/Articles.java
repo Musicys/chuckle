@@ -35,6 +35,11 @@ public class Articles implements Serializable {
     private String summary;
 
     /**
+     * 封面URL
+     */
+    private String cover;
+
+    /**
      * 分类ID
      */
     private Integer categoryId;
@@ -131,6 +136,20 @@ public class Articles implements Serializable {
      */
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    /**
+     * 封面URL
+     */
+    public String getCover() {
+        return cover;
+    }
+
+    /**
+     * 封面URL
+     */
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     /**
@@ -261,6 +280,7 @@ public class Articles implements Serializable {
             && (this.getTitle() == null ? other.getTitle() == null : this.getTitle().equals(other.getTitle()))
             && (this.getContent() == null ? other.getContent() == null : this.getContent().equals(other.getContent()))
             && (this.getSummary() == null ? other.getSummary() == null : this.getSummary().equals(other.getSummary()))
+            && (this.getCover() == null ? other.getCover() == null : this.getCover().equals(other.getCover()))
             && (this.getCategoryId() == null ? other.getCategoryId() == null : this.getCategoryId().equals(other.getCategoryId()))
             && (this.getWordCount() == null ? other.getWordCount() == null : this.getWordCount().equals(other.getWordCount()))
             && (this.getReadCount() == null ? other.getReadCount() == null : this.getReadCount().equals(other.getReadCount()))
@@ -279,6 +299,7 @@ public class Articles implements Serializable {
         result = prime * result + ((getTitle() == null) ? 0 : getTitle().hashCode());
         result = prime * result + ((getContent() == null) ? 0 : getContent().hashCode());
         result = prime * result + ((getSummary() == null) ? 0 : getSummary().hashCode());
+        result = prime * result + ((getCover() == null) ? 0 : getCover().hashCode());
         result = prime * result + ((getCategoryId() == null) ? 0 : getCategoryId().hashCode());
         result = prime * result + ((getWordCount() == null) ? 0 : getWordCount().hashCode());
         result = prime * result + ((getReadCount() == null) ? 0 : getReadCount().hashCode());
@@ -300,6 +321,7 @@ public class Articles implements Serializable {
         sb.append(", title=").append(title);
         sb.append(", content=").append(content);
         sb.append(", summary=").append(summary);
+        sb.append(", cover=").append(cover);
         sb.append(", categoryId=").append(categoryId);
         sb.append(", wordCount=").append(wordCount);
         sb.append(", readCount=").append(readCount);

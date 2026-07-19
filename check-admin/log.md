@@ -87,17 +87,60 @@
 - 功能：分类列表展示、分页、搜索（名称）、新增、编辑、删除、排序管理
 - 使用 NaiveUI 组件：NDataTable、NForm、NModal、NInput 等
 
+#### 5. 博主信息管理模块
+
+**API 接口**
+
+- 创建 `src/service/api/blogger.ts`
+- 实现 6 个接口：新增博主信息、更新博主信息、获取博主详情、分页查询列表、删除博主信息、设置启用状态
+- 接口路径：`/admin/blogger/*`
+
+**类型定义**
+
+- 创建 `src/typings/api/blogger.d.ts`
+- 定义 `BloggerInfo`、`AddBloggerParams`、`UpdateBloggerParams`、`BloggerListParams`、`BloggerListResult` 等接口
+
+**页面组件**
+
+- 创建 `src/views/blogger/index.vue`
+- 功能：博主信息列表展示、分页、搜索（昵称、博客标题、状态）、新增、编辑、启用/禁用、删除
+- 使用 NaiveUI 组件：NDataTable、NForm、NModal、NSelect、NTag 等
+
+#### 6. 图片管理模块（图床）
+
+**API 接口**
+
+- 创建 `src/service/api/image.ts`
+- 实现 5 个接口：上传图片、更新图片信息、获取图片详情、分页查询列表、删除图片
+- 接口路径：`/admin/image/*`
+
+**类型定义**
+
+- 创建 `src/typings/api/image.d.ts`
+- 定义 `ImageInfo`、`UpdateImageParams`、`ImageListParams`、`ImageListResult` 等接口
+
+**图床组件**
+
+- 创建 `src/components/common/image-selector.vue`
+- 功能：图片选择（支持单选/多选）、图片上传、图片列表展示、编辑备注、删除图片
+- 单选模式：返回 URL 字符串
+- 多选模式：返回 URL 数组 JSON 字符串
+- 使用 NaiveUI 组件：NModal、NForm、NButton、NSelect 等
+
 #### 3. 路由配置
 
 - 路由已通过 elegant-router 自动生成
 - 文章管理：`/article`
 - 评论管理：`/comment`
+- 标签管理：`/tag`
+- 分类管理：`/category`
+- 博主信息：`/blogger`
 
 #### 4. 国际化
 
 - 更新中文翻译 `src/locales/langs/zh-cn.ts`
 - 更新英文翻译 `src/locales/langs/en-us.ts`
-- 添加文章管理、评论管理、标签管理、分类管理路由名称
+- 添加文章管理、评论管理、标签管理、分类管理、博主信息路由名称
 
 ### 修改内容
 

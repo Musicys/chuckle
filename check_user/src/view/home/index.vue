@@ -30,7 +30,7 @@
                   <el-icon>
                      <PieChart />
                   </el-icon>
-                  最近跟新
+                  最近更新
                </div>
                <div class="cart-arg-title-left">
                   <div></div>
@@ -44,7 +44,7 @@
                   class="cart-gx-test-kp"
                   v-for="i in home_data.home_1lates"
                   :key="i.id">
-                  <div class=""><img v-lazy="i.url" alt="" /></div>
+                  <div class=""><img v-lazy="i.cover" alt="" /></div>
                   <div>
                      <div>{{ i.title }}</div>
                      <div>{{ i.time }}</div>
@@ -174,10 +174,18 @@
             </div>
 
             <div class="input-arg">
-               <div style="background: #25c2fe; padding-right: 5px">首页</div>
-               <div v-for="i in ArgData" :key="i.title">
+               <div
+                  :class="{ 'arg-active': selectedTagId === null }"
+                  @click="handleTagClick(null)"
+                  style="padding-right: 5px">
+                  首页
+               </div>
+               <div
+                  v-for="i in ArgData"
+                  :key="i.id"
+                  :class="{ 'arg-active': selectedTagId === i.id }"
+                  @click="handleTagClick(i.id)">
                   {{ i.title }}
-
                   <span>{{ i.nuber }}</span>
                </div>
             </div>
@@ -191,47 +199,66 @@
             :key="i.id"></Cart>
          <!-- 分页 -->
          <div style="background: none; border: none" class="page-but">
-            <div class="select-page">1</div>
-            <div>2</div>
-            <div>......</div>
-            <div>99</div>
-
-            <input type="text" />
-            <div>跳转</div>
+            <div
+               @click="handlePageChange(currentPage - 1)"
+               :class="{ disabled: currentPage <= 1 }">
+               上一页
+            </div>
+            <div
+               v-for="page in displayPages"
+               :key="page"
+               :class="{
+                  'select-page': currentPage === page,
+                  ellipsis: page === -1
+               }"
+               @click="page !== -1 && handlePageChange(page)">
+               {{ page === -1 ? '......' : page }}
+            </div>
+            <div
+               @click="handlePageChange(currentPage + 1)"
+               :class="{ disabled: currentPage >= totalPages }">
+               下一页
+            </div>
+            <input
+               type="text"
+               v-model="jumpPage"
+               @keyup.enter="handleJump"
+               placeholder="页码" />
+            <div @click="handleJump">跳转</div>
          </div>
       </div>
    </div>
 </template>
 
 <script setup lang="ts">
-import { defineComponent, defineAsyncComponent, Ref, ref, watch } from 'vue';
+import { Ref, ref, onMounted, computed } from 'vue';
 import { Isjc } from '@/util/windows';
 import UserCart from './usercart.vue';
 import ArgCart from './ArgCart.vue';
 import { storeToRefs } from 'pinia';
 import { useHomeStore } from '@/store/home';
 const { home_data } = storeToRefs(useHomeStore());
+const homeStore = useHomeStore();
 import PackCart from './PackCart.vue';
 import ConsultCart from './ConsultCart.vue';
 import util from '@/util/function';
 import Cart from './cart.vue';
+import { fetchHomeInfo, fetchArticles } from '@/api/home';
 
-//鼠标横向滚动事件
 const scrollableDiv = ref<HTMLDivElement | null>(null);
 
 const handleScroll = (event: WheelEvent) => {
-   event.preventDefault(); // 阻止默认的页面滚动行为
-   event.stopPropagation(); // 阻止事件冒泡到父元素
+   event.preventDefault();
+   event.stopPropagation();
 
    if (scrollableDiv.value) {
       scrollableDiv.value.scrollBy({
-         left: event.deltaY < 0 ? -50 : 50, // 根据滚轮方向滚动
-         behavior: 'smooth' // 平滑滚动
+         left: event.deltaY < 0 ? -50 : 50,
+         behavior: 'smooth'
       });
    }
 };
 
-// })
 const scrollToRight = () => {
    if (scrollableDiv.value) {
       scrollableDiv.value.scrollTo({
@@ -250,6 +277,34 @@ const scrollToLeft = () => {
    }
 };
 
+const currentPage = ref(1);
+const pageSize = ref(8);
+const total = ref(0);
+const totalPages = ref(1);
+const selectedTagId = ref<number | null>(null);
+const jumpPage = ref('');
+
+const displayPages = computed(() => {
+   const pages: number[] = [];
+   const total = totalPages.value;
+   const current = currentPage.value;
+
+   if (total <= 7) {
+      for (let i = 1; i <= total; i++) {
+         pages.push(i);
+      }
+   } else {
+      if (current <= 3) {
+         pages.push(1, 2, 3, 4, -1, total);
+      } else if (current >= total - 2) {
+         pages.push(1, -1, total - 3, total - 2, total - 1, total);
+      } else {
+         pages.push(1, -1, current - 1, current, current + 1, -1, total);
+      }
+   }
+   return pages;
+});
+
 const Data: Ref<
    {
       id: number;
@@ -257,101 +312,95 @@ const Data: Ref<
       url: string;
       jjdesc: string;
       arg: string;
-      createtime: string; // 这里可以更精确地使用 Date 类型，取决于你的需求
-      updatetime: string; // 同上
+      createtime: string;
+      updatetime: string;
       fontnber: string;
+      tags: Array<{ id: number; name: string; color: string }>;
+      readCount: number;
+      commentCount: number;
    }[]
-> = ref([
-   {
-      id: 1,
-      title: '123',
-      url: 'https://cdn.seovx.com/d/?mom=302',
-      jjdesc: '记录各个方面、各种编码相关的零碎操作',
-      arg: '科学',
-      createtime: '2024-10-03',
-      updatetime: '2024-10-03',
-      fontnber: '1.2'
-   },
-   {
-      id: 2,
-      title: '123',
-      jjdesc: '记录各个方面、各种编码相关的零碎操作',
-      url: 'https://cdn.seovx.com/d/?mom=302',
-      arg: '科学',
-      createtime: '2024-10-03',
-      updatetime: '2024-10-03',
-      fontnber: '1.2'
-   },
-   {
-      id: 3,
-      title: '123',
-      url: 'https://cdn.seovx.com/d/?mom=302',
-      jjdesc: '记录各个方面、各种编码相关的零碎操作',
-      arg: '编程',
-      createtime: '2024-10-03',
-      updatetime: '2024-10-03',
-      fontnber: '1.2'
-   },
-   {
-      id: 4,
-      title: '123',
-      url: 'https://cdn.seovx.com/d/?mom=302',
-      jjdesc: '记录各个方面、各种编码相关的零碎操作',
-      arg: '编程',
-      createtime: '2024-10-03',
-      updatetime: '2024-10-03',
-      fontnber: '1.2'
-   },
-   {
-      id: 5,
-      title: '123',
-      url: 'https://cdn.seovx.com/d/?mom=302',
-      jjdesc: '记录各个方面、各种编码相关的零碎操作',
-      arg: '编程',
-      createtime: '2024-10-03',
-      updatetime: '2024-10-03',
-      fontnber: '1.2'
-   },
-   {
-      id: 6,
-      title: '123',
-      url: 'https://cdn.seovx.com/d/?mom=302',
-      jjdesc: '记录各个方面、各种编码相关的零碎操作',
-      arg: '编程',
-      createtime: '2024-10-03',
-      updatetime: '2024-10-03',
-      fontnber: '1.2'
-   },
-   {
-      id: 7,
-      title: '123',
-      url: 'https://cdn.seovx.com/d/?mom=302',
-      jjdesc: '记录各个方面、各种编码相关的零碎操作',
-      arg: '编程',
-      createtime: '2024-10-03',
-      updatetime: '2024-10-03',
-      fontnber: '1.2'
-   },
-   {
-      id: 8,
-      title: '123',
-      url: 'https://cdn.seovx.com/d/?mom=302',
-      jjdesc: '记录各个方面、各种编码相关的零碎操作',
-      arg: '编程',
-      fontnber: '1.2',
-      createtime: '2024-10-03',
-      updatetime: '2024-10-03'
-   }
-]);
+> = ref([]);
 
-//Arg数据
-const ArgData = ref([
-   { title: '教程', nuber: 4 },
-   { title: '其它4', nuber: 7 },
-   { title: '学习笔记57', nuber: 7 },
-   { title: 'Hexo15', nuber: 7 },
-   { title: '项目6', nuber: 7 }
-]);
+const ArgData = ref<{ id: number; title: string; nuber: number }[]>([]);
+
+const loadHomeData = async () => {
+   try {
+      const response = await fetchHomeInfo();
+      if (response.code === 0 && response.data) {
+         homeStore.initHomeData(response.data);
+         ArgData.value = Object.entries(response.data.tags).map(
+            ([title, number], index) => ({
+               id: index + 1,
+               title: title,
+               nuber: number
+            })
+         );
+      }
+   } catch (error) {
+      console.error('加载主页数据失败:', error);
+   }
+};
+
+const loadArticles = async (page: number = 1, tagId?: number) => {
+   try {
+      const response = await fetchArticles({
+         current: page,
+         pageSize: pageSize.value,
+         tagId: tagId,
+         sortField: 'createdAt',
+         sortOrder: 'descend'
+      });
+      if (response.code === 0 && response.data) {
+         const { records, total: totalCount, current, pages } = response.data;
+         Data.value = records.map(article => ({
+            ...article,
+            id: article.id,
+            title: article.title,
+            url: article.cover || 'https://cdn.seovx.com/d/?mom=302',
+            jjdesc: article.summary || '',
+            arg: article.category?.name || '未分类',
+            createtime: article.createdAt,
+            updatetime: article.updatedAt,
+            fontnber:
+               article.wordCount >= 10000
+                  ? `${(article.wordCount / 10000).toFixed(1)}w`
+                  : article.wordCount.toString(),
+            tags: article.tags || [],
+            readCount: article.readCount,
+            commentCount: article.commentCount
+         }));
+         total.value = totalCount;
+         currentPage.value = current;
+         totalPages.value = pages;
+      }
+   } catch (error) {
+      console.error('加载文章列表失败:', error);
+   }
+};
+
+const handlePageChange = (page: number) => {
+   if (page < 1 || page > totalPages.value) return;
+   loadArticles(page, selectedTagId.value || undefined);
+};
+
+const handleTagClick = (tagId: number | null) => {
+   selectedTagId.value = tagId;
+   currentPage.value = 1;
+   loadArticles(1, tagId || undefined);
+};
+
+const handleJump = () => {
+   const page = parseInt(jumpPage.value);
+   if (!isNaN(page) && page >= 1 && page <= totalPages.value) {
+      handlePageChange(page);
+      jumpPage.value = '';
+   }
+};
+
+onMounted(() => {
+   loadHomeData();
+   loadArticles(1);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -422,6 +471,21 @@ const ArgData = ref([
       background: var(--cart-back-color);
       white-space: nowrap;
    }
+
+   .disabled {
+      opacity: 0.5;
+      cursor: not-allowed !important;
+   }
+
+   .ellipsis {
+      cursor: default !important;
+      border: none !important;
+      background: transparent !important;
+
+      &:hover {
+         background: transparent !important;
+      }
+   }
 }
 
 .icons {
@@ -449,6 +513,7 @@ const ArgData = ref([
 }
 
 .page {
+   padding-top: 50px;
    transition: all 0.3s;
    width: 100%;
    display: flex;
@@ -766,6 +831,10 @@ const ArgData = ref([
             }
 
             & > div:hover {
+               background: #25c2fe;
+            }
+
+            .arg-active {
                background: #25c2fe;
             }
          }

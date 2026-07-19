@@ -9,237 +9,162 @@
          <div class="box" style="margin-bottom: 1em">
             <Announcement></Announcement>
          </div>
-         <div class="box ml-box" ref="desc_mr">
+         <div class="box ml-box">
             <div class="left-top">
                <el-icon> <Memo /> </el-icon>目录
             </div>
-
             <div class="ml">
-               <ol>
-                  <!-- 跳转加到下面这些目录里 -->
-                  <li v-for="heading in toc" :key="heading.id">
-                     <a
-                        :class="heading.level == 1 ? 'one' : 'srte'"
-                        :href="'#' + heading.text.toLowerCase()"
-                        >{{ heading.text }}</a
-                     >
-                  </li>
-               </ol>
+               <MdCatalog
+                  :key="scrollElementKey"
+                  :editorId="editorId"
+                  :scrollElement="currentScrollElement"
+                  :headings="['h1', 'h2', 'h3']"
+                  :indent="16"
+                  :offsetTop="60" />
             </div>
          </div>
       </div>
       <div class="right">
-         <MarkTop></MarkTop>
-         <MarkdownViewer :markdownContent="markdownContent" />
-         <MessageBoard />
+         <div v-if="loading" style="text-align: center; padding: 2em">
+            <svg
+               class="icon"
+               aria-hidden="true"
+               style="font-size: 2em; animation: spin 1s linear infinite">
+               <use xlink:href="#icon-loading"></use>
+            </svg>
+            <div style="margin-top: 1em">加载中...</div>
+         </div>
+         <template v-else>
+            <MarkTop :article="article" />
+            <MdPreview
+               :editorId="editorId"
+               :model-value="markdownContent"
+               :style="customTheme"
+               :codeFoldable="false" />
+            <MessageBoard
+               :articleId="Number(id)"
+               @submit="handleSubmitComment" />
+         </template>
       </div>
    </div>
 </template>
 
 <script setup lang="ts">
 import { Ispc } from '@/util/windows';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed, nextTick } from 'vue';
 import Usercart from '../home/usercart.vue';
 import Announcement from './Announcement.vue';
-import wz from '../../static/java.md?raw';
-import MarkdownViewer from './Markdownview.vue';
+import { MdPreview, MdCatalog } from 'md-editor-v3';
+import 'md-editor-v3/lib/preview.css';
 import MarkTop from './MarkTop.vue';
 import { descIsFlex, desc_mr } from '@/util/scrse';
 import MessageBoard from './MessageBoard.vue';
 import util from '@/util/function';
 import { useRoute } from 'vue-router';
-// 获取当前路由对象
+import { fetchArticleById, submitComment } from '@/api/desc';
+
 const route = useRoute();
+const id = ref(route.params.id);
+const article = ref<any>(null);
+const markdownContent = ref('');
+const loading = ref(true);
+const editorId = 'desc-preview-' + Date.now();
 
-// 创建一个响应式的 id 变量
-const id = ref(route.query.id);
+const scrollContainerRef = ref<HTMLElement | null>(null);
+let cachedScrollElement: HTMLElement | null = null;
+const scrollElementKey = ref(0);
 
-// 监听路由参数的变化
+const currentScrollElement = computed(() => {
+   return cachedScrollElement;
+});
+
 watch(
-   () => route.query.id,
+   () => route.params.id,
    newId => {
       id.value = newId;
+      if (newId) {
+         loadArticle(Number(newId));
+      }
    }
 );
 
-const markdownContent = ref(`
-
-# 你好
-
-This is a **markdown** example.
-
-## Headings1
-## Headings2
-## Headings3
-
-## Headings4
-## Headings5
-
-# Hello, world!
-
-This is a **markdown** example.
-
-## Headings5
-## Headings
-## Headings6
-
-## Headings7
-## Headings
-
-
-# Hello, world!
-
-This is a **markdown** example.
-
-
-
-
-**Bold** text.
-
-***Bold and Italic*** text.
-
-~~Strikethrough~~ text.
-
-## Lists
-
-### Unordered List
-
-- Item 1
-- Item 2
-  - Subitem 2.1
-  - Subitem 2.2
-- Item 3
-
-### Ordered List
-
-1. First item
-2. Second item
-   1. Subitem 2.1
-   2. Subitem 2.2
-3. Third item
-
-## Links
-
-[Google](https://www.google.com)
-
-## Images
-
-![Markdown Logo](https://file.moyublog.com/free_wallpapers_files/kdxevforc0m.jpg)
-
-## Code
-
-![Markdown Logo](https://wallpaperm.cmcm.com/4700eaf249b71d56d95aff8ca94313fa.jpg)
-
-
-
-This is an example of \`inline code\`.
-
-
-
-\`\`\`javascript
-function greet(name) {
-  console.log(\`Hello, \${name}!\`);
-}
-
-greet('Alice');
-\`\`\`
-
-
-
-\`\`\`javascript
-function greet(name) {
-  console.log(\`Hello, \${name}!\`);
-}
-
-
-ddddd
-
-ddddd
-ddddd
-
-
-greet('Alice');
-\`\`\`
-
-## Blockquotes
-
-> This is a blockquote.
->
-> It can span multiple lines.
-
-## Horizontal Rule
-
----
-
-## Tables
-
-| Header 1 | Header 2 |
-| -------- | -------- |
-| Row 1    | Data 1   |
-| Row 2    | Data 2   |
-`);
-
-const toc = ref<{ id: string; level: number; text: string }[]>([]);
-
-function generateToc() {
-   const headingRegex = /^(#+)\s+(.*)$/gm;
-   let match: RegExpExecArray | null;
-
-   toc.value = [];
-
-   while ((match = headingRegex.exec(markdownContent.value)) !== null) {
-      const level: number = match[1].length;
-      const text: string = match[2];
-      const id: string = text
-         .toLowerCase()
-         .replace(/\s+/g, '-')
-         .replace(/[^\w-]+/g, '');
-      toc.value.push({ id, level, text });
+async function loadArticle(articleId: number) {
+   loading.value = true;
+   try {
+      const result = await fetchArticleById(articleId);
+      if (result && result.data) {
+         article.value = result.data;
+         markdownContent.value = result.data.content || '';
+         await nextTick();
+         setTimeout(() => {
+            setupScrollContainer();
+         }, 300);
+      }
+   } catch (error) {
+      console.error('加载文章失败:', error);
+      markdownContent.value = '# 文章加载失败';
+   } finally {
+      loading.value = false;
    }
 }
-onMounted(() => {
-   generateToc();
 
-   console.log(id.value);
+function setupScrollContainer() {
+   const container = document.querySelector('.page-zqdongz') as HTMLElement;
+   if (container) {
+      cachedScrollElement = container;
+      scrollElementKey.value++;
+      console.log('scroll container found:', container);
+   } else {
+      console.log('scroll container not found');
+   }
+}
+
+async function handleSubmitComment(commentData: {
+   nickname: string;
+   email?: string;
+   content: string;
+   replyToCommentId?: number;
+}) {
+   try {
+      const result = await submitComment({
+         articleId: Number(id.value),
+         ...commentData
+      });
+      console.log('评论提交成功:', result);
+   } catch (error) {
+      console.error('评论提交失败:', error);
+   }
+}
+
+const customTheme: Record<string, string> = {
+   '--md-bk-color': 'var(--datail-back-color)',
+   '--md-color': 'var(--bk-font-color)',
+   '--md-border-color': 'var(--cart-border-color)',
+   '--md-color-primary': 'var(--bk-draw-back-color)',
+   '--md-blockquote-bk-color': 'var(--cart-back-color)',
+   '--md-blockquote-border-color': 'var(--bk-draw-back-color)',
+   '--md-table-bk-color': 'var(--cart-back-color)',
+   '--md-table-border-color': 'var(--cart-border-color)',
+   '--md-table-th-bk-color': 'var(--bk-draw-back-color)',
+   '--md-editor-font-size': '16px'
+};
+
+onMounted(() => {
+   nextTick(() => {
+      setupScrollContainer();
+   });
+
+   if (id.value) {
+      loadArticle(Number(id.value));
+   }
 });
 </script>
 
 <style lang="scss" scoped>
-/* 自定义代码块背景颜色 */
-
-.one {
-   display: inline-block;
-   margin-bottom: 0.5em;
-   transition: all 0.5s ease;
-   width: 100%;
-   cursor: pointer;
-
-   &:hover {
-      background: rgba(129, 209, 239, 0.5);
-   }
-}
-
-.srte {
-   width: 100%;
-   display: inline-block;
-   margin-left: 0.8em;
-   padding-left: 0.2em;
-
-   border-left: 1px dashed var(--bk-font-color);
-   transition: all 0.5s ease;
-   cursor: pointer;
-
-   &:hover {
-      background: rgba(129, 209, 239, 0.9);
-   }
-}
-
 .ml-box {
    height: 85vh;
    position: sticky;
-   /* 关键属性 */
    top: 0;
-   /* 固定在顶部 */
 }
 
 .bordr {
@@ -252,6 +177,7 @@ onMounted(() => {
 
 .desc {
    display: flex;
+   padding-top: 50px;
 
    .left {
       position: relative;
@@ -274,29 +200,10 @@ onMounted(() => {
 
             &::-webkit-scrollbar-track {
                background: var(--cart-back-color);
-               /* 轨道背景色 */
             }
 
             &::-webkit-scrollbar {
                width: 5px;
-               /* 滚动条的宽度 */
-            }
-
-            & > ol {
-               list-style: none;
-
-               & > li > a {
-                  line-height: 1.8em;
-
-                  text-decoration: none;
-                  /* 去掉下划线 */
-                  color: inherit;
-                  /* 继承父元素的颜色 */
-                  cursor: pointer;
-                  /* 确保光标样式为指针 */
-                  outline: none;
-                  /* 去掉点击时的外边框 */
-               }
             }
          }
       }
@@ -307,6 +214,163 @@ onMounted(() => {
       margin-bottom: 2em;
       flex: 4;
       @extend .bordr;
+   }
+}
+
+:deep(.md-editor-catalog) {
+   padding: 0;
+
+   ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+   }
+
+   li {
+      padding: 2px 0;
+   }
+
+   a {
+      display: block;
+      padding: 4px 6px;
+      text-decoration: none;
+      color: var(--bk-font-color);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+
+      &:hover {
+         background: rgba(129, 209, 239, 0.5);
+      }
+
+      &.active {
+         background: var(--el-but-back);
+         color: #fff;
+      }
+   }
+}
+
+:deep(.md-editor-preview) {
+   line-height: 2.2;
+
+   p {
+      margin-bottom: 24px;
+   }
+
+   h1,
+   h2,
+   h3,
+   h4,
+   h5,
+   h6 {
+      margin-top: 1.5em;
+      margin-bottom: 0.8em;
+      color: var(--bk-font-color);
+   }
+
+   h1 {
+      font-size: 2em;
+      border-bottom: 2px solid var(--cart-border-color);
+      padding-bottom: 0.3em;
+   }
+
+   h2 {
+      font-size: 1.6em;
+      border-bottom: 1px solid var(--cart-border-color);
+      padding-bottom: 0.2em;
+   }
+
+   h3 {
+      font-size: 1.4em;
+   }
+
+   a {
+      color: var(--bk-draw-back-color);
+      text-decoration: none;
+
+      &:hover {
+         text-decoration: underline;
+         color: var(--div-hover-color);
+      }
+   }
+
+   ul,
+   ol {
+      padding-left: 1.5em;
+      margin-bottom: 1em;
+   }
+
+   li {
+      margin-bottom: 0.5em;
+   }
+
+   blockquote {
+      border-left: 4px solid var(--bk-draw-back-color);
+      padding: 10px 20px;
+      margin: 1em 0;
+      background: var(--cart-back-color);
+      border-radius: 0 4px 4px 0;
+   }
+
+   pre {
+      margin: 1em 0;
+   }
+
+   table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1em 0;
+      border: 1px solid var(--cart-border-color);
+      border-radius: 8px;
+      overflow: hidden;
+   }
+
+   th {
+      background: var(--bk-draw-back-color);
+      color: #fff;
+      padding: 12px;
+      text-align: left;
+      font-weight: bold;
+      border-bottom: 2px solid var(--cart-border-color);
+   }
+
+   td {
+      padding: 12px;
+      border-bottom: 1px solid var(--cart-border-color);
+      border-right: 1px solid var(--cart-border-color);
+
+      &:last-child {
+         border-right: none;
+      }
+   }
+
+   tr:nth-child(even) {
+      background: rgba(0, 0, 0, 0.05);
+   }
+
+   tr:hover {
+      background: rgba(129, 209, 239, 0.2);
+   }
+
+   img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin: 1em 0;
+   }
+
+   hr {
+      border: none;
+      border-top: 1px solid var(--cart-border-color);
+      margin: 2em 0;
+   }
+
+   strong {
+      font-weight: bold;
+      color: var(--bk-font-color);
+   }
+
+   em {
+      font-style: italic;
    }
 }
 </style>

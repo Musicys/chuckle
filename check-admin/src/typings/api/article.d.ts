@@ -11,6 +11,7 @@ declare namespace Api {
       title: string;
       content: string;
       summary: string;
+      cover: string;
       categoryId: number;
       categoryName: string;
       tags: Tag[];
@@ -26,6 +27,7 @@ declare namespace Api {
       title: string;
       content: string;
       summary: string;
+      cover?: string;
       categoryId: number;
       status: number;
       tagIds?: number[];
@@ -36,6 +38,7 @@ declare namespace Api {
       title?: string;
       content?: string;
       summary?: string;
+      cover?: string;
       categoryId?: number;
       status?: number;
       tagIds?: number[];

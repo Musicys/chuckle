@@ -14,58 +14,68 @@
             right: !Iswart && Ispc,
             left: Iswart && Ispc
          }">
-         <div class="but-bt">标题{{ data.title }}</div>
-         <div>
+         <div class="but-bt">{{ truncateText(data.title, 8) }}</div>
+         <div class="meta-row">
             <div>
                <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-guanyubeifen2"></use>
                </svg>
-
-               发表于{{ data.createtime }}
+               {{ formatDate(data.createtime) }}
             </div>
             <div style="margin: 0 5px">|</div>
             <div>
                <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-shalou"></use>
                </svg>
-
-               更新于{{ data.updatetime }}
+               {{ formatDate(data.updatetime) }}
             </div>
          </div>
 
-         <div>
-            <div>
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-bijiben"></use>
-               </svg>
-               笔记
-            </div>
-            <div style="margin: 0 5px">|</div>
+         <div class="meta-row">
             <div>
                <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-fenlei"></use>
                </svg>
-               分类|{{ data.arg }}
+               {{ data.arg }}
             </div>
             <div style="margin: 0 5px">|</div>
             <div>
                <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-bi1"></use>
                </svg>
-               字数
+               {{ data.fontnber }}字
+            </div>
+
+            <div style="margin: 0 5px">|</div>
+            <div>
+               <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#icon-pinglun"></use>
+               </svg>
+               {{ data.commentCount || 0 }}
             </div>
          </div>
 
-         <div class="yc">{{ data.jjdesc }}</div>
+         <div v-if="data.tags && data.tags.length > 0" class="tags-row">
+            <span
+               v-for="tag in data.tags"
+               :key="tag.id"
+               class="tag-item"
+               :style="{ backgroundColor: tag.color || '#25c2fe' }">
+               {{ tag.name }}
+            </span>
+         </div>
+
+         <div class="yc">{{ truncateText(data.jjdesc, 50) }}</div>
       </div>
 
-      <div :class="!Iswart ? 'desc-po-top' : 'desc-bo-top'">最新文章</div>
+      <div :class="!Iswart ? 'desc-po-top' : 'desc-bo-top'">
+         {{ data.isNew ? '最新文章' : '文章' }}
+      </div>
    </div>
 </template>
 
 <script setup lang="ts">
 import { defineProps, toRefs, Ref, ref, onMounted } from 'vue';
-
 import { Ispc } from '@/util/windows';
 const Iswart: Ref<boolean> = ref(true);
 
@@ -73,18 +83,25 @@ const props = defineProps<{
    data: any;
 }>();
 const { data } = toRefs(props);
-const cart_test = ref({
-   //是否置顶
-   IsTop: false,
-   //是否最新创建
-   IscateTime: false
-});
 
-const IsNotYC: Ref<boolean> = ref(true);
-console.log('==>', { ...data.value });
+const formatDate = (dateStr: string) => {
+   if (!dateStr) return '';
+   const date = new Date(dateStr);
+   const year = date.getFullYear();
+   const month = String(date.getMonth() + 1).padStart(2, '0');
+   const day = String(date.getDate()).padStart(2, '0');
+   return `${year}-${month}-${day}`;
+};
+
+const truncateText = (text: string, maxLength: number) => {
+   if (!text) return '';
+   return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+};
 
 onMounted(() => {
    Iswart.value = data.value.id % 2 === 0 ? false : true;
+
+   console.log(props.data);
 });
 </script>
 
@@ -103,11 +120,9 @@ $r: 8px;
       bottom: 0;
       right: $r;
       width: 5px;
-      /* 竖线的宽度 */
       border-radius: 5px;
       height: 40%;
       background-color: #38d0c5;
-      /* 竖线的颜色 */
       transform: translateY(-50%);
    }
 }
@@ -120,11 +135,9 @@ $r: 8px;
       bottom: 0;
       left: $r;
       width: 5px;
-      /* 竖线的宽度 */
       border-radius: 5px;
       height: 40%;
       background-color: #38d0c5;
-      /* 竖线的颜色 */
       transform: translateY(-50%);
    }
 }
@@ -140,7 +153,6 @@ $r: 8px;
 .cart-desc {
    display: flex;
    flex-wrap: wrap;
-
    position: relative;
    padding: 10px;
 
@@ -149,7 +161,6 @@ $r: 8px;
       top: 0;
       left: 10px;
       font-size: 1.2em;
-
       color: white;
       background: #49b1f5;
       padding: 5px 10px;
@@ -161,7 +172,6 @@ $r: 8px;
       top: 0;
       right: 10px;
       font-size: 1.2em;
-
       color: white;
       background: #49b1f5;
       padding: 5px 10px;
@@ -170,7 +180,6 @@ $r: 8px;
 
    .desc-top {
       flex: 1;
-
       height: 100%;
       min-width: 200px;
 
@@ -184,25 +193,22 @@ $r: 8px;
 
    .desc-but {
       flex: 1;
-
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       min-width: 200px;
+      padding-left: 10px;
 
       & > div {
-         height: 20px;
          flex-wrap: nowrap;
          color: #858585;
          margin-bottom: 0.5em;
          display: flex;
-         justify-content: center;
          align-items: center;
 
          & > div {
             display: flex;
-            justify-content: center;
             align-items: center;
             flex-wrap: nowrap;
          }
@@ -210,8 +216,31 @@ $r: 8px;
 
       .but-bt {
          font-size: 1.5em;
-
          color: var(--bk-font-color);
+         margin-bottom: 0.8em;
+         cursor: pointer;
+
+         &:hover {
+            color: #25c2fe;
+         }
+      }
+
+      .meta-row {
+         font-size: 0.9em;
+      }
+
+      .tags-row {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 6px;
+         margin-top: 5px;
+      }
+
+      .tag-item {
+         padding: 2px 8px;
+         border-radius: 4px;
+         font-size: 0.8em;
+         color: white;
       }
 
       .yc {
@@ -221,17 +250,16 @@ $r: 8px;
          transition:
             opacity 0.5s ease,
             height 0.5s ease;
+         font-size: 0.9em;
+         line-height: 1.5;
+         margin-top: 5px;
       }
    }
 
    &:hover .yc {
       opacity: 1;
-      height: 20px;
-   }
-
-   &:active .yc {
-      opacity: 1;
-      height: 20px;
+      height: 40px;
+      overflow: hidden;
    }
 }
 </style>

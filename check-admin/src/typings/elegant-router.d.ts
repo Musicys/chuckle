@@ -21,6 +21,7 @@ declare module "@elegant-router/types" {
     "404": "/404";
     "500": "/500";
     "article": "/article";
+    "blogger": "/blogger";
     "category": "/category";
     "comment": "/comment";
     "home": "/home";
@@ -62,6 +63,7 @@ declare module "@elegant-router/types" {
     | "404"
     | "500"
     | "article"
+    | "blogger"
     | "category"
     | "comment"
     | "home"
@@ -90,6 +92,7 @@ declare module "@elegant-router/types" {
     | "iframe-page"
     | "login"
     | "article"
+    | "blogger"
     | "category"
     | "comment"
     | "home"

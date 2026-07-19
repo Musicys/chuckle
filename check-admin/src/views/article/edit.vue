@@ -24,6 +24,7 @@ import {
 } from "@/service/api/article";
 import { fetchTagList, fetchAddTag } from "@/service/api/tag";
 import { fetchCategoryList } from "@/service/api/category";
+import ImageSelector from "@/components/common/image-selector.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -39,6 +40,7 @@ const form = reactive({
   title: "",
   content: "",
   summary: "",
+  cover: "",
   categoryId: "1",
   status: 1 as 0 | 1 | 2,
   tagIds: [] as number[],
@@ -100,6 +102,7 @@ async function loadArticle() {
       form.title = article.title;
       form.content = article.content;
       form.summary = article.summary;
+      form.cover = article.cover || "";
       form.categoryId = String(article.categoryId);
       form.status = article.status as 0 | 1 | 2;
       form.tagIds = article.tags.map((tag) => tag.id);
@@ -170,6 +173,7 @@ async function handleSubmit() {
       ...form,
       categoryId: Number(form.categoryId) || 1,
       tagIds: form.tagIds,
+      cover: form.cover || undefined,
     };
 
     if (isEdit) {
@@ -361,6 +365,19 @@ onMounted(() => {
           />
         </NFormItem>
 
+        <NFormItem label="封面">
+          <div class="cover-selector">
+            <ImageSelector
+              v-model="form.cover"
+              :multiple="false"
+              source="cover"
+            />
+            <div v-if="form.cover" class="cover-preview">
+              <img :src="form.cover" alt="封面预览" />
+            </div>
+          </div>
+        </NFormItem>
+
         <NFormItem label="状态">
           <NSelect v-model:value="form.status" :options="statusOptions" />
         </NFormItem>
@@ -437,3 +454,26 @@ onMounted(() => {
     </NModal>
   </div>
 </template>
+
+<style scoped>
+.cover-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cover-preview {
+  width: 150px;
+  height: 100px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</style>

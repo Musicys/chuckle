@@ -6,6 +6,7 @@ import com.yupi.springbootinit.common.ResultUtils;
 import com.yupi.springbootinit.exception.BusinessException;
 import com.yupi.springbootinit.model.domain.BloggerInfo;
 import com.yupi.springbootinit.model.vo.BloggerInfoVO;
+import com.yupi.springbootinit.model.vo.HomepageVO;
 import com.yupi.springbootinit.service.BloggerInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,5 +36,12 @@ public class BloggerInfoController {
             BeanUtils.copyProperties(info, vo);
         }
         return ResultUtils.success(vo);
+    }
+
+    @GetMapping("/home")
+    @ApiOperation(value = "获取首页聚合数据（最近文章、热门文章、标签统计、文章归档、站点概览）")
+    public BaseResponse<HomepageVO> getHomepage() {
+        HomepageVO homepage = bloggerInfoService.getHomepage();
+        return ResultUtils.success(homepage);
     }
 }

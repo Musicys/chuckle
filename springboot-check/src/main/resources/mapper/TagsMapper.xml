@@ -15,4 +15,13 @@
         id,name,color,
         created_at
     </sql>
+
+    <select id="listTagCounts" resultType="java.util.Map">
+        SELECT t.name, IFNULL(COUNT(at.article_id), 0) AS article_count
+        FROM tags t
+        LEFT JOIN article_tags at ON t.id = at.tag_id
+        LEFT JOIN articles a ON at.article_id = a.id AND a.`status` = 1 AND a.is_delete = 0
+        GROUP BY t.id, t.name
+        ORDER BY article_count DESC
+    </select>
 </mapper>

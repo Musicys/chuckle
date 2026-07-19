@@ -14,6 +14,7 @@ public class BloggerInfoVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Integer id;
     @ApiModelProperty(value = "头像URL")
     private String avatar;
 
