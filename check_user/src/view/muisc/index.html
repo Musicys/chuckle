@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-CN">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Web Audio 音乐可视化</title>
+      <style>
+         :root {
+            --bg-color: #121212;
+            --bar-width: 8px;
+            --bar-gap: 4px;
+            --bar-height: 200px;
+         }
+
+         * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+         }
+
+         body {
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+         }
+
+         /* 可视化容器 */
+         .visualizer-container {
+            display: flex;
+            align-items: flex-end; /* 关键：让柱子从底部向上生长 */
+            justify-content: center;
+            height: var(--bar-height);
+            width: 90%;
+            max-width: 800px;
+            gap: var(--bar-gap);
+            margin-bottom: 40px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+         }
+
+         .bar {
+            width: var(--bar-width);
+            background: linear-gradient(to top, #ff6b6b, #feca57, #48dbfb);
+            border-radius: 4px 4px 0 0;
+            height: 5px; /* 初始最小高度 */
+            transition: height 0.05s ease-out; /* 快速响应，避免拖影 */
+            box-shadow: 0 0 8px rgba(255, 107, 107, 0.4);
+         }
+
+         /* 控制区域 */
+         .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            z-index: 10;
+         }
+
+         button,
+         label {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+         }
+
+         button:hover,
+         label:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+         }
+
+         input[type='file'] {
+            display: none;
+         }
+
+         .track-info {
+            margin-top: 20px;
+            font-size: 12px;
+            opacity: 0.6;
+            max-width: 300px;
+            text-align: center;
+            word-break: break-all;
+         }
+      </style>
+   </head>
+   <body>
+      <div class="visualizer-container" id="visualizer"></div>
+
+      <div class="controls">
+         <label for="audioFile">📂 选择音频</label>
+         <input type="file" id="audioFile" accept="audio/*" />
+         <button id="playPauseBtn" disabled>▶ 播放</button>
+      </div>
+
+      <div class="track-info" id="trackInfo">等待加载音频文件...</div>
+
+      <script>
+         // 1. 核心变量
+         const BAR_COUNT = 64;
+         let audioContext, analyser, source, dataArray, bufferLength;
+         let audioElement = null;
+         let isPlaying = false;
+         let animationId = null;
+
+         // 2. 初始化 DOM
+         const visualizer = document.getElementById('visualizer');
+         const playPauseBtn = document.getElementById('playPauseBtn');
+         const trackInfo = document.getElementById('trackInfo');
+
+         for (let i = 0; i < BAR_COUNT; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            visualizer.appendChild(bar);
+         }
+         const bars = document.querySelectorAll('.bar');
+
+         // 3. 音频上下文初始化
+         function initAudio() {
+            if (audioContext) return;
+            audioContext = new (
+               window.AudioContext || window.webkitAudioContext
+            )();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256; // 256 产生 128 个频段，适合 64 根柱子
+            bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+         }
+
+         // 4. 文件处理与连接
+         document.getElementById('audioFile').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            initAudio();
+
+            // 停止旧音频
+            if (audioElement) {
+               audioElement.pause();
+               if (source) source.disconnect();
+            }
+
+            // 创建新音频元素
+            audioElement = new Audio();
+            audioElement.src = URL.createObjectURL(file);
+            audioElement.crossOrigin = 'anonymous'; // 解决 CORS
+
+            // 连接 Web Audio API
+            source = audioContext.createMediaElementSource(audioElement);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            trackInfo.textContent = `正在播放: ${file.name}`;
+            playPauseBtn.disabled = false;
+            playPauseBtn.textContent = '▶ 播放';
+            isPlaying = false;
+         });
+
+         // 5. 播放/暂停控制
+         playPauseBtn.addEventListener('click', async () => {
+            if (!audioElement) return;
+
+            if (audioContext.state === 'suspended') {
+               await audioContext.resume();
+            }
+
+            if (isPlaying) {
+               audioElement.pause();
+               playPauseBtn.textContent = '▶ 播放';
+               cancelAnimationFrame(animationId);
+            } else {
+               audioElement.play();
+               playPauseBtn.textContent = '⏸ 暂停';
+               animate();
+            }
+            isPlaying = !isPlaying;
+         });
+
+         // 6. 动画渲染循环
+         function animate() {
+            if (!isPlaying) return;
+            animationId = requestAnimationFrame(animate);
+
+            analyser.getByteFrequencyData(dataArray);
+
+            // 采样：128个频段映射到64根柱子，每2个取1个或取平均
+            for (let i = 0; i < BAR_COUNT; i++) {
+               const dataIndex = Math.floor(i * (bufferLength / BAR_COUNT));
+               const value = dataArray[dataIndex];
+
+               // 高度映射：0-255 -> 5px-200px
+               const percent = value / 255;
+               const height = Math.max(percent * 200, 5);
+
+               bars[i].style.height = `${height}px`;
+
+               // 动态颜色：根据索引和能量值调整色相
+               const hue = (i / BAR_COUNT) * 360;
+               const lightness = 50 + percent * 20; // 能量越高越亮
+               bars[i].style.background = `hsl(${hue}, 100%, ${lightness}%)`;
+               bars[i].style.boxShadow =
+                  `0 0 ${10 + percent * 15}px hsl(${hue}, 100%, 50%)`;
+            }
+         }
+
+         // 7. 播放结束处理
+         document.addEventListener('DOMContentLoaded', () => {
+            // 监听音频结束事件需要在 audioElement 创建后，这里用事件委托或全局监听
+            // 简单处理：在 animate 中检测或给 audioElement 加 ended 监听
+            // 为了简洁，我们在文件加载时添加：
+            const originalChangeHandler =
+               document.getElementById('audioFile').onchange;
+            document
+               .getElementById('audioFile')
+               .addEventListener('change', function () {
+                  if (audioElement) {
+                     audioElement.addEventListener('ended', () => {
+                        isPlaying = false;
+                        playPauseBtn.textContent = '▶ 播放';
+                        cancelAnimationFrame(animationId);
+                        bars.forEach(b => (b.style.height = '5px'));
+                     });
+                  }
+               });
+         });
+      </script>
+   </body>
+</html>

@@ -76,46 +76,33 @@
          <section
             class="screen screen2"
             :class="{ active: currentIndex === 1 }">
-            <PhotoWall v-if="currentIndex >= 1" />
+            <Portfolio />
          </section>
 
          <section
             class="screen screen3"
             :class="{ active: currentIndex === 2 }">
-            <Portfolio v-if="currentIndex >= 2" />
-         </section>
-
-         <section
-            class="screen screen4"
-            :class="{ active: currentIndex === 3 }">
-            <FriendLinks v-if="currentIndex >= 3" />
+            <FriendLinks />
          </section>
       </div>
+      <img src="@/static/lding.gif" alt="" class="blog-bg" />
    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/store/user';
+import Portfolio from './components/Portfolio.vue';
+import FriendLinks from './components/FriendLinks.vue';
 
 const { user } = storeToRefs(useUserStore());
-
-const PhotoWall = defineAsyncComponent(
-   () => import('./components/PhotoWall.vue')
-);
-const Portfolio = defineAsyncComponent(
-   () => import('./components/Portfolio.vue')
-);
-const FriendLinks = defineAsyncComponent(
-   () => import('./components/FriendLinks.vue')
-);
 
 const currentTitle = ref('');
 const currentIndex = ref(0);
 const lastScrollTime = ref(new Date());
 const animationDuration = 700;
-const totalScreens = 4;
+const totalScreens = 3;
 let intervalId: ReturnType<typeof setInterval> | null = null;
 
 const typeWriter = (text: string, speed: number) => {
@@ -347,5 +334,13 @@ onBeforeUnmount(() => {
       width: 40px;
       height: 40px;
    }
+}
+.blog-bg {
+   position: absolute;
+   z-index: 0;
+   opacity: 0.1;
+   width: 100vw;
+   inset: 0;
+   height: 100vh;
 }
 </style>

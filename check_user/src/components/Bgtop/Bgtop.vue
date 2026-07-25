@@ -13,6 +13,11 @@ const { handleClose, startpop } = appStore;
 
 const IsTab = ref(true);
 
+const handleSearchClick = (e: MouseEvent) => {
+   startpop();
+   console.log('点击了');
+};
+
 onMounted(() => {
    const currentTheme = document.documentElement.getAttribute('data-theme');
    if (currentTheme == 'dark') {
@@ -88,7 +93,7 @@ const leave = (el, done) => {
             </div>
 
             <div class="router-tab" v-if="Ispc">
-               <div class="top-sc" @click="startpop">
+               <div class="top-sc" @click="handleSearchClick">
                   <svg class="icon" aria-hidden="true">
                      <use xlink:href="#icon-sousuox"></use>
                   </svg>
@@ -120,7 +125,7 @@ const leave = (el, done) => {
                   <svg class="icon" aria-hidden="true">
                      <use xlink:href="#icon-rengongzhinengjiqiren"></use>
                   </svg>
-                  <span>GPT</span>
+                  <span>音乐</span>
                </div>
                <!--  -->
                <div class="top-sc" @click="util.mine()">
@@ -191,10 +196,7 @@ const leave = (el, done) => {
    </div>
 
    <!-- 弹窗 -->
-
-   <transition name="fade">
-      <Pop v-if="Ispop"></Pop>
-   </transition>
+   <Pop />
 </template>
 <style lang="scss" scoped>
 //

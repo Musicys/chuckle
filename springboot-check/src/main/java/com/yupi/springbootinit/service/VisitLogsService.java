@@ -1,6 +1,7 @@
 package com.yupi.springbootinit.service;
 
 import com.yupi.springbootinit.model.domain.VisitLogs;
+import com.yupi.springbootinit.model.vo.VisitStatsVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -10,4 +11,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface VisitLogsService extends IService<VisitLogs> {
 
+    /**
+     * 记录访问
+     */
+    void recordVisit(String ip, String userAgent, String pageUrl);
+
+    /**
+     * 获取访问统计（今日PV/UV、本月PV、总PV）
+     */
+    VisitStatsVO getVisitStats();
 }

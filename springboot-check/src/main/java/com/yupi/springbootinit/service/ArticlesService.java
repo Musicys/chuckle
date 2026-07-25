@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yupi.springbootinit.model.domain.Articles;
 import com.yupi.springbootinit.model.dto.article.ArticleUserQueryRequest;
+import com.yupi.springbootinit.model.vo.ArticleSearchVO;
 import com.yupi.springbootinit.model.vo.ArticleUserVO;
 
 /**
@@ -22,4 +23,9 @@ public interface ArticlesService extends IService<Articles> {
      * 获取文章详情（用户端，含正文内容，阅读量+1）
      */
     ArticleUserVO getArticleDetail(Integer id);
+
+    /**
+     * 搜索文章（用户端，返回高亮结果）
+     */
+    Page<ArticleSearchVO> searchArticles(ArticleUserQueryRequest request);
 }

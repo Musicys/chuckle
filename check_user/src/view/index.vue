@@ -12,8 +12,10 @@ import Monitor from '@/components/monitor/monitor.vue';
    <div class="page" style="height: 100vh; overflow: auto">
       <aPlayer></aPlayer>
       <Bgtop></Bgtop>
+
       <!-- 一级路由+路由切换动画 -->
       <Monitor></Monitor>
+
       <div class="box">
          <transition name="slide-fade">
             <keep-alive>

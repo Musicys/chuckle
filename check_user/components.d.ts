@@ -7,18 +7,22 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AiChatModal: typeof import('./src/components/AiChatModal.vue')['default']
     Bgtop: typeof import('./src/components/Bgtop/Bgtop.vue')['default']
     Draw: typeof import('./src/components/draw/draw.vue')['default']
     Echarts: typeof import('./src/components/Echarts.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElDivider: typeof import('element-plus/es')['ElDivider']
     ElDrawer: typeof import('element-plus/es')['ElDrawer']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
+    Live2dToggle: typeof import('./src/components/Live2dToggle.vue')['default']
     Lloding: typeof import('./src/components/lodding/lloding.vue')['default']
     MapContainer: typeof import('./src/components/MapContainer.vue')['default']
     Monitor: typeof import('./src/components/monitor/monitor.vue')['default']
     Pop: typeof import('./src/components/pop.vue')['default']
+    RightMenu: typeof import('./src/components/RightMenu/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

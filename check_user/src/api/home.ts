@@ -1,5 +1,26 @@
 import request from './request';
 
+export interface GameItem {
+   icon: string;
+   title: string;
+   value: string;
+}
+
+export interface Config {
+   theme: string;
+   layout: string;
+   musicEnabled: boolean;
+   commentEnabled: boolean;
+   url: string;
+   aiurl: string;
+   miyao: string;
+   age: string;
+   major: string;
+   currentOccupation: string;
+   pursuits: string[];
+   games: GameItem[];
+}
+
 export interface BloggerInfo {
    avatar: string;
    nickname: string;
@@ -18,6 +39,7 @@ export interface BloggerInfo {
    longitude: number;
    address: string;
    announcement: string;
+   config: string;
 }
 
 export interface RecentArticle {
@@ -61,7 +83,9 @@ export interface ArticleCategory {
 export interface ArticleItem {
    id: number;
    title: string;
+   titleHighlight: string;
    summary: string;
+   summaryHighlight: string;
    cover: string;
    content: string;
    category: ArticleCategory;
@@ -128,4 +152,11 @@ export const fetchArticleById = (id: number) => {
 
 export const submitComment = (data: CommentRequest) => {
    return request.post<any, ApiResponse<number>>('/articles/comment', data);
+};
+
+export const searchArticles = (params: ArticleListRequest) => {
+   return request.post<any, ApiResponse<ArticleListResponse>>(
+      '/articles/search',
+      params
+   );
 };

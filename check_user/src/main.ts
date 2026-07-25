@@ -87,12 +87,14 @@ app.use(router);
 
 app.use(hljsVuePlugin);
 import loading from './static/lding.gif';
+import errorImg from './static/error.svg';
 app.use(VueLazyload, {
    loading,
-   error: loading,
+   error: errorImg,
    throttleWait: 200,
-   preLoad: 0.1,
-   attempt: 1
+   preLoad: 0.3,
+   attempt: 3,
+   observer: true
 });
 
 app.mount('#app');

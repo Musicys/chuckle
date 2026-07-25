@@ -16,7 +16,3 @@ public class DailyStatsServiceImpl extends ServiceImpl<DailyStatsMapper, DailySt
     implements DailyStatsService{
 
 }
-
-
-
-

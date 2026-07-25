@@ -17,4 +17,23 @@
         id,ip,user_agent,
         page_url,visit_date,created_at
     </sql>
+
+    <select id="selectPvByDate" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM visit_logs WHERE visit_date = #{date}
+    </select>
+
+    <select id="selectUvByDate" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT ip) FROM visit_logs WHERE visit_date = #{date}
+    </select>
+
+    <select id="selectPvSumSince" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM visit_logs
+        <if test="startDate != null">
+            WHERE visit_date &gt;= #{startDate}
+        </if>
+    </select>
+
+    <select id="selectTotalPv" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM visit_logs
+    </select>
 </mapper>

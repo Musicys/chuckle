@@ -1,9 +1,5 @@
 <template>
    <div class="pr">
-      <div style="margin-bottom: 1em">
-         <span> 名称:{{ nickname }} </span>
-         <span> 邮箱 :{{ email }}</span>
-      </div>
       <textarea
          v-model="content"
          @input="updateCharacterCount"
@@ -20,18 +16,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
 
-const props = defineProps<{
-   nickname?: string;
-   email?: string;
+defineProps<{
+   isReply?: boolean;
 }>();
 
 const emit = defineEmits<{
-   (e: 'submit', data: { nickname: string; email?: string; content: string }): void;
+   (e: 'submit', content: string): void;
 }>();
 
-const nickname = ref(props.nickname || '游客');
-const email = ref(props.email || '');
 const content = ref('');
 const characterCount = ref(0);
 
@@ -42,14 +36,10 @@ const updateCharacterCount = (event: Event) => {
 
 const handleSubmit = () => {
    if (!content.value.trim()) {
-      alert('请输入评论内容');
+      ElMessage.warning('请输入评论内容');
       return;
    }
-   emit('submit', {
-      nickname: nickname.value,
-      email: email.value || undefined,
-      content: content.value
-   });
+   emit('submit', content.value);
    content.value = '';
    characterCount.value = 0;
 };
@@ -58,7 +48,6 @@ const handleSubmit = () => {
 <style lang="scss" scoped>
 .pr {
    width: 90%;
-
    margin: 1em auto;
    border-radius: 15px;
    background: var(--mart-top-pr-back);
@@ -70,19 +59,14 @@ const handleSubmit = () => {
 
    .pr_but {
       align-items: center;
+      width: 100%;
+      display: flex;
+      justify-content: end;
 
       & > span {
          margin-right: 1em;
-      }
-   }
-
-   & > div {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-
-      & > span {
-         display: inline-block;
+         font-size: 0.9em;
+         color: var(--cart-home-time-color);
       }
    }
 
@@ -91,50 +75,36 @@ const handleSubmit = () => {
       background: #61a9de;
       padding: 0.5em 1em;
       border-radius: 10px;
-
       border: none;
+      cursor: pointer;
 
       &:hover {
-         cursor: pointer;
          background: #f5cf51;
       }
    }
 
    .text {
       width: 95%;
-
       resize: vertical;
-      /* 用户只能调整高度 */
       min-height: 150px;
       border-radius: 10px;
       color: var(--bk-font-color);
       border: none;
-      border: none;
-
-      /* 清除内边距 */
-      padding: 0;
-
-      /* 清除外边距 */
-      margin: 0;
-
-      /* 清除背景颜色 */
       background-color: transparent;
-
-      /* 清除字体样式 */
       font-family: inherit;
       font-size: inherit;
       line-height: inherit;
-
-      /* 清除轮廓线 */
       outline: none;
-
-      /* 清除文本区域的滚动条 */
       overflow: auto;
       margin-bottom: 0.5em;
       padding: 1em;
 
       &:focus {
          background: var(--mart-commment-bot-back);
+      }
+
+      &::placeholder {
+         color: var(--cart-home-time-color);
       }
    }
 }

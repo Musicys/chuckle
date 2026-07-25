@@ -7,6 +7,11 @@ const apiClient = axios.create({
    timeout: 20000 // 设置请求超时时间
 });
 
+// 更新 baseURL
+export const updateBaseUrl = (url: string) => {
+   apiClient.defaults.baseURL = url;
+};
+
 // 添加请求拦截器
 apiClient.interceptors.request.use(
    config => {

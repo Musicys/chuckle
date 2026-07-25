@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
 import { getBloggerInfo } from '@/api/home';
-import type { BloggerInfo } from '@/api/home';
+import type { BloggerInfo, Config } from '@/api/home';
 
 interface User {
    username: string;
@@ -18,26 +18,48 @@ interface User {
    CsdnUrl: string;
    StartTilte: string;
    announcement: string;
+   // 新增字段
+   occupation: string;
+   address: string;
+   tags: string[];
+   hobbies: string[];
 }
 
 export const useUserStore = defineStore('user', () => {
    const user: User = reactive({
       username: '轻笑Chuckle',
-      userImg:
-         'https://www.keaitupian.cn/cjpic/frombd/2/253/1676065055/2828606542.jpg',
+      userImg: '',
       LodingImgUrl: '',
       IndexBack: '',
-      drawURL:
-         'https://tse2-mm.cn.bing.net/th/id/OIP-C.OX22ZodoOmhwmPQ3-31sSgAAAA?rs=1&pid=ImgDetMain',
+      drawURL: '',
       IndexBackImg: '',
       GitHubUrl: '',
-      gitURL: 'string,',
-      drawtilte: '漫天倾尘 风中轻笑',
-      QqUrl: 'https://space.bilibili.com/283189629?spm_id_from=333.788.0.0',
-      Bilbilurl: 'https://space.bilibili.com/283189629?spm_id_from=333.788.0.0',
-      CsdnUrl: 'https://blog.csdn.net/Idmusi?spm=1000.2115.3001.5343',
-      StartTilte: '我走不开制动懂你发个额额',
-      announcement: ''
+      gitURL: '',
+      drawtilte: '轻笑Chuckle的个人博客',
+      QqUrl: '',
+      Bilbilurl: '',
+      CsdnUrl: '',
+      StartTilte: '',
+      announcement: '',
+      occupation: '',
+      address: '',
+      tags: [],
+      hobbies: []
+   });
+
+   const config: Config = reactive({
+      theme: 'default',
+      layout: 'blog',
+      musicEnabled: false,
+      commentEnabled: true,
+      url: '',
+      aiurl: '',
+      miyao: '',
+      age: '',
+      major: '',
+      currentOccupation: '',
+      pursuits: [],
+      games: []
    });
 
    /** 从后端获取博主信息并映射到 store */
@@ -46,15 +68,54 @@ export const useUserStore = defineStore('user', () => {
          const res = await getBloggerInfo();
          if (res.code === 0) {
             const data: BloggerInfo = res.data;
-            user.username = data.nickname;
-            user.userImg = data.avatar;
-            user.drawURL = data.avatar;
-            user.GitHubUrl = data.github;
-            user.gitURL = data.gitee;
-            user.QqUrl = data.qq;
-            user.Bilbilurl = data.bilibili;
-            user.drawtilte = data.blogTitle;
-            user.announcement = data.announcement;
+            user.username = data.nickname || '轻笑Chuckle';
+            user.userImg = data.avatar || '';
+            user.drawURL = data.avatar || '';
+            user.GitHubUrl = data.github || '';
+            user.gitURL = data.gitee || '';
+            user.QqUrl = data.qq || '';
+            user.Bilbilurl = data.bilibili || '';
+            user.drawtilte = data.blogTitle || '轻笑Chuckle的个人博客';
+            user.announcement = data.announcement || '';
+            user.occupation = data.occupation || '';
+            user.address = data.address || '';
+
+            // 解析 tags 和 hobbies
+            try {
+               user.tags = data.tags ? JSON.parse(data.tags) : [];
+            } catch {
+               user.tags = [];
+            }
+            try {
+               user.hobbies = data.hobbies ? JSON.parse(data.hobbies) : [];
+            } catch {
+               user.hobbies = [];
+            }
+
+            // 解析 config
+            if (data.config) {
+               try {
+                  const configObj = JSON.parse(data.config);
+                  config.theme = configObj.theme || 'default';
+                  config.layout = configObj.layout || 'blog';
+                  config.musicEnabled = configObj.musicEnabled || false;
+                  config.commentEnabled = configObj.commentEnabled ?? true;
+                  config.url = configObj.url || '';
+                  config.aiurl = configObj.aiurl || '';
+                  config.miyao = configObj.miyao || '';
+                  config.age = configObj.age || '';
+                  config.major = configObj.major || '';
+                  config.currentOccupation = configObj.currentOccupation || '';
+                  config.pursuits = Array.isArray(configObj.pursuits)
+                     ? configObj.pursuits
+                     : [];
+                  config.games = Array.isArray(configObj.games)
+                     ? configObj.games
+                     : [];
+               } catch (e) {
+                  console.error('解析配置失败', e);
+               }
+            }
             return data;
          }
       } catch (e) {
@@ -62,5 +123,5 @@ export const useUserStore = defineStore('user', () => {
       }
    };
 
-   return { user, fetchBloggerInfo };
+   return { user, config, fetchBloggerInfo };
 });

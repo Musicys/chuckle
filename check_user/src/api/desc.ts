@@ -36,6 +36,17 @@ export interface CommentRequest {
    replyToCommentId?: number;
 }
 
+export interface Comment {
+   id: number;
+   nickname: string;
+   email: string;
+   avatar: string;
+   content: string;
+   replyToCommentId: number | null;
+   createdAt: string;
+   children: Comment[];
+}
+
 export interface ApiResponse<T> {
    code: number;
    data: T;
@@ -48,4 +59,10 @@ export const fetchArticleById = (id: number) => {
 
 export const submitComment = (data: CommentRequest) => {
    return request.post<any, ApiResponse<number>>('/articles/comment', data);
+};
+
+export const fetchComments = (articleId: number) => {
+   return request.get<any, ApiResponse<Comment[]>>(
+      `/articles/comments/${articleId}`
+   );
 };

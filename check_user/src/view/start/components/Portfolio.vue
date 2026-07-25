@@ -6,16 +6,9 @@
             v-for="(project, index) in portfolio"
             :key="index"
             class="portfolio-item"
-            :style="{ animationDelay: `${index * 0.1}s` }"
-            :class="{ show: isVisible }">
+            :class="{ show: visibleItems[index] }">
             <div class="portfolio-image">
-               <img
-                  :src="
-                     loadedImages[index] ||
-                     'https://img.zcool.cn/community/0115bb5715c7356ac725134349d24b.gif'
-                  "
-                  :alt="project.title"
-                  @load="onImageLoad(index)" />
+               <img :src="project.image" :alt="project.title" />
                <div class="portfolio-overlay">
                   <span class="portfolio-title">{{ project.title }}</span>
                   <span class="portfolio-desc">{{ project.desc }}</span>
@@ -32,10 +25,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 
-const isVisible = ref(false);
-const loadedImages = ref<string[]>([]);
+const visibleItems = ref<boolean[]>([]);
+const timerIds = ref<number[]>([]);
 
 const portfolio = computed(() => {
    return [
@@ -76,7 +69,7 @@ const portfolio = computed(() => {
          image: 'https://images.unsplash.com/photo-1535224206242-87dfbf2f6a71'
       },
       {
-         title: 'AI助手',
+         title: '音乐',
          desc: '基于大模型的智能问答系统',
          category: 'Python',
          image: 'https://images.unsplash.com/photo-1677442136506-72140f387635'
@@ -90,20 +83,31 @@ const portfolio = computed(() => {
    ];
 });
 
-const onImageLoad = (index: number) => {
-   const nextIndex = index + 1;
-   if (nextIndex < portfolio.value.length && !loadedImages.value[nextIndex]) {
-      setTimeout(() => {
-         loadedImages.value[nextIndex] = portfolio.value[nextIndex].image;
-      }, 100);
-   }
+const preloadImages = () => {
+   portfolio.value.forEach(item => {
+      const img = new Image();
+      img.src = item.image;
+   });
+};
+
+const animateItems = (index: number) => {
+   if (index >= portfolio.value.length) return;
+   const timer = setTimeout(() => {
+      visibleItems.value[index] = true;
+      animateItems(index + 1);
+   }, 120);
+   timerIds.value.push(timer);
 };
 
 onMounted(() => {
-   isVisible.value = true;
-   if (portfolio.value.length > 0) {
-      loadedImages.value[0] = portfolio.value[0].image;
-   }
+   visibleItems.value = new Array(portfolio.value.length).fill(false);
+   preloadImages();
+   animateItems(0);
+});
+
+onBeforeUnmount(() => {
+   timerIds.value.forEach(timer => clearTimeout(timer));
+   timerIds.value = [];
 });
 </script>
 
@@ -139,19 +143,20 @@ onMounted(() => {
    border-radius: 16px;
    overflow: hidden;
    opacity: 0;
-   transform: translateY(20px);
+   transform: translateY(20px) translateZ(0);
    transition:
-      opacity 0.4s ease-out,
-      transform 0.4s ease-out;
+      opacity 0.3s ease-out,
+      transform 0.3s ease-out;
+   will-change: opacity, transform;
 }
 
 .portfolio-item.show {
    opacity: 1;
-   transform: translateY(0);
+   transform: translateY(0) translateZ(0);
 }
 
 .portfolio-item:hover {
-   transform: translateY(-6px);
+   transform: translateY(-6px) translateZ(0);
    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 

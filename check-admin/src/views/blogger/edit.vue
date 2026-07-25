@@ -12,6 +12,7 @@ import {
   NText,
   NModal,
   NTag,
+  NSwitch,
   useMessage,
 } from "naive-ui";
 import ImageSelector from "@/components/common/image-selector.vue";
@@ -55,7 +56,21 @@ const form = reactive({
   longitude: "",
   address: "",
   announcement: "",
-  config: '{"theme":"default","layout":"blog","commentEnabled":true}',
+  // 配置项拆分为独立字段
+  config: {
+    theme: "default",
+    layout: "blog",
+    musicEnabled: false,
+    commentEnabled: true,
+    url: "",
+    aiurl: "",
+    miyao: "",
+    age: "",
+    major: "",
+    currentOccupation: "",
+    pursuits: [] as string[],
+    games: [] as GameItem[],
+  },
 });
 
 const genderOptions = [
@@ -66,9 +81,11 @@ const genderOptions = [
 const showTagModal = ref(false);
 const showHobbyModal = ref(false);
 const showGameModal = ref(false);
+const showPursuitModal = ref(false);
 
 const newTag = ref("");
 const newHobby = ref("");
+const newPursuit = ref("");
 const newGame = reactive<GameItem>({
   icon: "",
   title: "",
@@ -77,7 +94,8 @@ const newGame = reactive<GameItem>({
 
 const tagsJson = computed(() => JSON.stringify(form.tags));
 const hobbiesJson = computed(() => JSON.stringify(form.hobbies));
-const gamesJson = computed(() => JSON.stringify(form.games));
+const pursuitsJson = computed(() => JSON.stringify(form.config.pursuits));
+const gamesJson = computed(() => JSON.stringify(form.config.games));
 
 async function loadBlogger() {
   if (!isEdit) return;
@@ -115,7 +133,39 @@ async function loadBlogger() {
       form.longitude = String(blogger.longitude || "");
       form.address = blogger.address;
       form.announcement = blogger.announcement;
-      form.config = blogger.config;
+      // 解析 config JSON
+      try {
+        const configObj = blogger.config ? JSON.parse(blogger.config) : {};
+        form.config = {
+          theme: configObj.theme || "default",
+          layout: configObj.layout || "blog",
+          musicEnabled: configObj.musicEnabled || false,
+          commentEnabled: configObj.commentEnabled ?? true,
+          url: configObj.url || "",
+          aiurl: configObj.aiurl || "",
+          miyao: configObj.miyao || "",
+          age: configObj.age || "",
+          major: configObj.major || "",
+          currentOccupation: configObj.currentOccupation || "",
+          pursuits: Array.isArray(configObj.pursuits) ? configObj.pursuits : [],
+          games: Array.isArray(configObj.games) ? configObj.games : [],
+        };
+      } catch {
+        form.config = {
+          theme: "default",
+          layout: "blog",
+          musicEnabled: false,
+          commentEnabled: true,
+          url: "",
+          aiurl: "",
+          miyao: "",
+          age: "",
+          major: "",
+          currentOccupation: "",
+          pursuits: [],
+          games: [],
+        };
+      }
     }
   } catch (error) {
     message.error("获取博主信息失败");
@@ -160,12 +210,30 @@ function removeHobby(index: number) {
   form.hobbies.splice(index, 1);
 }
 
+function addPursuit() {
+  if (!newPursuit.value.trim()) {
+    message.warning("请输入追求内容");
+    return;
+  }
+  if (form.config.pursuits.includes(newPursuit.value.trim())) {
+    message.warning("追求已存在");
+    return;
+  }
+  form.config.pursuits.push(newPursuit.value.trim());
+  newPursuit.value = "";
+  showPursuitModal.value = false;
+}
+
+function removePursuit(index: number) {
+  form.config.pursuits.splice(index, 1);
+}
+
 function addGame() {
   if (!newGame.title.trim()) {
     message.warning("请输入游戏标题");
     return;
   }
-  form.games.push({ ...newGame });
+  form.config.games.push({ ...newGame });
   newGame.icon = "";
   newGame.title = "";
   newGame.value = "";
@@ -173,7 +241,7 @@ function addGame() {
 }
 
 function removeGame(index: number) {
-  form.games.splice(index, 1);
+  form.config.games.splice(index, 1);
 }
 
 async function handleSubmit() {
@@ -202,7 +270,7 @@ async function handleSubmit() {
       longitude: form.longitude ? Number(form.longitude) : undefined,
       address: form.address,
       announcement: form.announcement,
-      config: form.config,
+      config: JSON.stringify(form.config),
     };
 
     if (isEdit) {
@@ -506,13 +574,186 @@ onMounted(() => {
           </div>
 
           <div class="list-field">
-            <div class="field-label">配置</div>
+            <div class="field-label">主题</div>
+            <div class="field-content">
+              <NSelect
+                v-model:value="form.config.theme"
+                :options="[
+                  { label: '默认', value: 'default' },
+                  { label: '暗色', value: 'dark' },
+                ]"
+                placeholder="请选择主题"
+                class="config-select"
+              />
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">布局</div>
+            <div class="field-content">
+              <NSelect
+                v-model:value="form.config.layout"
+                :options="[
+                  { label: '博客', value: 'blog' },
+                  { label: '卡片', value: 'card' },
+                ]"
+                placeholder="请选择布局"
+                class="config-select"
+              />
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">音乐开关</div>
+            <div class="field-content">
+              <NSwitch v-model:value="form.config.musicEnabled" />
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">评论开关</div>
+            <div class="field-content">
+              <NSwitch v-model:value="form.config.commentEnabled" />
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">API 地址</div>
             <div class="field-content">
               <NInput
-                v-model:value="form.config"
-                placeholder='请输入配置JSON，如 {"theme":"default","layout":"blog"}'
+                v-model:value="form.config.url"
+                placeholder="请输入后端 API 地址"
                 class="full-width"
               />
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">AI 地址</div>
+            <div class="field-content">
+              <NInput
+                v-model:value="form.config.aiurl"
+                placeholder="请输入 AI 接口地址"
+                class="full-width"
+              />
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">AI 密钥</div>
+            <div class="field-content">
+              <NInput
+                v-model:value="form.config.miyao"
+                placeholder="请输入 AI 密钥"
+                class="full-width"
+                :type="'password'"
+              />
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">年龄</div>
+            <div class="field-content">
+              <NInput
+                v-model:value="form.config.age"
+                placeholder="请输入年龄"
+                class="full-width"
+              />
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">专业</div>
+            <div class="field-content">
+              <NInput
+                v-model:value="form.config.major"
+                placeholder="请输入专业"
+                class="full-width"
+              />
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">现在职业</div>
+            <div class="field-content">
+              <NInput
+                v-model:value="form.config.currentOccupation"
+                placeholder="请输入现在职业"
+                class="full-width"
+              />
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">追求</div>
+            <div class="field-content">
+              <div class="tags-list">
+                <NTag
+                  v-for="(pursuit, index) in form.config.pursuits"
+                  :key="index"
+                  closable
+                  @close="removePursuit(index)"
+                  class="tag-item"
+                  type="info"
+                >
+                  {{ pursuit }}
+                </NTag>
+                <NButton
+                  v-if="form.config.pursuits.length < 10"
+                  dashed
+                  size="small"
+                  @click="showPursuitModal = true"
+                  class="add-btn"
+                >
+                  + 添加追求
+                </NButton>
+                <span v-else class="limit-text">最多添加10个追求</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="list-field">
+            <div class="field-label">游戏配置</div>
+            <div class="field-content">
+              <div class="games-list">
+                <div
+                  v-for="(game, index) in form.config.games"
+                  :key="index"
+                  class="game-card"
+                >
+                  <div class="game-icon">
+                    <img
+                      v-if="game.icon"
+                      :src="game.icon"
+                      alt="游戏图标"
+                      class="icon-img"
+                    />
+                    <span v-else class="icon-placeholder">🎮</span>
+                  </div>
+                  <div class="game-info">
+                    <div class="game-title">{{ game.title }}</div>
+                    <div class="game-value">{{ game.value }}</div>
+                  </div>
+                  <NButton
+                    size="small"
+                    type="error"
+                    @click="removeGame(index)"
+                    class="remove-btn"
+                  >
+                    删除
+                  </NButton>
+                </div>
+                <NButton
+                  v-if="form.config.games.length < 4"
+                  dashed
+                  size="small"
+                  @click="showGameModal = true"
+                  class="add-btn"
+                >
+                  + 添加游戏配置
+                </NButton>
+                <span v-else class="limit-text">最多添加4个游戏配置</span>
+              </div>
             </div>
           </div>
         </div>
@@ -572,7 +813,7 @@ onMounted(() => {
     <NModal
       v-model:show="showGameModal"
       preset="card"
-      title="添加游戏"
+      title="添加游戏配置"
       style="width: 450px"
     >
       <NForm
@@ -607,6 +848,33 @@ onMounted(() => {
         <NSpace>
           <NButton @click="showGameModal = false">取消</NButton>
           <NButton type="primary" @click="addGame">确定</NButton>
+        </NSpace>
+      </template>
+    </NModal>
+
+    <NModal
+      v-model:show="showPursuitModal"
+      preset="card"
+      title="添加追求"
+      style="width: 400px"
+    >
+      <NForm
+        :model="{ pursuit: newPursuit }"
+        label-placement="left"
+        :label-width="60"
+      >
+        <NFormItem label="追求">
+          <NInput
+            v-model:value="newPursuit"
+            placeholder="请输入追求内容"
+            @keyup.enter="addPursuit"
+          />
+        </NFormItem>
+      </NForm>
+      <template #action>
+        <NSpace>
+          <NButton @click="showPursuitModal = false">取消</NButton>
+          <NButton type="primary" @click="addPursuit">确定</NButton>
         </NSpace>
       </template>
     </NModal>
@@ -727,6 +995,10 @@ onMounted(() => {
 
 .gender-select {
   width: 120px;
+}
+
+.config-select {
+  width: 180px;
 }
 
 .list-field {

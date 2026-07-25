@@ -114,19 +114,6 @@ CREATE TABLE `comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表（树状嵌套）';
 
 
--- 7. 友情链接表
-CREATE TABLE `friend_links` (
-    `id`          INT UNSIGNED  NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `name`        VARCHAR(100)  NOT NULL COMMENT '友站名称',
-    `url`         VARCHAR(500)  NOT NULL COMMENT '友站URL',
-    `avatar`      VARCHAR(500)  NOT NULL DEFAULT '' COMMENT '友站头像URL',
-    `description` VARCHAR(200)  NOT NULL DEFAULT '' COMMENT '站点描述',
-    `sort_order`  INT           NOT NULL DEFAULT 0 COMMENT '排序（越小越靠前）',
-    `status`      TINYINT       NOT NULL DEFAULT 1 COMMENT '状态（0=隐藏 1=展示）',
-    `created_at`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (`id`),
-    KEY `idx_sort` (`sort_order`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友情链接表';
 
 
 -- 8. 访问日志表（原始访问记录）
@@ -169,7 +156,40 @@ CREATE TABLE `system_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统设置表';
 
 
--- 11. 图床文件表（图片管理）
+-- 11. 作品集表
+CREATE TABLE IF NOT EXISTS `portfolio` (
+    `id`          INT UNSIGNED  NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `title`       VARCHAR(100)  NOT NULL COMMENT '作品名称',
+    `description` VARCHAR(500)  NOT NULL DEFAULT '' COMMENT '作品描述',
+    `category`    VARCHAR(50)   NOT NULL DEFAULT '' COMMENT '分类标签（如 Java、Vue、React）',
+    `cover`       VARCHAR(500)  NOT NULL DEFAULT '' COMMENT '封面图片URL',
+    `project_url` VARCHAR(500)  NOT NULL DEFAULT '' COMMENT '项目链接/演示地址',
+    `sort_order`  INT           NOT NULL DEFAULT 0 COMMENT '排序（越小越靠前）',
+    `status`      TINYINT       NOT NULL DEFAULT 1 COMMENT '状态（0=隐藏 1=展示）',
+    `created_at`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_sort` (`sort_order`),
+    KEY `idx_category` (`category`),
+    KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='作品集表';
+-- 7. 友情链接表
+CREATE TABLE IF NOT EXISTS `friend_links` (
+    `id`          INT UNSIGNED  NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `name`        VARCHAR(100)  NOT NULL COMMENT '友站名称',
+    `url`         VARCHAR(500)  NOT NULL COMMENT '友站URL',
+    `avatar`      VARCHAR(500)  NOT NULL DEFAULT '' COMMENT '友站头像URL',
+    `description` VARCHAR(200)  NOT NULL DEFAULT '' COMMENT '站点描述',
+    `email`       VARCHAR(200)  NOT NULL DEFAULT '' COMMENT '联系邮箱（用于友链申请通知）',
+    `sort_order`  INT           NOT NULL DEFAULT 0 COMMENT '排序（越小越靠前）',
+    `status`      TINYINT       NOT NULL DEFAULT 1 COMMENT '状态（0=隐藏 1=展示）',
+    `created_at`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_sort` (`sort_order`),
+    KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友情链接表';
+
 
 
 

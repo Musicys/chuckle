@@ -2,6 +2,9 @@ package com.yupi.springbootinit.mapper;
 
 import com.yupi.springbootinit.model.domain.DailyStats;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
 
 /**
 * @author 黎旺
@@ -11,8 +14,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface DailyStatsMapper extends BaseMapper<DailyStats> {
 
+    /**
+     * 查询指定日期范围的PV总和
+     */
+    Integer selectPvSumSince(@Param("startDate") Date startDate);
+
+    /**
+     * 查询总PV
+     */
+    Integer selectTotalPv();
 }
-
-
-
-

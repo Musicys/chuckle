@@ -17,4 +17,15 @@
         id,stat_date,pv,
         uv,created_at,updated_at
     </sql>
+
+    <select id="selectPvSumSince" resultType="java.lang.Integer">
+        SELECT COALESCE(SUM(pv), 0) FROM daily_stats
+        <if test="startDate != null">
+            WHERE stat_date &gt;= #{startDate}
+        </if>
+    </select>
+
+    <select id="selectTotalPv" resultType="java.lang.Integer">
+        SELECT COALESCE(SUM(pv), 0) FROM daily_stats
+    </select>
 </mapper>

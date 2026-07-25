@@ -71,7 +71,15 @@ const columns = [
     key: "url",
     width: 120,
     render(row: Api.Image.ImageInfo) {
-      return `<img src="${row.url}" style="width:100px;height:100px;object-fit:cover;border-radius:4px;" />`;
+      return isVideoType(row.fileType)
+        ? h("video", {
+            src: row.url,
+            style: "width:100px;height:100px;object-fit:cover;border-radius:4px;background:#000",
+            muted: true,
+            playsinline: true,
+            preload: "metadata",
+          })
+        : `<img src="${row.url}" style="width:100px;height:100px;object-fit:cover;border-radius:4px;" />`;
     },
   },
   {
@@ -97,7 +105,7 @@ const columns = [
     key: "width",
     width: 100,
     render(row: Api.Image.ImageInfo) {
-      return `${row.width}×${row.height}`;
+      return row.width ? `${row.width}×${row.height}` : "-";
     },
   },
   {
@@ -175,6 +183,10 @@ function getSourceLabel(source: string): string {
   return option ? option.label : source;
 }
 
+function isVideoType(fileType: string): boolean {
+  return fileType.startsWith("video/");
+}
+
 function openModal() {
   showModal.value = true;
   searchForm.source = props.source || "";
@@ -236,8 +248,8 @@ function handleFileUpload(event: Event) {
   const file = target.files?.[0];
   if (!file) return;
 
-  if (!file.type.startsWith("image/")) {
-    message.warning("请上传图片文件");
+  if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
+    message.warning("请上传图片或 MP4 视频文件");
     return;
   }
 
@@ -365,7 +377,7 @@ defineExpose({
         <NSpace>
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,video/mp4,video/quicktime"
             class="hidden"
             @change="handleFileUpload"
             ref="fileInputRef"
@@ -409,7 +421,21 @@ defineExpose({
           :class="{ selected: isSelected(image) }"
           @click="toggleSelect(image)"
         >
-          <img :src="image.url" :alt="image.originalName" class="image-thumb" />
+          <video
+            v-if="isVideoType(image.fileType)"
+            :src="image.url"
+            class="image-thumb"
+            muted
+            playsinline
+            preload="metadata"
+            style="background: #000"
+          ></video>
+          <img
+            v-else
+            :src="image.url"
+            :alt="image.originalName"
+            class="image-thumb"
+          />
           <div class="image-info">
             <NText :ellipsis="{ tooltip: image.originalName }">
               {{ image.originalName }}

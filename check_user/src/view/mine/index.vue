@@ -1,6 +1,64 @@
 <script setup lang="ts">
 import MapContainer from '../../components/MapContainer.vue';
-import { ref, Ref } from 'vue';
+import { useUserStore } from '../../store/user';
+import { getVisitsStats, type VisitsStats } from '../../api/mine';
+import { ref, onMounted, onUnmounted } from 'vue';
+
+const userStore = useUserStore();
+
+// 追求轮询索引
+const currentPursuitIndex = ref(0);
+let pursuitTimer: ReturnType<typeof setInterval> | null = null;
+
+// 访问统计数据
+const visitsStats = ref<VisitsStats>({
+   todayPv: 0,
+   todayUv: 0,
+   monthPv: 0,
+   totalPv: 0
+});
+const visitsLoading = ref(false);
+
+// 获取访问统计
+const loadVisitsStats = async () => {
+   visitsLoading.value = true;
+   try {
+      const response = await getVisitsStats();
+      if (response.code === 0 && response.data) {
+         visitsStats.value = response.data;
+      }
+   } catch (error) {
+      console.error('获取访问统计失败:', error);
+   } finally {
+      visitsLoading.value = false;
+   }
+};
+
+onMounted(() => {
+   // 每2秒切换一个追求
+   pursuitTimer = setInterval(() => {
+      const pursuits = userStore.config.pursuits || [];
+      if (pursuits.length > 0) {
+         currentPursuitIndex.value =
+            (currentPursuitIndex.value + 1) % pursuits.length;
+      }
+   }, 1000);
+
+   // 加载访问统计
+   loadVisitsStats();
+});
+
+onUnmounted(() => {
+   if (pursuitTimer) {
+      clearInterval(pursuitTimer);
+   }
+});
+
+// 当前显示的追求
+const currentPursuit = () => {
+   const pursuits = userStore.config.pursuits || [];
+   return pursuits[currentPursuitIndex.value] || '乐趣·兴趣';
+};
 </script>
 
 <template>
@@ -12,7 +70,6 @@ import { ref, Ref } from 'vue';
                <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-yuanshen-wa"></use>
                </svg>
-
                <span>神里绫华的狗</span>
             </div>
             <div style="--l: 10px; --s: 4.4s">
@@ -37,10 +94,12 @@ import { ref, Ref } from 'vue';
          <!-- center -->
          <div class="box">
             <div class="img"></div>
-
             <img
-               src="https://tse3-mm.cn.bing.net/th/id/OIP-C.U1UG7FN50qzrntU8he3s9wAAAA?rs=1&pid=ImgDetMain"
-               alt="" />
+               :src="
+                  userStore.user.userImg ||
+                  'https://tse3-mm.cn.bing.net/th/id/OIP-C.U1UG7FN50qzrntU8he3s9wAAAA?rs=1&pid=ImgDetMain'
+               "
+               :alt="userStore.user.username" />
          </div>
          <!-- right -->
          <div class="top-futer-txt02">
@@ -66,7 +125,7 @@ import { ref, Ref } from 'vue';
                <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-rengongzhinengjiqiren"></use>
                </svg>
-               <span> GPT深度依赖者</span>
+               <span> AI深度依赖者</span>
             </div>
          </div>
       </div>
@@ -89,9 +148,12 @@ import { ref, Ref } from 'vue';
                font-size: 1.1em;
             ">
             <span>这里~这里~</span>
-            <span>网名 轻笑Chuckle</span>
+            <span>网名 {{ userStore.user.username || '轻笑Chuckle' }}</span>
             <span>有了备案就是 实名制上网啦QAQ</span>
-            <span>是一只还在求学路上的 大学生、个人博主</span>
+            <span>{{
+               userStore.user.occupation ||
+               '是一只还在求学路上的 大学生、个人博主'
+            }}</span>
          </div>
          <div
             style="
@@ -104,9 +166,9 @@ import { ref, Ref } from 'vue';
             ">
             <span style="font-size: 0.8em">追求</span>
             <span style="font-size: 1.8em">源于</span>
-            <span style="font-size: 1.8em">乐趣·兴趣</span>
+            <span style="font-size: 1.8em">技术</span>
             <div class="dom">
-               <span>程序</span>
+               <span>{{ currentPursuit() }}</span>
             </div>
          </div>
 
@@ -117,20 +179,20 @@ import { ref, Ref } from 'vue';
             <div class="dom-grid">
                <div>
                   <span>今日访问</span>
-                  <span>1321</span>
+                  <span>{{ visitsLoading ? '--' : visitsStats.todayPv }}</span>
                </div>
 
                <div>
                   <span>访问人数</span>
-                  <span>1321</span>
+                  <span>{{ visitsLoading ? '--' : visitsStats.todayUv }}</span>
                </div>
                <div>
                   <span>本月访问</span>
-                  <span>1321</span>
+                  <span>{{ visitsLoading ? '--' : visitsStats.monthPv }}</span>
                </div>
                <div>
-                  <span> 总访问量</span>
-                  <span>1321</span>
+                  <span>总访问量</span>
+                  <span>{{ visitsLoading ? '--' : visitsStats.totalPv }}</span>
                </div>
 
                <div></div>
@@ -150,24 +212,61 @@ import { ref, Ref } from 'vue';
                height: 100%;
             "
             class="xinx">
-            <div><span>生于</span><span style="color: #43a6c6">2003</span></div>
             <div>
-               <span>专业</span
-               ><span style="color: #c69043">计算机科学与技术</span>
+               <span>年龄</span
+               ><span style="color: #43a6c6">{{
+                  userStore.config.age || '2003'
+               }}</span>
             </div>
             <div>
-               <span>现在职业</span><span style="color: #b04fe6">大三学生</span>
+               <span>专业</span
+               ><span style="color: #c69043">{{
+                  userStore.config.major || '计算机科学与技术'
+               }}</span>
+            </div>
+            <div>
+               <span>现在职业</span
+               ><span style="color: #b04fe6">{{
+                  userStore.config.currentOccupation || '大三学生'
+               }}</span>
             </div>
          </div>
       </div>
 
       <div class="flex-cart">
-         <div style="color: white">
+         <div
+            v-for="(game, index) in userStore.config.games"
+            :key="index"
+            style="color: white">
+            <div class="cart-tilte">
+               <span>爱好游戏</span>
+               <span>{{ game.title }}</span>
+            </div>
+            <img
+               v-if="game.icon"
+               :src="game.icon"
+               style="width: 100%; height: 100%"
+               :alt="game.title" />
+            <div
+               v-else
+               style="
+                  width: 100%;
+                  height: 100%;
+                  background: #1d1b26;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 3em;
+               ">
+               🎮
+            </div>
+         </div>
+         <!-- 默认游戏卡片（当配置为空时显示） -->
+         <div v-if="userStore.config.games.length === 0" style="color: white">
             <div class="cart-tilte">
                <span>爱好游戏</span>
                <span>英魂之刃</span>
             </div>
-
             <video
                src="https://wjdown.99.com/games/yhzr/act/2020/znq/znq-index.mp4"
                autoplay="true"
@@ -175,34 +274,31 @@ import { ref, Ref } from 'vue';
                muted="true"
                style="width: 100%; position: absolute; top: 0"></video>
          </div>
-         <div>
+         <div v-if="userStore.config.games.length === 0" style="color: white">
             <div class="cart-tilte">
                <span>爱好游戏</span>
                <span>原神</span>
             </div>
-
             <img
                src="https://upload-bbs.miyoushe.com/upload/2022/11/28/17949827/2266190b99bece98ebc3bfb05212ca01_5809411558282465606.jpg?x-oss-process=image//resize,s_600/quality,q_80/auto-orient,0/interlace,1/format,jpg"
                style="width: 100%; height: 100%"
                alt="" />
          </div>
-         <div>
+         <div v-if="userStore.config.games.length === 0" style="color: white">
             <div class="cart-tilte">
                <span>爱好游戏</span>
                <span>永杰无间</span>
             </div>
-
             <img
                src="https://web-uns.oss-cn-beijing.aliyuncs.com/use.png"
                style="width: 100%; height: 100%"
                alt="" />
          </div>
-         <div>
+         <div v-if="userStore.config.games.length === 0" style="color: white">
             <div class="cart-tilte">
                <span>爱好游戏</span>
                <span>英雄联盟</span>
             </div>
-
             <img
                src="https://ts1.cn.mm.bing.net/th/id/R-C.78c17b06aa8e5df5f392034973ca7484?rik=b0RrvtImKRUi4g&riu=http%3a%2f%2fimg.likebizhi.com%2fuploads%2flikebizhi%2fup%2f2022%2f01%2f28d3df888cd09f2bda25a8f9586b2211125.jpg&ehk=%2fAWQ74FBd62DEYslIy0O2CK0X1g2nGRVQeMTMowf%2fvw%3d&risl=&pid=ImgRaw&r=0"
                style="width: 100%; height: 100%"
@@ -457,6 +553,7 @@ import { ref, Ref } from 'vue';
 
 .mine-page {
    margin-bottom: 200px;
+   margin-top: 50px;
 
    .top {
       display: flex;

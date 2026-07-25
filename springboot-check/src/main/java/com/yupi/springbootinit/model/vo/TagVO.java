@@ -4,9 +4,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * 标签视图
+ * 标签视图（用户端，含文章数量）
  */
-@ApiModel(description = "标签视图")
+@ApiModel(description = "标签视图（用户端，含文章数量）")
 public class TagVO {
 
     @ApiModelProperty(value = "标签ID")
@@ -17,6 +17,9 @@ public class TagVO {
 
     @ApiModelProperty(value = "标签颜色")
     private String color;
+
+    @ApiModelProperty(value = "标签下文章数量")
+    private Integer articleCount;
 
     public Integer getId() {
         return id;
@@ -40,5 +43,13 @@ public class TagVO {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Integer getArticleCount() {
+        return articleCount;
+    }
+
+    public void setArticleCount(Integer articleCount) {
+        this.articleCount = articleCount;
     }
 }

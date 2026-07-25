@@ -10,14 +10,16 @@
             <result property="url" column="url" jdbcType="VARCHAR"/>
             <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
             <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="email" column="email" jdbcType="VARCHAR"/>
             <result property="sortOrder" column="sort_order" jdbcType="INTEGER"/>
             <result property="status" column="status" jdbcType="TINYINT"/>
             <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+            <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,name,url,
-        avatar,description,sort_order,
-        status,created_at
+        id,name,url,avatar,
+        description,email,sort_order,
+        status,created_at,updated_at
     </sql>
 </mapper>

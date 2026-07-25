@@ -14,13 +14,18 @@
                <el-icon> <Memo /> </el-icon>目录
             </div>
             <div class="ml">
-               <MdCatalog
-                  :key="scrollElementKey"
-                  :editorId="editorId"
-                  :scrollElement="currentScrollElement"
-                  :headings="['h1', 'h2', 'h3']"
-                  :indent="16"
-                  :offsetTop="60" />
+               <nav class="toc-nav">
+                  <ul>
+                     <li
+                        v-for="item in toc"
+                        :key="item.id"
+                        :class="['toc-item', { active: activeId === item.id }]"
+                        :style="{ paddingLeft: `${(item.level - 1) * 16}px` }"
+                        @click="scrollToHeading(item.id)">
+                        {{ item.text }}
+                     </li>
+                  </ul>
+               </nav>
             </div>
          </div>
       </div>
@@ -37,13 +42,14 @@
          <template v-else>
             <MarkTop :article="article" />
             <MdPreview
-               :editorId="editorId"
                :model-value="markdownContent"
                :style="customTheme"
                :codeFoldable="false" />
             <MessageBoard
+               ref="messageBoardRef"
                :articleId="Number(id)"
-               @submit="handleSubmitComment" />
+               @submit="handleSubmitComment"
+               @reply="handleReplyComment" />
          </template>
       </div>
    </div>
@@ -51,10 +57,10 @@
 
 <script setup lang="ts">
 import { Ispc } from '@/util/windows';
-import { ref, onMounted, watch, computed, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import Usercart from '../home/usercart.vue';
 import Announcement from './Announcement.vue';
-import { MdPreview, MdCatalog } from 'md-editor-v3';
+import { MdPreview } from 'md-editor-v3';
 import 'md-editor-v3/lib/preview.css';
 import MarkTop from './MarkTop.vue';
 import { descIsFlex, desc_mr } from '@/util/scrse';
@@ -68,15 +74,12 @@ const id = ref(route.params.id);
 const article = ref<any>(null);
 const markdownContent = ref('');
 const loading = ref(true);
-const editorId = 'desc-preview-' + Date.now();
 
-const scrollContainerRef = ref<HTMLElement | null>(null);
-let cachedScrollElement: HTMLElement | null = null;
-const scrollElementKey = ref(0);
+const toc = ref<{ id: string; text: string; level: number }[]>([]);
+const activeId = ref('');
+let scrollTimeout: number | null = null;
 
-const currentScrollElement = computed(() => {
-   return cachedScrollElement;
-});
+const messageBoardRef = ref<InstanceType<typeof MessageBoard> | null>(null);
 
 watch(
    () => route.params.id,
@@ -97,8 +100,8 @@ async function loadArticle(articleId: number) {
          markdownContent.value = result.data.content || '';
          await nextTick();
          setTimeout(() => {
-            setupScrollContainer();
-         }, 300);
+            extractTocFromDom();
+         }, 500);
       }
    } catch (error) {
       console.error('加载文章失败:', error);
@@ -108,22 +111,115 @@ async function loadArticle(articleId: number) {
    }
 }
 
-function setupScrollContainer() {
-   const container = document.querySelector('.page-zqdongz') as HTMLElement;
-   if (container) {
-      cachedScrollElement = container;
-      scrollElementKey.value++;
-      console.log('scroll container found:', container);
+function extractTocFromDom() {
+   console.log('=== extractTocFromDom ===');
+   const mdEditor = document.querySelector('.desc .right .md-editor');
+   let headings;
+   if (mdEditor) {
+      headings = mdEditor.querySelectorAll('h1, h2, h3');
    } else {
-      console.log('scroll container not found');
+      headings = document.querySelectorAll('h1, h2, h3');
    }
+   console.log('headings found:', headings.length);
+   headings.forEach((heading, index) => {
+      const h = heading as HTMLElement;
+      console.log(
+         `heading ${index}: tag=${h.tagName}, id=${h.id}, text=${h.textContent}, innerText=${h.innerText}`
+      );
+   });
+   toc.value = [];
+   headings.forEach((heading, index) => {
+      const h = heading as HTMLElement;
+      let headingId = h.id || `heading-${index}-${Date.now()}`;
+      headingId = headingId.replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+      h.id = headingId;
+      const level = parseInt(h.tagName.replace('H', ''));
+      toc.value.push({
+         id: headingId,
+         text: h.textContent || '',
+         level
+      });
+   });
+   console.log('toc generated:', toc.value);
+}
+
+function scrollToHeading(headingId: string) {
+   console.log('=== scrollToHeading ===');
+   console.log('headingId:', headingId);
+   activeId.value = headingId;
+
+   let element = document.getElementById(headingId);
+   console.log('element by id:', element);
+
+   if (!element) {
+      const mdEditor = document.querySelector('.desc .right .md-editor');
+      if (mdEditor) {
+         element = mdEditor.querySelector(`[id="${headingId}"]`);
+         console.log('element found in mdEditor:', element);
+      }
+   }
+
+   if (!element) {
+      const allHeadings = document.querySelectorAll(
+         '.md-editor h1, .md-editor h2, .md-editor h3'
+      );
+      console.log('all headings available:', allHeadings.length);
+      allHeadings.forEach((h, i) => {
+         const el = h as HTMLElement;
+         console.log(`heading ${i}: id=${el.id}, text=${el.textContent}`);
+      });
+      return;
+   }
+
+   element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+   setTimeout(() => {
+      const scrollContainer = document.querySelector(
+         '.page-zqdongz'
+      ) as HTMLElement;
+      if (scrollContainer) {
+         scrollContainer.scrollTop = scrollContainer.scrollTop - 80;
+      } else {
+         window.scrollBy(0, -80);
+      }
+   }, 100);
+}
+
+function handleScroll() {
+   console.log('=== handleScroll ===');
+
+   const headings = toc.value;
+   if (!headings || headings.length === 0) {
+      console.log('no headings to check');
+      return;
+   }
+
+   let currentActiveId = '';
+   const scrollTop = window.scrollY || document.documentElement.scrollTop;
+   console.log('scrollTop:', scrollTop);
+
+   for (let i = headings.length - 1; i >= 0; i--) {
+      const element = document.getElementById(headings[i].id);
+      if (element) {
+         const rect = element.getBoundingClientRect();
+         console.log(
+            `heading ${i}: id=${headings[i].id}, text=${element.textContent}, rect.top=${rect.top}`
+         );
+         if (rect.top <= 120) {
+            currentActiveId = headings[i].id;
+            break;
+         }
+      }
+   }
+
+   console.log('currentActiveId:', currentActiveId);
+   activeId.value = currentActiveId;
 }
 
 async function handleSubmitComment(commentData: {
    nickname: string;
    email?: string;
    content: string;
-   replyToCommentId?: number;
+   avatar?: string;
 }) {
    try {
       const result = await submitComment({
@@ -131,8 +227,32 @@ async function handleSubmitComment(commentData: {
          ...commentData
       });
       console.log('评论提交成功:', result);
+      if (messageBoardRef.value) {
+         messageBoardRef.value.loadComments();
+      }
    } catch (error) {
       console.error('评论提交失败:', error);
+   }
+}
+
+async function handleReplyComment(commentData: {
+   nickname: string;
+   email?: string;
+   content: string;
+   avatar?: string;
+   replyToCommentId: number;
+}) {
+   try {
+      const result = await submitComment({
+         articleId: Number(id.value),
+         ...commentData
+      });
+      console.log('回复提交成功:', result);
+      if (messageBoardRef.value) {
+         messageBoardRef.value.loadComments();
+      }
+   } catch (error) {
+      console.error('回复提交失败:', error);
    }
 }
 
@@ -149,14 +269,24 @@ const customTheme: Record<string, string> = {
    '--md-editor-font-size': '16px'
 };
 
-onMounted(() => {
-   nextTick(() => {
-      setupScrollContainer();
-   });
-
+onMounted(async () => {
    if (id.value) {
       loadArticle(Number(id.value));
    }
+
+   await nextTick();
+   setTimeout(() => {
+      const scrollContainer = document.querySelector(
+         '.page-zqdongz'
+      ) as HTMLElement;
+      if (scrollContainer) {
+         scrollContainer.addEventListener('scroll', handleScroll);
+         console.log('scroll listener registered on .page-zqdongz');
+      } else {
+         window.addEventListener('scroll', handleScroll);
+         console.log('scroll listener registered on window');
+      }
+   }, 100);
 });
 </script>
 
@@ -217,7 +347,7 @@ onMounted(() => {
    }
 }
 
-:deep(.md-editor-catalog) {
+.toc-nav {
    padding: 0;
 
    ul {
@@ -226,18 +356,13 @@ onMounted(() => {
       margin: 0;
    }
 
-   li {
-      padding: 2px 0;
-   }
-
-   a {
-      display: block;
+   .toc-item {
       padding: 4px 6px;
-      text-decoration: none;
-      color: var(--bk-font-color);
       cursor: pointer;
       border-radius: 4px;
       transition: all 0.3s ease;
+      color: var(--bk-font-color);
+      font-size: 14px;
 
       &:hover {
          background: rgba(129, 209, 239, 0.5);
@@ -266,6 +391,7 @@ onMounted(() => {
       margin-top: 1.5em;
       margin-bottom: 0.8em;
       color: var(--bk-font-color);
+      scroll-margin-top: 80px;
    }
 
    h1 {

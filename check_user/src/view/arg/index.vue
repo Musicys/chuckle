@@ -3,14 +3,14 @@
       <h1>标签</h1>
       <div class="arg">
          <div
-            :style="{ color: getRandomColor() }"
-            @click="util.detail(i.id)"
-            v-for="i in home_data.home_arg"
-            :key="i.id">
-            {{ i.tiltle }}
-            <div class="arg-cart-nuber">{{ i.number }}</div>
+            v-for="tag in tags"
+            :key="tag.id"
+            class="tag-item"
+            :style="{ '--tag-color': tag.color }"
+            @click="handleTagClick(tag)">
+            <span class="tag-name">{{ tag.name }}</span>
+            <span class="tag-count">{{ tag.articleCount }}</span>
          </div>
-         <div></div>
       </div>
       <div style="width: 100%; height: 400px">
          <Echarts v-if="IsCharts" :data="option"></Echarts>
@@ -19,24 +19,36 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { option } from '@/util/echarts';
-import { storeToRefs } from 'pinia';
-import { useHomeStore } from '@/store/home';
-const { home_data } = storeToRefs(useHomeStore());
-import util from '@/util/function';
+import { getTagList, type Tag } from '@/api/arg';
 import Echarts from '@/components/Echarts.vue';
 
-import { onMounted, ref } from 'vue';
+const router = useRouter();
+const tags = ref<Tag[]>([]);
 const IsCharts = ref(false);
 
-function getRandomColor(): string {
-   const r = Math.floor(Math.random() * 256);
-   const g = Math.floor(Math.random() * 256);
-   const b = Math.floor(Math.random() * 256);
-   return `rgb(${r}, ${g}, ${b})`;
-}
+const loadTags = async () => {
+   try {
+      const response = await getTagList();
+      if (response.code === 0 && response.data) {
+         tags.value = response.data;
+      }
+   } catch (error) {
+      console.error('加载标签列表失败:', error);
+   }
+};
+
+const handleTagClick = (tag: Tag) => {
+   router.push({
+      path: '/datail',
+      query: { tagId: tag.id, tagName: tag.name }
+   });
+};
 
 onMounted(() => {
+   loadTags();
    setTimeout(() => {
       IsCharts.value = true;
    }, 1000);
@@ -53,6 +65,7 @@ onMounted(() => {
 }
 
 .page {
+   margin-top: 50px;
    margin-bottom: 2em;
 
    & > h1 {
@@ -66,29 +79,41 @@ onMounted(() => {
       width: 100%;
       display: flex;
       flex-wrap: wrap;
-      font-size: 2em;
-      margin-left: 1em;
+      gap: 12px;
+      padding: 16px;
 
-      & > div {
+      .tag-item {
+         display: inline-flex;
+         align-items: center;
+         gap: 8px;
+         padding: 8px 16px;
+         background: var(--cart-back-color);
+         border: 2px solid var(--tag-color);
+         border-radius: 20px;
          cursor: pointer;
-         margin-right: 0.5em;
-         line-height: 1.2em;
-         margin-bottom: 0.2em;
-         font-size: 1.5em;
-         position: relative;
-         padding-right: 0.4em;
-         padding-top: 0.4em;
+         transition: all 0.3s ease;
+         color: var(--tag-color);
+         font-size: 16px;
 
-         .arg-cart-nuber {
-            position: absolute;
-            top: -0.4em;
-            right: 0;
-            font-size: 0.5em;
+         .tag-name {
+            font-weight: 500;
          }
-      }
 
-      & > div:hover {
-         background: var(--bk-font-color);
+         .tag-count {
+            font-size: 13px;
+            opacity: 0.8;
+         }
+
+         &:hover {
+            background: var(--tag-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+            .tag-count {
+               opacity: 1;
+            }
+         }
       }
    }
 }

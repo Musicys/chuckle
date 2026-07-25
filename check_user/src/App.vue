@@ -5,19 +5,27 @@ import { storeToRefs } from 'pinia';
 import { useAppStore } from '@/store';
 const { Isindex } = storeToRefs(useAppStore());
 import Draw from '@/components/draw/draw.vue';
+import RightMenu from '@/components/RightMenu/index.vue';
 import '@/util/windows';
 import { handleScroll } from '@/util/scrse';
 import { onMounted } from 'vue';
 import { useUserStore } from '@/store/user';
+import { updateBaseUrl } from '@/htpps/request';
 
 onMounted(async () => {
    console.log('欢迎来到我的博客');
-   useUserStore().fetchBloggerInfo();
+   const userStore = useUserStore();
+   await userStore.fetchBloggerInfo();
+   // 如果配置了后端地址，更新 axios baseURL
+   if (userStore.config.url) {
+      updateBaseUrl(userStore.config.url);
+   }
 });
 </script>
 
 <template>
    <Draw />
+   <RightMenu />
    <div class="page">
       <div class="page-zqdongz" @scroll="handleScroll">
          <index></index>

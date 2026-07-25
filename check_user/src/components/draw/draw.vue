@@ -99,7 +99,7 @@ const { user: music } = storeToRefs(useUserStore());
                <svg class="icon" aria-hidden="true">
                   <use xlink:href="#icon-rengongzhinengjiqiren"></use>
                </svg>
-               <span>GPT</span>
+               <span>音乐</span>
             </el-menu-item>
             <el-menu-item index="5" @click="util.mine">
                <svg class="icon" aria-hidden="true">
