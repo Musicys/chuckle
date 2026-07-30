@@ -2,6 +2,8 @@
 .env
 .env.local
 .env.*
+springboot-check/src/main/resources/.env
+replacements.txt
 
 # IDE 配置
 .idea/

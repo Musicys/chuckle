@@ -5,17 +5,17 @@
 spring:
   jackson:
     time-zone: Asia/Shanghai
-    date-format: "yyyy-MM-dd'T'HH:mm:ssXXX"  # 输出如 2025-11-17T22:25:03+08:00
+    date-format: "yyyy-MM-dd'T'HH:mm:ssXXX" # 输出如 2025-11-17T22:25:03+08:00
   servlet:
     multipart:
-      max-file-size: 1GB       # 单个文件最大大小（OSS 图床支持大文件上传）
-      max-request-size: 1GB    # 整个 HTTP 请求的最大大小
-      enabled: true            # 启用 multipart 处理
+      max-file-size: 1GB # 单个文件最大大小（OSS 图床支持大文件上传）
+      max-request-size: 1GB # 整个 HTTP 请求的最大大小
+      enabled: true # 启用 multipart 处理
   mail:
     host: smtp.qq.com
     port: 465
-    username: REDACTED_QQ_EMAIL
-    password: REDACTED_QQ_PASSWORD
+    username: ${QQ_MAIL_USERNAME}
+    password: ${QQ_MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -34,7 +34,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/check_blog
     username: root
-    password: ${DB_PASSWORD:123456}
+    password: ${DB_PASSWORD}
   #/
   # session 失效时间（分钟）
   session:
@@ -67,14 +67,13 @@ aliyun:
   oss:
     file:
       endpoint: oss-cn-beijing.aliyuncs.com
-      keyid: REDACTED_ACCESS_KEY
-      keysecret: REDACTED_SECRET_KEY
+      keyid: ${OSS_ACCESS_KEY_ID}
+      keysecret: ${OSS_ACCESS_KEY_SECRET}
       bucketname: web-scoke
-
 
 gaode:
   map:
-    apikey: REDACTED_GAODE_KEY
+    apikey: ${GAODE_MAP_API_KEY}
 
 # 微信相关配置
 wx:
