@@ -418,3 +418,78 @@
 - 先对文本做 HTML 转义（`&` → `&amp;`，`<` → `&lt;`，`>` → `&gt;`，`"` → `&quot;`），再包裹 `<em class="highlight">` 标签，防止 XSS 注入
 - 仅对标题（title）和简介（summary）做高亮，正文（content）不在搜索结果中返回
 - 若未传入 keyword 或 keyword 为空，则不进行高亮处理，titleHighlight / summaryHighlight 与 title / summary 内容相同
+
+---
+
+## 获取文章归档列表
+
+**接口说明**：获取所有已发布文章，按年份分组归档。每年度最多返回 100 篇文章，按发布时间倒序排列。
+
+**请求方式**：`GET`
+
+**接口路径**：`/api/articles/archives`
+
+**请求参数**：无
+
+**响应示例**：
+
+```json
+{
+  "code": 0,
+  "data": [
+    {
+      "year": 2026,
+      "count": 15,
+      "articles": [
+        {
+          "id": 42,
+          "title": "Vue3 组合式 API 入门教程",
+          "summary": "详细讲解Vue3组合式API的使用方法，包括setup函数、ref、reactive、computed等核心概念。",
+          "cover": "https://example.com/cover.jpg",
+          "readCount": 1024,
+          "commentCount": 8,
+          "createdAt": "2026-07-28 10:30:00"
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "count": 8,
+      "articles": [
+        {
+          "id": 10,
+          "title": "Spring Boot 入门指南",
+          "summary": "从零开始搭建 Spring Boot 项目，涵盖常用配置和最佳实践。",
+          "cover": "https://example.com/spring-boot.jpg",
+          "readCount": 2048,
+          "commentCount": 15,
+          "createdAt": "2025-03-15 14:20:00"
+        }
+      ]
+    }
+  ],
+  "message": "ok"
+}
+```
+
+**响应字段说明**：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| [].year | int | 年份 |
+| [].count | int | 该年文章数量 |
+| [].articles | array | 该年文章列表（最多 100 条） |
+| [].articles[].id | int | 文章ID |
+| [].articles[].title | string | 文章标题 |
+| [].articles[].summary | string | 文章简介 |
+| [].articles[].cover | string | 封面URL |
+| [].articles[].readCount | int | 阅读量 |
+| [].articles[].commentCount | int | 评论数 |
+| [].articles[].createdAt | datetime | 发布时间 |
+
+**注意事项**：
+- 仅返回已发布（status=1）且未删除的文章
+- 按年份倒序排列（最新的年份在前），同一年内按发布时间倒序
+- 每年最多返回 100 篇文章
+- 无需登录即可访问
+- 适合归档页面的"时间轴"展示场景

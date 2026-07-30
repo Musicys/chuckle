@@ -20,6 +20,11 @@ public interface ArticlesMapper extends BaseMapper<Articles> {
     List<Map<String, Object>> listArticleCountByYear();
 
     /**
+     * 获取所有已发布、未删除的文章（按时间倒序），用于归档
+     */
+    List<Articles> listArchives();
+
+    /**
      * 获取站点统计信息（上线时间、文章数、最后更新、总字数）
      */
     Map<String, Object> getSiteInfo();

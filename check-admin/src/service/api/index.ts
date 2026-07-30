@@ -6,3 +6,6 @@ export * from "./tag";
 export * from "./category";
 export * from "./blogger";
 export * from "./image";
+export * from "./portfolio";
+export * from "./friend-link";
+export * from "./stats";

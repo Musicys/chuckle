@@ -13,21 +13,86 @@
          </div>
       </div>
       <div style="width: 100%; height: 400px">
-         <Echarts v-if="IsCharts" :data="option"></Echarts>
+         <Echarts
+            v-if="IsCharts"
+            :data="option"
+            :onChartClick="handleChartClick"></Echarts>
       </div>
    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { option } from '@/util/echarts';
 import { getTagList, type Tag } from '@/api/arg';
 import Echarts from '@/components/Echarts.vue';
 
 const router = useRouter();
 const tags = ref<Tag[]>([]);
 const IsCharts = ref(false);
+
+const sortedTags = computed(() => {
+   return [...tags.value].sort((a, b) => b.articleCount - a.articleCount);
+});
+
+const option = computed(() => {
+   return {
+      tooltip: {
+         trigger: 'axis',
+         axisPointer: { type: 'shadow' }
+      },
+      grid: {
+         left: '3%',
+         right: '4%',
+         bottom: '3%',
+         containLabel: true
+      },
+      xAxis: {
+         type: 'category',
+         data: sortedTags.value.map(t => t.name),
+         axisLabel: {
+            interval: 0,
+            rotate: sortedTags.value.length > 10 ? 45 : 0,
+            color: 'var(--bk-font-color)'
+         },
+         axisLine: { lineStyle: { color: 'var(--bk-font-color)' } }
+      },
+      yAxis: {
+         type: 'value',
+         name: '文章数',
+         nameTextStyle: { color: 'var(--bk-font-color)' },
+         axisLabel: { color: 'var(--bk-font-color)' },
+         axisLine: { lineStyle: { color: 'var(--bk-font-color)' } },
+         splitLine: { lineStyle: { type: 'dashed' } }
+      },
+      series: [
+         {
+            data: sortedTags.value.map(t => ({
+               value: t.articleCount,
+               itemStyle: {
+                  color: t.color || '#06c0b4',
+                  borderRadius: [4, 4, 0, 0]
+               }
+            })),
+            type: 'bar',
+            barMaxWidth: 60,
+            emphasis: {
+               itemStyle: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.3)'
+               }
+            },
+            label: {
+               show: true,
+               position: 'top',
+               color: 'var(--bk-font-color)',
+               fontWeight: 'bold'
+            }
+         }
+      ]
+   };
+});
 
 const loadTags = async () => {
    try {
@@ -45,6 +110,17 @@ const handleTagClick = (tag: Tag) => {
       path: '/datail',
       query: { tagId: tag.id, tagName: tag.name }
    });
+};
+
+const handleChartClick = (params: any) => {
+   const index = params.dataIndex;
+   const tag = sortedTags.value[index];
+   if (tag) {
+      router.push({
+         path: '/datail',
+         query: { tagId: tag.id, tagName: tag.name }
+      });
+   }
 };
 
 onMounted(() => {

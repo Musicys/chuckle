@@ -40,6 +40,12 @@ export interface BloggerInfo {
    address: string;
    announcement: string;
    config: string;
+   profileStats: ProfileStat[];
+}
+
+export interface ProfileStat {
+   label: string;
+   count: number;
 }
 
 export interface RecentArticle {
@@ -158,5 +164,27 @@ export const searchArticles = (params: ArticleListRequest) => {
    return request.post<any, ApiResponse<ArticleListResponse>>(
       '/articles/search',
       params
+   );
+};
+
+export interface ArchiveArticle {
+   id: number;
+   title: string;
+   summary: string;
+   cover: string;
+   readCount: number;
+   commentCount: number;
+   createdAt: string;
+}
+
+export interface ArchiveYearGroup {
+   year: number;
+   count: number;
+   articles: ArchiveArticle[];
+}
+
+export const fetchArchives = () => {
+   return request.get<any, ApiResponse<ArchiveYearGroup[]>>(
+      '/articles/archives'
    );
 };

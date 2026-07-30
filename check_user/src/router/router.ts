@@ -12,9 +12,15 @@ export default [
    {
       path: '/home',
       name: 'home',
-
       component: defineAsyncComponent(() => import('@/view/home/index.vue')),
       // redirect: '/login',
+      meta: { title: '博客首页' },
+      children: []
+   },
+   {
+      path: '/home/page/:page',
+      name: 'homePage',
+      component: defineAsyncComponent(() => import('@/view/home/index.vue')),
       meta: { title: '博客首页' },
       children: []
    },
@@ -68,5 +74,12 @@ export default [
       name: 'argDetail', // 子路由名称
       component: defineAsyncComponent(() => import('@/view/datail/index.vue')), // 子路由组件
       meta: { title: '详情' } // 子路由元信息
+   },
+   {
+      path: '/archive',
+      name: 'archive',
+      component: defineAsyncComponent(() => import('@/view/archive/index.vue')),
+      meta: { title: '归档' },
+      children: []
    }
 ];

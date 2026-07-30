@@ -6,11 +6,36 @@ import { useAppStore } from '@/store';
 const { Isindex } = storeToRefs(useAppStore());
 import Draw from '@/components/draw/draw.vue';
 import RightMenu from '@/components/RightMenu/index.vue';
+import GlobalMusicPlayer from '@/components/GlobalMusicPlayer.vue';
+import AiChatModal from '@/components/AiChatModal.vue';
 import '@/util/windows';
 import { handleScroll } from '@/util/scrse';
-import { onMounted } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import { useUserStore } from '@/store/user';
 import { updateBaseUrl } from '@/htpps/request';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+// 判断当前是否在音乐页面
+const isMusicPage = computed(() => {
+   return route.path.includes('/muisc');
+});
+
+// AI弹窗状态（全局共享）
+const showAiChat = ref(false);
+
+// 提供给子组件使用的方法
+const openAiChat = () => {
+   showAiChat.value = true;
+};
+
+const closeAiChat = () => {
+   showAiChat.value = false;
+};
+
+// 暴露给全局使用
+(window as any).openAiChat = openAiChat;
 
 onMounted(async () => {
    console.log('欢迎来到我的博客');
@@ -32,6 +57,8 @@ onMounted(async () => {
       </div>
    </div>
    <Lloding v-if="!Isindex"></Lloding>
+   <GlobalMusicPlayer v-if="!isMusicPage" />
+   <AiChatModal :visible="showAiChat" @close="closeAiChat" />
 </template>
 
 <style lang="scss" scoped>
@@ -44,28 +71,32 @@ onMounted(async () => {
    height: 100vh;
    position: absolute;
 
+   /* 白天背景（注释掉）
    background-image:
       linear-gradient(to left, #0095c2, #5fd6c9),
-      /* 渐变背景 */
       repeating-linear-gradient(
-            /* 网格背景 */ 0deg,
+            0deg,
             rgba(0, 0, 0, 0) 0px,
             rgba(0, 0, 0, 0) 10px,
-            /* 增大网格线宽度 */ rgba(0, 0, 0, 0.5) 10px,
-            /* 增加网格线的颜色对比 */ rgba(0, 0, 0, 0.5) 11px
+            rgba(0, 0, 0, 0.5) 10px,
+            rgba(0, 0, 0, 0.5) 11px
          );
+   background-size:
+      100% 100%,
+      40px 40px;
+   */
+
+   /* 使用 CSS 变量实现白天/夜晚背景切换 */
+   background-image:
+      var(--app-bg-gradient),
+      /* 渐变背景 */ var(--app-bg-grid);
+   /* 网格背景 */
 
    background-size:
       100% 100%,
-      /* 渐变背景大小 */ 40px 40px;
-   /* 网格背景大小（增大网格线间距） */
-
-   background-size: cover;
-   /* 背景图片覆盖整个元素 */
+      40px 40px;
    background-position: center center;
-   /* 背景图片居中对齐 */
    background-repeat: no-repeat;
-   /* 防止背景图片重复 */
    background-attachment: fixed;
 
    /* 背景图片固定在视口，不随内容滚动 */

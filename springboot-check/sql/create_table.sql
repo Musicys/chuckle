@@ -174,6 +174,8 @@ CREATE TABLE IF NOT EXISTS `portfolio` (
     KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='作品集表';
 -- 7. 友情链接表
+
+
 CREATE TABLE IF NOT EXISTS `friend_links` (
     `id`          INT UNSIGNED  NOT NULL AUTO_INCREMENT COMMENT '主键',
     `name`        VARCHAR(100)  NOT NULL COMMENT '友站名称',

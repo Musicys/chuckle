@@ -9,6 +9,7 @@ import com.yupi.springbootinit.model.domain.Articles;
 import com.yupi.springbootinit.model.domain.Comments;
 import com.yupi.springbootinit.model.dto.article.ArticleUserQueryRequest;
 import com.yupi.springbootinit.model.dto.comment.CommentAddRequest;
+import com.yupi.springbootinit.model.vo.ArchiveVO;
 import com.yupi.springbootinit.model.vo.ArticleSearchVO;
 import com.yupi.springbootinit.model.vo.ArticleUserVO;
 import com.yupi.springbootinit.model.vo.CommentUserVO;
@@ -50,6 +51,13 @@ public class ArticlesController {
     public BaseResponse<Page<ArticleSearchVO>> searchArticles(@RequestBody ArticleUserQueryRequest request) {
         Page<ArticleSearchVO> page = articlesService.searchArticles(request);
         return ResultUtils.success(page);
+    }
+
+    @GetMapping("/archives")
+    @ApiOperation(value = "获取文章归档列表（按年份分组，每年度最多100条）")
+    public BaseResponse<List<ArchiveVO>> getArchives() {
+        List<ArchiveVO> archives = articlesService.getArchives();
+        return ResultUtils.success(archives);
     }
 
     @GetMapping("/{id}")

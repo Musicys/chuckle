@@ -1,82 +1,94 @@
 <template>
-   <div class="cart-desc" :class="!Ispc ? '' : Iswart ? 'hs-left' : 'hs-right'">
-      <div
-         :class="{
-            'desc-top': true,
-            right: Iswart && Ispc,
-            left: !Iswart && Ispc
-         }">
-         <img v-lazy="data.url" alt="" />
-      </div>
-      <div
-         :class="{
-            'desc-but': true,
-            right: !Iswart && Ispc,
-            left: Iswart && Ispc
-         }">
-         <div class="but-bt">{{ truncateText(data.title, 8) }}</div>
-         <div class="meta-row">
-            <div>
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-guanyubeifen2"></use>
-               </svg>
-               {{ formatDate(data.createtime) }}
+   <div
+      class="cart-desc"
+      :class="[
+         !Ispc ? '' : Iswart ? 'hs-left' : 'hs-right',
+         isVisible ? 'cart-visible' : ''
+      ]"
+      ref="containerRef">
+      <template v-if="isVisible">
+         <div
+            :class="{
+               'desc-top': true,
+               right: Iswart && Ispc,
+               left: !Iswart && Ispc
+            }">
+            <img v-lazy="data.url" alt="" />
+         </div>
+         <div
+            :class="{
+               'desc-but': true,
+               right: !Iswart && Ispc,
+               left: Iswart && Ispc
+            }">
+            <div class="but-bt">{{ truncateText(data.title, 8) }}</div>
+            <div class="meta-row">
+               <div>
+                  <svg class="icon" aria-hidden="true">
+                     <use xlink:href="#icon-guanyubeifen2"></use>
+                  </svg>
+                  {{ formatDate(data.createtime) }}
+               </div>
+               <div style="margin: 0 5px">|</div>
+               <div>
+                  <svg class="icon" aria-hidden="true">
+                     <use xlink:href="#icon-shalou"></use>
+                  </svg>
+                  {{ formatDate(data.updatetime) }}
+               </div>
             </div>
-            <div style="margin: 0 5px">|</div>
-            <div>
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-shalou"></use>
-               </svg>
-               {{ formatDate(data.updatetime) }}
+
+            <div class="meta-row">
+               <div>
+                  <svg class="icon" aria-hidden="true">
+                     <use xlink:href="#icon-fenlei"></use>
+                  </svg>
+                  {{ data.arg }}
+               </div>
+               <div style="margin: 0 5px">|</div>
+               <div>
+                  <svg class="icon" aria-hidden="true">
+                     <use xlink:href="#icon-bi1"></use>
+                  </svg>
+                  {{ data.fontnber }}字
+               </div>
+
+               <div style="margin: 0 5px">|</div>
+               <div>
+                  <svg class="icon" aria-hidden="true">
+                     <use xlink:href="#icon-pinglun"></use>
+                  </svg>
+                  {{ data.commentCount || 0 }}
+               </div>
             </div>
+
+            <div v-if="data.tags && data.tags.length > 0" class="tags-row">
+               <span
+                  v-for="tag in data.tags"
+                  :key="tag.id"
+                  class="tag-item"
+                  :style="{ backgroundColor: tag.color || '#25c2fe' }">
+                  {{ tag.name }}
+               </span>
+            </div>
+
+            <div class="yc">{{ truncateText(data.jjdesc, 50) }}</div>
          </div>
 
-         <div class="meta-row">
-            <div>
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-fenlei"></use>
-               </svg>
-               {{ data.arg }}
-            </div>
-            <div style="margin: 0 5px">|</div>
-            <div>
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-bi1"></use>
-               </svg>
-               {{ data.fontnber }}字
-            </div>
-
-            <div style="margin: 0 5px">|</div>
-            <div>
-               <svg class="icon" aria-hidden="true">
-                  <use xlink:href="#icon-pinglun"></use>
-               </svg>
-               {{ data.commentCount || 0 }}
-            </div>
+         <div :class="!Iswart ? 'desc-po-top' : 'desc-bo-top'">
+            {{ data.isNew ? '最新文章' : '文章' }}
          </div>
-
-         <div v-if="data.tags && data.tags.length > 0" class="tags-row">
-            <span
-               v-for="tag in data.tags"
-               :key="tag.id"
-               class="tag-item"
-               :style="{ backgroundColor: tag.color || '#25c2fe' }">
-               {{ tag.name }}
-            </span>
-         </div>
-
-         <div class="yc">{{ truncateText(data.jjdesc, 50) }}</div>
-      </div>
-
-      <div :class="!Iswart ? 'desc-po-top' : 'desc-bo-top'">
-         {{ data.isNew ? '最新文章' : '文章' }}
-      </div>
+      </template>
+      <div v-else class="cart-placeholder"></div>
    </div>
 </template>
 
 <script setup lang="ts">
 import { defineProps, toRefs, Ref, ref, onMounted } from 'vue';
 import { Ispc } from '@/util/windows';
+import { useLazyVisible } from './useLazyVisible';
+
+const { isVisible, containerRef } = useLazyVisible();
 const Iswart: Ref<boolean> = ref(true);
 
 const props = defineProps<{
@@ -100,8 +112,6 @@ const truncateText = (text: string, maxLength: number) => {
 
 onMounted(() => {
    Iswart.value = data.value.id % 2 === 0 ? false : true;
-
-   console.log(props.data);
 });
 </script>
 
@@ -155,6 +165,24 @@ $r: 8px;
    flex-wrap: wrap;
    position: relative;
    padding: 10px;
+   opacity: 0;
+   transform: translateY(30px);
+   transition:
+      opacity 0.5s ease,
+      transform 0.5s ease;
+
+   &.cart-visible {
+      opacity: 1;
+      transform: translateY(0);
+   }
+
+   .cart-placeholder {
+      width: 100%;
+      height: 200px;
+      border-radius: 10px;
+      background: var(--cart-back-color);
+      opacity: 0.5;
+   }
 
    .desc-po-top {
       position: absolute;
@@ -182,12 +210,20 @@ $r: 8px;
       flex: 1;
       height: 100%;
       min-width: 200px;
+      overflow: hidden;
+      border-radius: 10px;
 
       & > img {
          width: 100%;
          height: 180px;
          border-radius: 10px;
          margin-right: 50px;
+         transition: transform 0.3s ease;
+         cursor: pointer;
+
+         &:hover {
+            transform: scale(1.1);
+         }
       }
    }
 

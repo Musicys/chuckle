@@ -24,9 +24,11 @@ declare module "@elegant-router/types" {
     "blogger": "/blogger";
     "category": "/category";
     "comment": "/comment";
+    "friend-link": "/friend-link";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
+    "portfolio": "/portfolio";
     "tag": "/tag";
   };
 
@@ -66,9 +68,11 @@ declare module "@elegant-router/types" {
     | "blogger"
     | "category"
     | "comment"
+    | "friend-link"
     | "home"
     | "iframe-page"
     | "login"
+    | "portfolio"
     | "tag"
   >;
 
@@ -95,7 +99,9 @@ declare module "@elegant-router/types" {
     | "blogger"
     | "category"
     | "comment"
+    | "friend-link"
     | "home"
+    | "portfolio"
     | "tag"
   >;
 

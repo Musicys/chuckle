@@ -24,6 +24,8 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   blogger: () => import("@/views/blogger/index.vue"),
   category: () => import("@/views/category/index.vue"),
   comment: () => import("@/views/comment/index.vue"),
+  "friend-link": () => import("@/views/friend-link/index.vue"),
   home: () => import("@/views/home/index.vue"),
+  portfolio: () => import("@/views/portfolio/index.vue"),
   tag: () => import("@/views/tag/index.vue"),
 };

@@ -1,5 +1,7 @@
 package com.yupi.springbootinit.controller.user;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yupi.springbootinit.common.BaseResponse;
 import com.yupi.springbootinit.common.ErrorCode;
 import com.yupi.springbootinit.common.ResultUtils;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/blogger")
@@ -24,6 +28,9 @@ public class BloggerInfoController {
 
     @Resource
     private BloggerInfoService bloggerInfoService;
+
+    @Resource
+    private ObjectMapper objectMapper;
 
     @GetMapping("/info")
     @ApiOperation(value = "获取博主公开信息（当前启用配置）")
@@ -34,8 +41,32 @@ public class BloggerInfoController {
         BloggerInfoVO vo = new BloggerInfoVO();
         if (info != null) {
             BeanUtils.copyProperties(info, vo);
+            vo.setProfileStats(buildProfileStats(info));
         }
         return ResultUtils.success(vo);
+    }
+
+    /**
+     * 从 blogger_info 的 JSON 数组字段构建主页统计列表
+     */
+    private List<BloggerInfoVO.ProfileStat> buildProfileStats(BloggerInfo info) {
+        List<BloggerInfoVO.ProfileStat> stats = new ArrayList<>();
+        stats.add(new BloggerInfoVO.ProfileStat("个性标签", countJsonArray(info.getTags())));
+        stats.add(new BloggerInfoVO.ProfileStat("爱好", countJsonArray(info.getHobbies())));
+        stats.add(new BloggerInfoVO.ProfileStat("游戏", countJsonArray(info.getGames())));
+        return stats;
+    }
+
+    private int countJsonArray(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            return 0;
+        }
+        try {
+            JsonNode node = objectMapper.readTree(json);
+            return node.isArray() ? node.size() : 0;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     @GetMapping("/home")

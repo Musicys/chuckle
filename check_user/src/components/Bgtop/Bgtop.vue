@@ -5,13 +5,25 @@ import { storeToRefs } from 'pinia';
 import { useAppStore } from '@/store';
 import { Ispc } from '@/util/windows';
 import Pop from '@/components/pop.vue';
-import { IsScroll } from '@/util/scrse';
+import { scrollProgress } from '@/util/scrse';
+import { watch } from 'vue';
 const appStore = useAppStore();
 const { Ispop } = storeToRefs(appStore);
 const { handleClose, startpop } = appStore;
 // IsTab 下滑css
 
 const IsTab = ref(true);
+
+// 控制导航栏固定
+const IsScroll = ref(false);
+
+watch(
+   scrollProgress,
+   newVal => {
+      IsScroll.value = newVal > 2;
+   },
+   { immediate: true }
+);
 
 const handleSearchClick = (e: MouseEvent) => {
    startpop();
@@ -257,6 +269,9 @@ const leave = (el, done) => {
    top: 0;
    font-family: 'MyCustomFonts', sans-serif;
    z-index: 99;
+   transition:
+      position 0.3s ease,
+      box-shadow 0.3s ease;
 
    .box {
       width: 100%;
@@ -363,6 +378,8 @@ const leave = (el, done) => {
    height: 45px;
 
    background: var(--back-op-color);
+   backdrop-filter: blur(10px);
+   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .top-two2 {

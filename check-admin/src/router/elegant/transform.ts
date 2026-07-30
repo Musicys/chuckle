@@ -170,9 +170,11 @@ const routeMap: RouteMap = {
   "blogger": "/blogger",
   "category": "/category",
   "comment": "/comment",
+  "friend-link": "/friend-link",
   "home": "/home",
   "iframe-page": "/iframe-page/:url",
   "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",
+  "portfolio": "/portfolio",
   "tag": "/tag"
 };
 

@@ -9,6 +9,8 @@ import com.yupi.springbootinit.model.domain.Articles;
 import com.yupi.springbootinit.model.domain.Categories;
 import com.yupi.springbootinit.model.domain.Tags;
 import com.yupi.springbootinit.model.dto.article.ArticleUserQueryRequest;
+import com.yupi.springbootinit.model.vo.ArchiveItemVO;
+import com.yupi.springbootinit.model.vo.ArchiveVO;
 import com.yupi.springbootinit.model.vo.ArticleSearchVO;
 import com.yupi.springbootinit.model.vo.ArticleUserVO;
 import com.yupi.springbootinit.model.vo.TagVO;
@@ -366,6 +368,58 @@ public class ArticlesServiceImpl extends ServiceImpl<ArticlesMapper, Articles>
         Page<ArticleSearchVO> voPage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
         voPage.setRecords(voList);
         return voPage;
+    }
+
+    @Override
+    public List<ArchiveVO> getArchives() {
+        // 1. 查询所有已发布、未删除的文章（按时间倒序）
+        List<Articles> articles = this.baseMapper.listArchives();
+        if (articles.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 2. 按年份分组，每年最多100条
+        Map<Integer, List<ArchiveItemVO>> yearMap = new LinkedHashMap<>();
+        for (Articles article : articles) {
+            // 从 created_at 中提取年份
+            Date createdAt = article.getCreatedAt();
+            if (createdAt == null) {
+                continue;
+            }
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(createdAt);
+            int year = cal.get(Calendar.YEAR);
+
+            // 获取该年份已有的文章列表，如果达到100条则跳过
+            List<ArchiveItemVO> yearList = yearMap.computeIfAbsent(year, k -> new ArrayList<>());
+            if (yearList.size() >= 100) {
+                continue;
+            }
+
+            ArchiveItemVO item = new ArchiveItemVO();
+            item.setId(article.getId());
+            item.setTitle(article.getTitle());
+            item.setSummary(article.getSummary());
+            item.setCover(article.getCover());
+            item.setReadCount(article.getReadCount());
+            item.setCommentCount(article.getCommentCount());
+            item.setCreatedAt(article.getCreatedAt());
+            yearList.add(item);
+        }
+
+        // 3. 组装 VO（按年份倒序）
+        List<ArchiveVO> result = new ArrayList<>();
+        for (Map.Entry<Integer, List<ArchiveItemVO>> entry : yearMap.entrySet()) {
+            ArchiveVO vo = new ArchiveVO();
+            vo.setYear(entry.getKey());
+            vo.setArticles(entry.getValue());
+            vo.setCount(entry.getValue().size());
+            result.add(vo);
+        }
+        // 按年份倒序排列
+        result.sort((a, b) -> b.getYear().compareTo(a.getYear()));
+
+        return result;
     }
 
     /**

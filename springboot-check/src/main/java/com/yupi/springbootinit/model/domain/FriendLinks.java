@@ -40,6 +40,11 @@ public class FriendLinks implements Serializable {
     private String description;
 
     /**
+     * 联系邮箱（用于友链申请通知）
+     */
+    private String email;
+
+    /**
      * 排序（越小越靠前）
      */
     private Integer sortOrder;
@@ -53,6 +58,11 @@ public class FriendLinks implements Serializable {
      * 创建时间
      */
     private Date createdAt;
+
+    /**
+     * 更新时间
+     */
+    private Date updatedAt;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
@@ -128,6 +138,20 @@ public class FriendLinks implements Serializable {
     }
 
     /**
+     * 联系邮箱（用于友链申请通知）
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * 联系邮箱（用于友链申请通知）
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
      * 排序（越小越靠前）
      */
     public Integer getSortOrder() {
@@ -169,6 +193,20 @@ public class FriendLinks implements Serializable {
         this.createdAt = createdAt;
     }
 
+    /**
+     * 更新时间
+     */
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    /**
+     * 更新时间
+     */
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {
@@ -186,9 +224,11 @@ public class FriendLinks implements Serializable {
             && (this.getUrl() == null ? other.getUrl() == null : this.getUrl().equals(other.getUrl()))
             && (this.getAvatar() == null ? other.getAvatar() == null : this.getAvatar().equals(other.getAvatar()))
             && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
+            && (this.getEmail() == null ? other.getEmail() == null : this.getEmail().equals(other.getEmail()))
             && (this.getSortOrder() == null ? other.getSortOrder() == null : this.getSortOrder().equals(other.getSortOrder()))
             && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
-            && (this.getCreatedAt() == null ? other.getCreatedAt() == null : this.getCreatedAt().equals(other.getCreatedAt()));
+            && (this.getCreatedAt() == null ? other.getCreatedAt() == null : this.getCreatedAt().equals(other.getCreatedAt()))
+            && (this.getUpdatedAt() == null ? other.getUpdatedAt() == null : this.getUpdatedAt().equals(other.getUpdatedAt()));
     }
 
     @Override
@@ -200,6 +240,7 @@ public class FriendLinks implements Serializable {
         result = prime * result + ((getUrl() == null) ? 0 : getUrl().hashCode());
         result = prime * result + ((getAvatar() == null) ? 0 : getAvatar().hashCode());
         result = prime * result + ((getDescription() == null) ? 0 : getDescription().hashCode());
+        result = prime * result + ((getEmail() == null) ? 0 : getEmail().hashCode());
         result = prime * result + ((getSortOrder() == null) ? 0 : getSortOrder().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         result = prime * result + ((getCreatedAt() == null) ? 0 : getCreatedAt().hashCode());
@@ -217,9 +258,11 @@ public class FriendLinks implements Serializable {
         sb.append(", url=").append(url);
         sb.append(", avatar=").append(avatar);
         sb.append(", description=").append(description);
+        sb.append(", email=").append(email);
         sb.append(", sortOrder=").append(sortOrder);
         sb.append(", status=").append(status);
         sb.append(", createdAt=").append(createdAt);
+        sb.append(", updatedAt=").append(updatedAt);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

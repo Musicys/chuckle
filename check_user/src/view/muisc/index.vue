@@ -15,12 +15,27 @@
 
       <div class="player-body">
          <div class="playlist-panel">
-            <div class="panel-title">
-               <el-icon><VideoPlay /></el-icon>
-               <span>搜索结果</span>
-               <span class="song-count">{{ songList.length }} 首</span>
+            <div class="panel-tabs">
+               <button
+                  :class="{ active: !showFavorites }"
+                  class="tab-btn"
+                  @click="showFavorites = false">
+                  <el-icon><VideoPlay /></el-icon>
+                  <span>搜索结果</span>
+                  <span class="tab-count">{{ songList.length }}</span>
+               </button>
+               <button
+                  :class="{ active: showFavorites }"
+                  class="tab-btn"
+                  @click="showFavorites = true">
+                  <el-icon><FolderOpened /></el-icon>
+                  <span>我的收藏</span>
+                  <span class="tab-count">{{ favoriteSongs.length }}</span>
+               </button>
             </div>
-            <div class="song-list">
+
+            <!-- 搜索结果列表 -->
+            <div v-show="!showFavorites" class="song-list">
                <div
                   v-for="(song, index) in songList"
                   :key="song.id"
@@ -43,6 +58,12 @@
                   <div class="song-duration">
                      {{ formatDuration(song.duration) }}
                   </div>
+                  <button
+                     class="favorite-btn"
+                     :class="{ favorited: isFavorite(song) }"
+                     @click="toggleFavorite(song, $event)">
+                     <el-icon><Star /></el-icon>
+                  </button>
                </div>
                <div
                   v-if="!isSearching && songList.length === 0"
@@ -53,6 +74,56 @@
                <div v-if="isSearching" class="loading-state">
                   <el-icon class="loading-icon"><Loading /></el-icon>
                   <p>搜索中...</p>
+               </div>
+            </div>
+
+            <!-- 收藏列表 -->
+            <div v-show="showFavorites" class="song-list">
+               <div
+                  v-for="(song, index) in favoriteSongs"
+                  :key="song.id"
+                  :class="{ active: currentSong?.id === song.id }"
+                  class="song-item"
+                  @click="playFavoriteSong(song)">
+                  <div class="song-index">
+                     <el-icon v-if="currentSong?.id === song.id && isPlaying"
+                        ><VideoPause
+                     /></el-icon>
+                     <span v-else>{{ index + 1 }}</span>
+                  </div>
+                  <div class="song-info">
+                     <div class="song-name">{{ song.name }}</div>
+                     <div class="song-artist">
+                        {{ song.artists.map(a => a.name).join(' / ') }}
+                     </div>
+                  </div>
+                  <div class="song-album">{{ song.album.name }}</div>
+                  <div class="song-duration">
+                     {{ formatDuration(song.duration) }}
+                  </div>
+                  <button
+                     class="favorite-btn favorited"
+                     @click="toggleFavorite(song, $event)">
+                     <el-icon><Star /></el-icon>
+                  </button>
+               </div>
+               <div v-if="favoriteSongs.length === 0" class="empty-state">
+                  <el-icon class="empty-icon"><FolderOpened /></el-icon>
+                  <p>暂无收藏歌曲</p>
+                  <button
+                     class="clear-favorites-btn"
+                     @click="showFavorites = false">
+                     去搜索
+                  </button>
+               </div>
+               <div
+                  v-if="favoriteSongs.length > 0"
+                  class="clear-favorites-wrapper">
+                  <button
+                     class="clear-favorites-btn"
+                     @click="clearAllFavorites">
+                     清空收藏
+                  </button>
                </div>
             </div>
          </div>
@@ -154,11 +225,34 @@
             </div>
 
             <div v-else class="welcome-state">
-               <div class="welcome-icon">
-                  <el-icon><VideoPlay /></el-icon>
+               <div class="welcome-bg">
+                  <img src="../static/bg.webp" class="bg-img" alt="" />
                </div>
-               <h3>音乐播放器</h3>
-               <p>搜索并播放你喜欢的歌曲</p>
+               <div class="welcome-vinyl">
+                  <img src="../static/t.jpg" class="vinyl-img" alt="" />
+                  <div class="vinyl-ring"></div>
+                  <div class="vinyl-ring ring-2"></div>
+                  <div class="vinyl-center">
+                     <el-icon><VideoPlay /></el-icon>
+                  </div>
+               </div>
+               <div class="welcome-text">
+                  <h3>音乐播放器</h3>
+                  <p>搜索并播放你喜欢的歌曲</p>
+                  <div class="welcome-tags">
+                     <span class="tag-item">♪ 流行</span>
+                     <span class="tag-item">♫ 民谣</span>
+                     <span class="tag-item">♩ 电子</span>
+                     <span class="tag-item">♬ 古典</span>
+                  </div>
+               </div>
+               <div class="floating-notes">
+                  <span class="note note-1">♪</span>
+                  <span class="note note-2">♫</span>
+                  <span class="note note-3">♩</span>
+                  <span class="note note-4">♬</span>
+                  <span class="note note-5">♭</span>
+               </div>
             </div>
          </div>
       </div>
@@ -182,7 +276,9 @@ import {
    DArrowRight,
    Mic,
    Loading,
-   Document
+   Document,
+   Star,
+   FolderOpened
 } from '@element-plus/icons-vue';
 import {
    searchMusic,
@@ -193,6 +289,9 @@ import {
    type Song,
    type LyricLine
 } from '@/api/muisc';
+import { useMusicStore } from '@/store/music';
+
+const musicStore = useMusicStore();
 
 const searchText = ref('');
 const songList = ref<Song[]>([]);
@@ -209,6 +308,63 @@ const currentLyricIndex = ref(-1);
 const isLoadingLyrics = ref(false);
 const lyricsContainer = ref<HTMLElement | null>(null);
 const audioRef = ref<HTMLAudioElement | null>(null);
+
+// 收藏相关
+const favoriteSongs = ref<Song[]>([]);
+const showFavorites = ref(false);
+const FAVORITE_KEY = 'music_favorites';
+
+// 从localStorage加载收藏
+const loadFavorites = () => {
+   try {
+      const saved = localStorage.getItem(FAVORITE_KEY);
+      if (saved) {
+         favoriteSongs.value = JSON.parse(saved);
+      }
+   } catch (error) {
+      console.error('加载收藏失败:', error);
+   }
+};
+
+// 保存收藏到localStorage
+const saveFavorites = () => {
+   try {
+      localStorage.setItem(FAVORITE_KEY, JSON.stringify(favoriteSongs.value));
+   } catch (error) {
+      console.error('保存收藏失败:', error);
+   }
+};
+
+// 检查歌曲是否已收藏
+const isFavorite = (song: Song): boolean => {
+   return favoriteSongs.value.some(s => s.id === song.id);
+};
+
+// 切换收藏状态
+const toggleFavorite = (song: Song, event?: Event) => {
+   event?.stopPropagation();
+   const index = favoriteSongs.value.findIndex(s => s.id === song.id);
+   if (index > -1) {
+      // 取消收藏
+      favoriteSongs.value.splice(index, 1);
+   } else {
+      // 添加收藏
+      favoriteSongs.value.push(song);
+   }
+   saveFavorites();
+};
+
+// 播放收藏的歌曲
+const playFavoriteSong = async (song: Song) => {
+   showFavorites.value = false;
+   await playSong(song);
+};
+
+// 清空所有收藏
+const clearAllFavorites = () => {
+   favoriteSongs.value = [];
+   saveFavorites();
+};
 
 const formatDuration = (ms: number): string => {
    const seconds = Math.floor(ms / 1000);
@@ -308,6 +464,11 @@ const playSong = async (song: Song) => {
             await playPromise;
             await audioRef.value?.play();
             isPlaying.value = true;
+            // 同步到全局状态
+            musicStore.setCurrentSong(currentSong.value!);
+            musicStore.setPlaylist(songList.value);
+            musicStore.setPlaying(true);
+            musicStore.setDuration(audioRef.value?.duration || 0);
          } catch (playError) {
             console.error('音频播放失败:', playError);
             isPlaying.value = false;
@@ -342,9 +503,11 @@ const togglePlay = async () => {
    if (!audioRef.value) return;
    if (isPlaying.value) {
       audioRef.value.pause();
+      musicStore.pause();
    } else {
       try {
          await audioRef.value.play();
+         musicStore.resume();
       } catch (error) {
          console.error('播放失败:', error);
       }
@@ -411,17 +574,20 @@ const onTimeUpdate = () => {
       currentTime.value = audioRef.value.currentTime;
       updateProgress();
       updateLyric();
+      musicStore.setCurrentTime(audioRef.value.currentTime);
    }
 };
 
 const onLoadedMetadata = () => {
    if (audioRef.value) {
       duration.value = audioRef.value.duration;
+      musicStore.setDuration(audioRef.value.duration);
    }
 };
 
 const onEnded = () => {
    isPlaying.value = false;
+   musicStore.setPlaying(false);
    playNext();
 };
 
@@ -457,6 +623,7 @@ watch(volume, newVal => {
 onMounted(() => {
    handleSearch();
    document.addEventListener('fullscreenchange', handleFullscreenChange);
+   loadFavorites();
 });
 
 onUnmounted(() => {
@@ -468,6 +635,8 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .music-player {
    margin-top: 50px;
+   overflow: hidden;
+   border-radius: 8px;
    height: calc(100vh - 80px);
    display: flex;
    flex-direction: column;
@@ -603,6 +772,53 @@ onUnmounted(() => {
    display: flex;
    flex-direction: column;
 
+   .panel-tabs {
+      display: flex;
+      background: var(--back-op-color);
+      border-bottom: 1px solid var(--cart-border-color);
+
+      .tab-btn {
+         flex: 1;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         gap: 8px;
+         padding: 12px 15px;
+         font-size: 14px;
+         font-weight: 500;
+         background: transparent;
+         border: none;
+         color: var(--bk-font-color);
+         opacity: 0.6;
+         cursor: pointer;
+         transition: all 0.3s;
+
+         .tab-count {
+            font-size: 12px;
+            background: var(--cart-border-color);
+            color: var(--cart-muisc-color);
+            padding: 2px 8px;
+            border-radius: 10px;
+         }
+
+         &:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+         }
+
+         &.active {
+            opacity: 1;
+            background: var(--cart-border-color);
+            color: var(--cart-muisc-color);
+
+            .tab-count {
+               background: var(--cart-muisc-color);
+               color: var(--cart-border-color);
+            }
+         }
+      }
+   }
+
    .panel-title {
       display: flex;
       align-items: center;
@@ -611,6 +827,7 @@ onUnmounted(() => {
       font-size: 16px;
       font-weight: 600;
       background: var(--back-op-color);
+      display: none;
 
       .song-count {
          margin-left: auto;
@@ -705,6 +922,49 @@ onUnmounted(() => {
       width: 50px;
       text-align: right;
    }
+
+   .favorite-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-left: 10px;
+
+      el-icon {
+         font-size: 16px;
+         color: var(--bk-font-color);
+         opacity: 0.4;
+         transition: all 0.3s;
+      }
+
+      &:hover {
+         background: rgba(255, 255, 255, 0.1);
+
+         el-icon {
+            opacity: 0.8;
+            transform: scale(1.1);
+         }
+      }
+
+      &.favorited {
+         el-icon {
+            color: #ffd700;
+            opacity: 1;
+         }
+
+         &:hover {
+            el-icon {
+               color: #ffed4a;
+            }
+         }
+      }
+   }
 }
 
 .empty-state,
@@ -730,6 +990,44 @@ onUnmounted(() => {
 
    p {
       margin: 0;
+   }
+
+   .clear-favorites-btn {
+      margin-top: 15px;
+      padding: 8px 20px;
+      border: 1px solid var(--cart-border-color);
+      background: transparent;
+      color: var(--bk-font-color);
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+
+      &:hover {
+         background: var(--cart-border-color);
+         color: var(--cart-muisc-color);
+      }
+   }
+}
+
+.clear-favorites-wrapper {
+   padding: 10px 15px;
+   text-align: center;
+
+   .clear-favorites-btn {
+      padding: 6px 16px;
+      border: 1px solid rgba(255, 100, 100, 0.5);
+      background: transparent;
+      color: rgba(255, 100, 100, 0.8);
+      border-radius: 15px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+
+      &:hover {
+         background: rgba(255, 100, 100, 0.2);
+         border-color: rgba(255, 100, 100, 0.8);
+      }
    }
 }
 
@@ -1105,38 +1403,232 @@ onUnmounted(() => {
    display: flex;
    flex-direction: column;
    align-items: center;
+   justify-content: center;
    color: var(--bk-font-color);
-   opacity: 0.6;
+   position: relative;
+   overflow: hidden;
+   width: 100%;
+   height: 100%;
 
-   .welcome-icon {
-      width: 120px;
-      height: 120px;
-      background: var(--bk-font-color);
-      opacity: 0.1;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 25px;
-      border: 2px solid var(--cart-border-color);
+   .welcome-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      overflow: hidden;
 
-      el-icon {
-         font-size: 64px;
-         color: var(--bk-font-color);
-         opacity: 0.5;
+      .bg-img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+         opacity: 0.12;
+         filter: blur(2px);
       }
    }
 
-   h3 {
-      font-size: 28px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: var(--bk-font-color);
+   .welcome-vinyl {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin-bottom: 40px;
+      z-index: 2;
+
+      .vinyl-img {
+         width: 100%;
+         height: 100%;
+         border-radius: 50%;
+         object-fit: cover;
+         animation: vinyl-spin 12s linear infinite;
+         box-shadow:
+            0 15px 50px rgba(0, 0, 0, 0.5),
+            0 0 0 6px var(--cart-border-color),
+            0 0 0 8px var(--cart-muisc-color);
+      }
+
+      .vinyl-ring {
+         position: absolute;
+         top: -15px;
+         left: -15px;
+         right: -15px;
+         bottom: -15px;
+         border-radius: 50%;
+         border: 2px dashed var(--cart-border-color);
+         opacity: 0.3;
+         animation: ring-pulse 4s ease-in-out infinite;
+      }
+
+      .vinyl-ring.ring-2 {
+         top: -30px;
+         left: -30px;
+         right: -30px;
+         bottom: -30px;
+         opacity: 0.15;
+         animation-delay: 1s;
+      }
+
+      .vinyl-center {
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         width: 56px;
+         height: 56px;
+         border-radius: 50%;
+         background: var(--cart-border-color);
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+
+         el-icon {
+            font-size: 26px;
+            color: var(--cart-muisc-color);
+         }
+      }
    }
 
-   p {
-      margin: 0;
-      font-size: 16px;
+   .welcome-text {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+
+      h3 {
+         font-size: 32px;
+         font-weight: 700;
+         margin: 0 0 12px;
+         color: var(--bk-font-color);
+         letter-spacing: 2px;
+         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      p {
+         margin: 0;
+         font-size: 16px;
+         opacity: 0.6;
+         letter-spacing: 1px;
+      }
+
+      .welcome-tags {
+         display: flex;
+         justify-content: center;
+         gap: 12px;
+         margin-top: 20px;
+         flex-wrap: wrap;
+
+         .tag-item {
+            padding: 6px 14px;
+            border: 1px solid var(--cart-border-color);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--bk-font-color);
+            opacity: 0.55;
+            transition: all 0.3s;
+            cursor: pointer;
+
+            &:hover {
+               opacity: 1;
+               background: var(--cart-border-color);
+               color: var(--cart-muisc-color);
+               transform: translateY(-2px);
+            }
+         }
+      }
+   }
+
+   .floating-notes {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+
+      .note {
+         position: absolute;
+         font-size: 24px;
+         color: var(--cart-border-color);
+         opacity: 0.3;
+         animation: float-note 6s ease-in-out infinite;
+      }
+
+      .note-1 {
+         top: 15%;
+         left: 20%;
+         animation-delay: 0s;
+         font-size: 28px;
+      }
+
+      .note-2 {
+         top: 25%;
+         right: 18%;
+         animation-delay: 1.5s;
+         font-size: 22px;
+      }
+
+      .note-3 {
+         bottom: 30%;
+         left: 15%;
+         animation-delay: 3s;
+         font-size: 32px;
+      }
+
+      .note-4 {
+         bottom: 20%;
+         right: 20%;
+         animation-delay: 2s;
+         font-size: 26px;
+      }
+
+      .note-5 {
+         top: 50%;
+         right: 10%;
+         animation-delay: 4s;
+         font-size: 20px;
+      }
+   }
+}
+
+@keyframes vinyl-spin {
+   from {
+      transform: rotate(0deg);
+   }
+   to {
+      transform: rotate(360deg);
+   }
+}
+
+@keyframes ring-pulse {
+   0%,
+   100% {
+      transform: scale(1);
+      opacity: 0.3;
+   }
+   50% {
+      transform: scale(1.05);
+      opacity: 0.15;
+   }
+}
+
+@keyframes float-note {
+   0%,
+   100% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 0.2;
+   }
+   25% {
+      transform: translateY(-15px) rotate(10deg);
+      opacity: 0.5;
+   }
+   50% {
+      transform: translateY(-8px) rotate(-5deg);
+      opacity: 0.3;
+   }
+   75% {
+      transform: translateY(-20px) rotate(8deg);
+      opacity: 0.4;
    }
 }
 
@@ -1159,6 +1651,48 @@ onUnmounted(() => {
    .album-cover .cover-image {
       width: 200px;
       height: 200px;
+   }
+
+   .welcome-state {
+      .welcome-vinyl {
+         width: 160px;
+         height: 160px;
+         margin-bottom: 28px;
+
+         .vinyl-center {
+            width: 44px;
+            height: 44px;
+
+            el-icon {
+               font-size: 20px;
+            }
+         }
+      }
+
+      .welcome-text {
+         h3 {
+            font-size: 24px;
+         }
+
+         p {
+            font-size: 14px;
+         }
+
+         .welcome-tags {
+            gap: 8px;
+
+            .tag-item {
+               padding: 4px 10px;
+               font-size: 12px;
+            }
+         }
+      }
+
+      .floating-notes {
+         .note {
+            font-size: 18px;
+         }
+      }
    }
 }
 </style>

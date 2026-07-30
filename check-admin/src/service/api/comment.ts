@@ -31,3 +31,11 @@ export function fetchDeleteComment(id: number) {
     data: { id }
   });
 }
+
+export function fetchReplyCommentByEmail(data: Api.Comment.EmailReplyParams) {
+  return request<boolean>({
+    url: "/admin/comment/reply-by-email",
+    method: "post",
+    data
+  });
+}

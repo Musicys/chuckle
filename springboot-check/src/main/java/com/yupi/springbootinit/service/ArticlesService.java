@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yupi.springbootinit.model.domain.Articles;
 import com.yupi.springbootinit.model.dto.article.ArticleUserQueryRequest;
+import com.yupi.springbootinit.model.vo.ArchiveVO;
 import com.yupi.springbootinit.model.vo.ArticleSearchVO;
 import com.yupi.springbootinit.model.vo.ArticleUserVO;
+
+import java.util.List;
 
 /**
 * @author 黎旺
@@ -28,4 +31,9 @@ public interface ArticlesService extends IService<Articles> {
      * 搜索文章（用户端，返回高亮结果）
      */
     Page<ArticleSearchVO> searchArticles(ArticleUserQueryRequest request);
+
+    /**
+     * 获取文章归档列表（按年份分组，每年度最多100条）
+     */
+    List<ArchiveVO> getArchives();
 }

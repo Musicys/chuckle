@@ -1,33 +1,24 @@
 <template>
-   <div class="box" :style="{ backgroundImage: `url(${music.drawURL})` }">
+   <div
+      class="box"
+      :class="{ 'lazy-visible': isVisible }"
+      :style="{ backgroundImage: `url(${bgWebp})` }"
+      ref="containerRef">
       <img v-lazy="music.userImg" alt="" />
       <span>{{ music.username }}</span>
       <span style="font-size: 1.2em">{{ music.drawtilte }}</span>
 
-      <div style="width: 100%; display: flex; margin-top: 0.5em">
-         <div class="flex-center" style="flex: 1; text-align: center">
-            <span>标签</span>
-            <span>15</span>
-         </div>
-         <div class="flex-center" style="flex: 1; text-align: center">
-            <span>标签</span>
-            <span>15</span>
-         </div>
-         <div class="flex-center" style="flex: 1; text-align: center">
-            <span>标签</span>
-            <span>15</span>
-         </div>
-      </div>
-
       <div
-         class="but"
-         style="width: 80%; border-radius: 15px; margin-top: 1em"
-         type="primary">
-         <el-icon>
-            <Platform />
-         </el-icon>
-
-         Follow Me
+         v-if="music.profileStats.length"
+         style="width: 100%; display: flex; margin-top: 0.5em">
+         <div
+            v-for="stat in music.profileStats"
+            :key="stat.label"
+            class="flex-center"
+            style="flex: 1; text-align: center">
+            <span>{{ stat.label }}</span>
+            <span>{{ stat.count }}</span>
+         </div>
       </div>
 
       <div class="grid">
@@ -73,6 +64,10 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/store/user';
+import { useLazyVisible } from './useLazyVisible';
+import bgWebp from '@/static/bg.webp';
+
+const { isVisible, containerRef } = useLazyVisible();
 const { user: music } = storeToRefs(useUserStore());
 </script>
 
@@ -99,9 +94,21 @@ const { user: music } = storeToRefs(useUserStore());
    flex-direction: column;
    padding-bottom: 1em;
    background-size: 100% 100%;
+   opacity: 0;
+   transform: translateY(30px);
+   transition:
+      opacity 0.5s ease,
+      transform 0.5s ease;
+
+   &.lazy-visible {
+      opacity: 1;
+      transform: translateY(0);
+   }
 
    img {
       width: 80px;
+      height: 80px;
+      object-fit: cover;
       border-radius: 25%;
       margin-top: 1em;
    }

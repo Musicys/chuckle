@@ -144,6 +144,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAppStore } from '@/store';
+import { fetchArticles } from '@/api/home';
 import {
    ArrowLeft,
    ArrowRight,
@@ -164,6 +165,35 @@ import {
 
 const router = useRouter();
 const appStore = useAppStore();
+
+// 预加载文章列表用于随机跳转
+const articleIds = ref<number[]>([]);
+const articlesLoaded = ref(false);
+
+const loadArticlesForRandom = async () => {
+   if (articlesLoaded.value) return;
+   try {
+      const res = await fetchArticles({ current: 1, pageSize: 9999 });
+      if (res.code === 0 && res.data) {
+         articleIds.value = res.data.records.map((a: { id: number }) => a.id);
+         articlesLoaded.value = true;
+      }
+   } catch (e) {
+      console.error('Failed to load articles for random:', e);
+   }
+};
+
+const randomArticle = async () => {
+   if (!articlesLoaded.value) {
+      await loadArticlesForRandom();
+   }
+   if (articleIds.value.length > 0) {
+      const randomId =
+         articleIds.value[Math.floor(Math.random() * articleIds.value.length)];
+      router.push(`/desc/${randomId}`);
+   } else {
+   }
+};
 
 // 菜单状态
 const visible = ref(false);
@@ -203,10 +233,10 @@ const menuActions: Record<string, () => void> = {
    refresh: () => location.reload(),
    home: () => router.push('/home'),
    top: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
-   archive: () => router.push('/arg'),
+   archive: () => router.push('/archive'),
    category: () => router.push('/tree'),
    tags: () => router.push('/arg'),
-   random: () => router.push('/random'),
+   random: () => randomArticle(),
    copy: async () => {
       const text = getSelectedText();
       if (text) {

@@ -1,17 +1,29 @@
 <template>
    <div class="screen-content">
       <div class="section-title">作品集</div>
-      <div class="portfolio-container">
+      <div v-if="loading" class="loading">
+         <svg class="spinner" viewBox="0 0 50 50">
+            <circle
+               class="path"
+               cx="25"
+               cy="25"
+               r="20"
+               fill="none"
+               stroke-width="5"></circle>
+         </svg>
+         <span>加载中...</span>
+      </div>
+      <div v-else class="portfolio-container">
          <div
-            v-for="(project, index) in portfolio"
-            :key="index"
+            v-for="(project, index) in currentPageData"
+            :key="project.id"
             class="portfolio-item"
             :class="{ show: visibleItems[index] }">
             <div class="portfolio-image">
-               <img :src="project.image" :alt="project.title" />
+               <img :src="project.cover" :alt="project.title" />
                <div class="portfolio-overlay">
                   <span class="portfolio-title">{{ project.title }}</span>
-                  <span class="portfolio-desc">{{ project.desc }}</span>
+                  <span class="portfolio-desc">{{ project.description }}</span>
                </div>
             </div>
             <div class="portfolio-info">
@@ -20,78 +32,94 @@
             </div>
          </div>
       </div>
-      <div v-if="portfolio.length === 0" class="empty-tip">暂无作品数据</div>
+      <div v-if="!loading && allPortfolio.length === 0" class="empty-tip">
+         暂无作品数据
+      </div>
+      <div
+         v-if="!loading && allPortfolio.length > 0"
+         class="pagination-wrapper">
+         <div class="pagination">
+            <button
+               class="pagination-btn"
+               :disabled="currentPage === 1"
+               @click.stop="prevPage">
+               <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2">
+                  <path d="M15 18l-6-6 6-6" />
+               </svg>
+            </button>
+            <span class="pagination-info">
+               {{ currentPage }} / {{ totalPages }}
+            </span>
+            <button
+               class="pagination-btn"
+               :disabled="currentPage === totalPages"
+               @click.stop="nextPage">
+               <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2">
+                  <path d="M9 18l6-6-6-6" />
+               </svg>
+            </button>
+         </div>
+      </div>
    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { getPortfolioList, type PortfolioItem } from '@/api/start';
 
 const visibleItems = ref<boolean[]>([]);
 const timerIds = ref<number[]>([]);
+const allPortfolio = ref<PortfolioItem[]>([]);
+const loading = ref(false);
+const currentPage = ref(1);
+const pageSize = 8;
 
-const portfolio = computed(() => {
-   return [
-      {
-         title: '个人博客系统',
-         desc: '基于SpringBoot + Vue3 的博客平台',
-         category: 'Java',
-         image: 'https://images.unsplash.com/photo-1587620962725-abab7fe55159'
-      },
-      {
-         title: '在线商城',
-         desc: '前后端分离的电商平台',
-         category: 'Vue',
-         image: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713'
-      },
-      {
-         title: '管理后台',
-         desc: '权限管理系统',
-         category: 'React',
-         image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71'
-      },
-      {
-         title: '数据可视化',
-         desc: '大屏数据展示系统',
-         category: 'ECharts',
-         image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71'
-      },
-      {
-         title: '移动端App',
-         desc: '跨平台移动应用',
-         category: 'Flutter',
-         image: 'https://images.unsplash.com/photo-1512976790489-bd63fc0785d5'
-      },
-      {
-         title: '微信小程序',
-         desc: '小程序商城',
-         category: 'Taro',
-         image: 'https://images.unsplash.com/photo-1535224206242-87dfbf2f6a71'
-      },
-      {
-         title: '音乐',
-         desc: '基于大模型的智能问答系统',
-         category: 'Python',
-         image: 'https://images.unsplash.com/photo-1677442136506-72140f387635'
-      },
-      {
-         title: '爬虫工具',
-         desc: '数据采集与分析平台',
-         category: 'Go',
-         image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee'
-      }
-   ];
+const totalPages = computed(() =>
+   Math.ceil(allPortfolio.value.length / pageSize)
+);
+
+const currentPageData = computed(() => {
+   const start = (currentPage.value - 1) * pageSize;
+   const end = start + pageSize;
+   return allPortfolio.value.slice(start, end);
 });
 
+const loadPortfolio = async () => {
+   loading.value = true;
+   try {
+      const res = await getPortfolioList();
+      if (res.code === 0) {
+         allPortfolio.value = res.data;
+         currentPage.value = 1;
+      }
+   } catch (error) {
+      console.error('加载作品列表失败:', error);
+   } finally {
+      loading.value = false;
+   }
+};
+
 const preloadImages = () => {
-   portfolio.value.forEach(item => {
+   currentPageData.value.forEach(item => {
       const img = new Image();
-      img.src = item.image;
+      img.src = item.cover;
    });
 };
 
 const animateItems = (index: number) => {
-   if (index >= portfolio.value.length) return;
+   if (index >= currentPageData.value.length) return;
    const timer = setTimeout(() => {
       visibleItems.value[index] = true;
       animateItems(index + 1);
@@ -99,10 +127,56 @@ const animateItems = (index: number) => {
    timerIds.value.push(timer);
 };
 
-onMounted(() => {
-   visibleItems.value = new Array(portfolio.value.length).fill(false);
+const prevPage = () => {
+   console.log(
+      '[Portfolio] prevPage clicked, currentPage:',
+      currentPage.value,
+      'totalPages:',
+      totalPages.value
+   );
+   if (currentPage.value > 1) {
+      currentPage.value--;
+      console.log(
+         '[Portfolio] prevPage success, new currentPage:',
+         currentPage.value
+      );
+   } else {
+      console.log('[Portfolio] prevPage disabled, already at page 1');
+   }
+};
+
+const nextPage = () => {
+   console.log(
+      '[Portfolio] nextPage clicked, currentPage:',
+      currentPage.value,
+      'totalPages:',
+      totalPages.value
+   );
+   if (currentPage.value < totalPages.value) {
+      currentPage.value++;
+      console.log(
+         '[Portfolio] nextPage success, new currentPage:',
+         currentPage.value
+      );
+   } else {
+      console.log('[Portfolio] nextPage disabled, already at last page');
+   }
+};
+
+watch(currentPage, () => {
+   timerIds.value.forEach(timer => clearTimeout(timer));
+   timerIds.value = [];
+   visibleItems.value = new Array(currentPageData.value.length).fill(false);
    preloadImages();
    animateItems(0);
+});
+
+onMounted(() => {
+   loadPortfolio().then(() => {
+      visibleItems.value = new Array(currentPageData.value.length).fill(false);
+      preloadImages();
+      animateItems(0);
+   });
 });
 
 onBeforeUnmount(() => {
@@ -116,12 +190,15 @@ onBeforeUnmount(() => {
    width: 100%;
    padding: 50px 40px 100px 40px;
    text-align: center;
+
    display: flex;
-   align-items: center;
-   justify-content: center;
+   align-items: flex-start;
+   justify-content: flex-start;
    flex-direction: column;
-   height: 100%;
+
+   overflow: hidden;
    box-sizing: border-box;
+   position: relative;
 }
 
 .section-title {
@@ -232,6 +309,100 @@ onBeforeUnmount(() => {
    font-size: 1.2rem;
    opacity: 0.6;
    margin-top: 40px;
+}
+
+.loading {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   gap: 16px;
+   padding: 40px;
+}
+
+.loading .spinner {
+   width: 40px;
+   height: 40px;
+   animation: spin 1s linear infinite;
+}
+
+.loading .spinner .path {
+   stroke: var(--bk-font-color);
+   stroke-linecap: round;
+   animation: spinner 1.5s ease-in-out infinite;
+}
+
+@keyframes spin {
+   100% {
+      transform: rotate(360deg);
+   }
+}
+
+@keyframes spinner {
+   0% {
+      stroke-dasharray: 1, 150;
+      stroke-dashoffset: 0;
+   }
+   50% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -35;
+   }
+   100% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -124;
+   }
+}
+
+.pagination-wrapper {
+   position: sticky;
+   left: 50%;
+   transform: translateX(-50%);
+   z-index: 9999;
+   margin-top: 40px;
+}
+
+.pagination {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 20px;
+   background: rgba(255, 255, 255, 0.15);
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   padding: 12px 28px;
+   border-radius: 32px;
+   backdrop-filter: blur(20px);
+   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.pagination-btn {
+   width: 40px;
+   height: 40px;
+   border-radius: 10px;
+   border: none;
+   background: rgba(255, 255, 255, 0.2);
+   color: #fff;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   cursor: pointer;
+   transition: all 0.3s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+   background: #49b1f5;
+   transform: translateY(-2px);
+}
+
+.pagination-btn:disabled {
+   opacity: 0.3;
+   cursor: not-allowed;
+}
+
+.pagination-info {
+   font-size: 1rem;
+   color: #fff;
+   font-weight: 500;
+   min-width: 80px;
 }
 
 @media (max-width: 768px) {

@@ -26,11 +26,14 @@ export const handleScroll = (e: any) => {
       }
    }
 
-   IsScroll.value = e.target.scrollTop == 0 ? false : true;
+   IsScroll.value = e.target.scrollTop > 80 ? true : false;
    const scrollTop = e.target.scrollTop;
    const scrollHeight = e.target.scrollHeight - e.target.clientHeight;
 
-   // 计算滚动百分比
-   scrollProgress.value = Math.floor((scrollTop / scrollHeight) * 100) | 0;
-   console.log(scrollProgress.value);
+   // 计算滚动百分比，处理除零情况
+   if (scrollHeight > 0) {
+      scrollProgress.value = Math.floor((scrollTop / scrollHeight) * 100);
+   } else {
+      scrollProgress.value = 0;
+   }
 };

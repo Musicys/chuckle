@@ -6,35 +6,73 @@
 
 <script setup>
 import * as echarts from 'echarts';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, onUnmounted } from 'vue';
+
+const props = defineProps(['data', 'onChartClick']);
+
 const index = ref();
 const main = ref();
-
-let { data } = defineProps(['data']);
+let myChart = null;
 
 const startCharts = () => {
-   // 自适应
    index.value.style.maxWidthdth = index.value.offsetWidth + 'px';
    index.value.style.maxHeight = index.value.offsetHeight + 'px';
    main.value.style.width = `${index.value.offsetWidth}px`;
    main.value.style.height = `${index.value.offsetHeight}px`;
-   let myChart = echarts.init(main.value);
-   // 使用刚指定的配置项和数据显示图表。
+   myChart = echarts.init(main.value);
+   myChart.setOption(props.data);
 
-   myChart.setOption(data);
-
-   window.addEventListener('resize', () => {
-      index.value.style.maxWidthdth = index.value.offsetWidth + 'px';
-      index.value.style.maxHeight = index.value.offsetHeight + 'px';
-      myChart.resize({
-         width: index.value.offsetWidth,
-         height: index.value.offsetHeight
+   if (props.onChartClick) {
+      myChart.on('click', params => {
+         props.onChartClick(params);
       });
+   }
+
+   window.addEventListener('resize', handleResize);
+};
+
+const handleResize = () => {
+   if (!myChart) return;
+   index.value.style.maxWidthdth = index.value.offsetWidth + 'px';
+   index.value.style.maxHeight = index.value.offsetHeight + 'px';
+   myChart.resize({
+      width: index.value.offsetWidth,
+      height: index.value.offsetHeight
    });
 };
 
+watch(
+   () => props.data,
+   newData => {
+      if (myChart && newData) {
+         myChart.setOption(newData, true);
+      }
+   }
+);
+
+watch(
+   () => props.onChartClick,
+   (newHandler, oldHandler) => {
+      if (!myChart) return;
+      if (oldHandler) {
+         myChart.off('click', oldHandler);
+      }
+      if (newHandler) {
+         myChart.on('click', newHandler);
+      }
+   }
+);
+
 onMounted(() => {
    startCharts();
+});
+
+onUnmounted(() => {
+   window.removeEventListener('resize', handleResize);
+   if (myChart) {
+      myChart.dispose();
+      myChart = null;
+   }
 });
 </script>
 

@@ -7,6 +7,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel(description = "博主公开信息视图")
@@ -71,4 +72,24 @@ public class BloggerInfoVO implements Serializable {
 
     @ApiModelProperty(value = "是否启用（0=不使用 1=使用）")
     private Integer isUsed;
+
+    @ApiModelProperty(value = "博主主页统计列表")
+    private List<ProfileStat> profileStats;
+
+    @Data
+    @ApiModel(description = "博主主页统计项")
+    public static class ProfileStat {
+        @ApiModelProperty(value = "统计项名称")
+        private String label;
+
+        @ApiModelProperty(value = "统计数值")
+        private int count;
+
+        public ProfileStat() {}
+
+        public ProfileStat(String label, int count) {
+            this.label = label;
+            this.count = count;
+        }
+    }
 }

@@ -25,8 +25,21 @@ export interface ApiResponse<T> {
    message: string;
 }
 
-export const getMessageList = () => {
-   return request.get<any, ApiResponse<Message[]>>('/messages/list');
+export interface PageResponse<T> {
+   code: number;
+   data: {
+      records: T[];
+      total: number;
+      page: number;
+      size: number;
+      pages: number;
+   };
+}
+
+export const getMessageList = (page: number = 1, size: number = 20) => {
+   return request.get<any, PageResponse<Message>>('/messages/list', {
+      params: { page, size }
+   });
 };
 
 export const submitMessage = (data: MessageRequest) => {

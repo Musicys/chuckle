@@ -170,6 +170,7 @@ onBeforeUnmount(() => {
 .scroll-content {
    transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
    transform: translateZ(0);
+   overflow: hidden;
    -webkit-transform: translateZ(0);
    -webkit-backface-visibility: hidden;
    backface-visibility: hidden;
@@ -179,21 +180,24 @@ onBeforeUnmount(() => {
 .screen {
    height: 100vh;
    display: flex;
-   align-items: center;
-   justify-content: center;
+   align-items: flex-start;
+   justify-content: flex-start;
    position: relative;
    color: var(--bk-font-color);
+   overflow: visible;
 }
 
 .screen-content {
    width: 100%;
-   padding: 50px 40px 100px 40px;
+
    text-align: center;
    display: flex;
    align-items: center;
-   justify-content: center;
+   justify-content: flex-start;
    flex-direction: column;
    height: 100%;
+
+   overflow-y: hidden;
    box-sizing: border-box;
 }
 
@@ -228,6 +232,13 @@ onBeforeUnmount(() => {
    display: flex;
    justify-content: center;
    align-items: center;
+}
+
+.screen1 .screen-content {
+   justify-content: center;
+   height: auto;
+   max-height: none;
+   overflow-y: visible;
 }
 
 .screen1 .top img {
@@ -337,10 +348,11 @@ onBeforeUnmount(() => {
 }
 .blog-bg {
    position: absolute;
-   z-index: 0;
+   z-index: -1;
    opacity: 0.1;
    width: 100vw;
    inset: 0;
    height: 100vh;
+   pointer-events: none;
 }
 </style>

@@ -236,6 +236,8 @@ const local: App.I18n.Schema = {
     tag: "标签管理",
     category: "分类管理",
     blogger: "博主信息",
+    portfolio: "作品管理",
+    "friend-link": "友链管理",
   },
   page: {
     login: {

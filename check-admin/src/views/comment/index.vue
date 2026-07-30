@@ -19,6 +19,7 @@ import {
   fetchReviewComment,
   fetchReplyComment,
   fetchDeleteComment,
+  fetchReplyCommentByEmail,
 } from "@/service/api/comment";
 
 const message = useMessage();
@@ -44,6 +45,56 @@ const replyForm = reactive<Api.Comment.ReplyCommentParams>({
   replyToCommentId: 0,
   content: "",
 });
+
+const showEmailReplyModal = ref(false);
+const emailReplyLoading = ref(false);
+const emailReplyForm = reactive<Api.Comment.EmailReplyParams>({
+  commentId: 0,
+  toEmail: "",
+  subject: "",
+  content: "",
+});
+
+function openEmailReplyModal(row: Api.Comment.CommentInfo) {
+  emailReplyForm.commentId = row.id;
+  emailReplyForm.toEmail = row.email;
+  emailReplyForm.subject = `回复：关于您在「${row.articleTitle}」的评论`;
+  emailReplyForm.content = "";
+  showEmailReplyModal.value = true;
+}
+
+async function handleSendEmailReply() {
+  if (!emailReplyForm.toEmail) {
+    message.warning("该评论者没有邮箱地址");
+    return;
+  }
+  if (!emailReplyForm.subject.trim()) {
+    message.warning("请输入邮件主题");
+    return;
+  }
+  if (!emailReplyForm.content.trim()) {
+    message.warning("请输入回复内容");
+    return;
+  }
+
+  emailReplyLoading.value = true;
+  try {
+    const { error } = await fetchReplyCommentByEmail({
+      commentId: emailReplyForm.commentId,
+      toEmail: emailReplyForm.toEmail,
+      subject: emailReplyForm.subject,
+      content: emailReplyForm.content,
+    });
+    if (!error) {
+      message.success("邮件回复成功");
+    }
+    showEmailReplyModal.value = false;
+  } catch (error) {
+    message.error("邮件发送失败");
+  } finally {
+    emailReplyLoading.value = false;
+  }
+}
 
 const statusOptions = [
   { label: "待审核", value: 0 },
@@ -220,6 +271,16 @@ const columns = [
         ),
         h(
           NButton,
+          {
+            size: "small",
+            type: "primary",
+            ghost: true,
+            onClick: () => openEmailReplyModal(row),
+          },
+          "邮件回复",
+        ),
+        h(
+          NButton,
           { size: "small", type: "error", onClick: () => handleDelete(row) },
           "删除",
         ),
@@ -307,6 +368,46 @@ loadData();
           <NButton @click="showReplyModal = false">取消</NButton>
           <NButton type="primary" :loading="replyLoading" @click="handleReply">
             回复
+          </NButton>
+        </NSpace>
+      </template>
+    </NModal>
+
+    <NModal
+      v-model:show="showEmailReplyModal"
+      preset="card"
+      title="邮件回复"
+      style="width: 600px"
+    >
+      <NForm
+        :model="emailReplyForm"
+        label-placement="left"
+        :label-width="80"
+      >
+        <NFormItem label="收件人">
+          <NInput :value="emailReplyForm.toEmail" disabled />
+        </NFormItem>
+        <NFormItem label="主题" required>
+          <NInput v-model:value="emailReplyForm.subject" placeholder="请输入邮件主题" />
+        </NFormItem>
+        <NFormItem label="内容" required>
+          <NInput
+            v-model:value="emailReplyForm.content"
+            type="textarea"
+            :rows="5"
+            placeholder="请输入回复内容"
+          />
+        </NFormItem>
+      </NForm>
+      <template #action>
+        <NSpace>
+          <NButton @click="showEmailReplyModal = false">取消</NButton>
+          <NButton
+            type="primary"
+            :loading="emailReplyLoading"
+            @click="handleSendEmailReply"
+          >
+            发送邮件
           </NButton>
         </NSpace>
       </template>

@@ -31,9 +31,9 @@ router.beforeEach((to, from, next) => {
    next();
 });
 
-router.afterEach((to) => {
+router.afterEach(to => {
    // 记录访问
-   recordVisit(to.path).catch((error) => {
+   recordVisit(to.path).catch(error => {
       console.error('记录访问失败:', error);
    });
 });

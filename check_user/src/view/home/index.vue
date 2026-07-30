@@ -90,6 +90,10 @@
             </div>
          </div>
 
+         <div class="cart-yl">
+            <FriendCart />
+         </div>
+
          <div class="cart-zx">
             <div class="flex">
                <div class="flex-tile">
@@ -140,10 +144,10 @@
             </div>
             <div class="cart-lbt" @wheel="handleScroll" ref="scrollableDiv">
                <div class="lbt-left">
-                  <div class="lbt-left-but">
+                  <div class="lbt-left-but" @click="goToArchive">
                      <span> 归档</span>
                   </div>
-                  <div class="lbt-left-but">
+                  <div class="lbt-left-but" @click="goToArchive">
                      <span> 年份</span>
                   </div>
                </div>
@@ -198,15 +202,17 @@
             :data="i"
             :key="i.id"></Cart>
          <!-- 分页 -->
-         <div style="background: none; border: none" class="page-but">
+         <div class="page-but">
             <div
-               @click="handlePageChange(currentPage - 1)"
-               :class="{ disabled: currentPage <= 1 }">
+               class="page-btn prev-btn"
+               :class="{ disabled: currentPage <= 1 }"
+               @click="handlePageChange(currentPage - 1)">
                上一页
             </div>
             <div
                v-for="page in displayPages"
                :key="page"
+               class="page-btn page-num"
                :class="{
                   'select-page': currentPage === page,
                   ellipsis: page === -1
@@ -215,23 +221,26 @@
                {{ page === -1 ? '......' : page }}
             </div>
             <div
-               @click="handlePageChange(currentPage + 1)"
-               :class="{ disabled: currentPage >= totalPages }">
+               class="page-btn next-btn"
+               :class="{ disabled: currentPage >= totalPages }"
+               @click="handlePageChange(currentPage + 1)">
                下一页
             </div>
             <input
                type="text"
+               class="page-input"
                v-model="jumpPage"
                @keyup.enter="handleJump"
                placeholder="页码" />
-            <div @click="handleJump">跳转</div>
+            <div class="page-btn jump-btn" @click="handleJump">跳转</div>
          </div>
       </div>
    </div>
 </template>
 
 <script setup lang="ts">
-import { Ref, ref, onMounted, computed } from 'vue';
+import { Ref, ref, onMounted, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { Isjc } from '@/util/windows';
 import UserCart from './usercart.vue';
 import ArgCart from './ArgCart.vue';
@@ -240,10 +249,14 @@ import { useHomeStore } from '@/store/home';
 const { home_data } = storeToRefs(useHomeStore());
 const homeStore = useHomeStore();
 import PackCart from './PackCart.vue';
+import FriendCart from './FriendCart.vue';
 import ConsultCart from './ConsultCart.vue';
 import util from '@/util/function';
 import Cart from './cart.vue';
 import { fetchHomeInfo, fetchArticles } from '@/api/home';
+
+const route = useRoute();
+const router = useRouter();
 
 const scrollableDiv = ref<HTMLDivElement | null>(null);
 
@@ -277,8 +290,12 @@ const scrollToLeft = () => {
    }
 };
 
+const goToArchive = () => {
+   router.push('/archive');
+};
+
 const currentPage = ref(1);
-const pageSize = ref(8);
+const pageSize = ref(9);
 const total = ref(0);
 const totalPages = ref(1);
 const selectedTagId = ref<number | null>(null);
@@ -369,9 +386,9 @@ const loadArticles = async (page: number = 1, tagId?: number) => {
             readCount: article.readCount,
             commentCount: article.commentCount
          }));
-         total.value = totalCount;
-         currentPage.value = current;
-         totalPages.value = pages;
+         total.value = Number(totalCount);
+         currentPage.value = Number(current);
+         totalPages.value = Number(pages);
       }
    } catch (error) {
       console.error('加载文章列表失败:', error);
@@ -380,7 +397,7 @@ const loadArticles = async (page: number = 1, tagId?: number) => {
 
 const handlePageChange = (page: number) => {
    if (page < 1 || page > totalPages.value) return;
-   loadArticles(page, selectedTagId.value || undefined);
+   router.push(`/home/page/${page}`);
 };
 
 const handleTagClick = (tagId: number | null) => {
@@ -397,9 +414,25 @@ const handleJump = () => {
    }
 };
 
+watch(
+   () => route.params.page,
+   newPage => {
+      const page = newPage ? parseInt(newPage as string) : 1;
+      if (!isNaN(page) && page >= 1) {
+         currentPage.value = page;
+         loadArticles(page, selectedTagId.value || undefined);
+         window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+   }
+);
+
 onMounted(() => {
+   const page = route.params.page ? parseInt(route.params.page as string) : 1;
+   if (!isNaN(page) && page >= 1) {
+      currentPage.value = page;
+   }
    loadHomeData();
-   loadArticles(1);
+   loadArticles(currentPage.value, selectedTagId.value || undefined);
 });
 </script>
 
@@ -439,53 +472,80 @@ onMounted(() => {
    }
 }
 
-.select-page {
-   background: var(--div-hover-color);
-}
-
 .page-but {
    display: flex;
    justify-content: center;
    align-items: center;
+   gap: 8px;
+   padding: 16px;
+   margin-top: 20px;
+   background: none;
+   border: none;
+}
 
-   & > div {
-      cursor: pointer;
-      margin-left: 1em;
-      padding: 4px 8px;
-      border: 3px solid var(--cart-border-color);
-      border-radius: 5px;
-      background: var(--cart-back-color);
-      white-space: nowrap;
+.page-btn {
+   cursor: pointer;
+   padding: 8px 16px;
+   border-radius: 8px;
+   background: var(--cart-back-color);
+   border: 1px solid var(--cart-border-color);
+   white-space: nowrap;
+   transition: all 0.3s ease;
+   font-size: 0.9rem;
+   color: var(--bk-font-color);
+}
 
-      &:hover {
-         background: #06c0b4;
-      }
-   }
+.page-btn:hover {
+   background: #06c0b4;
+   border-color: #06c0b4;
+   color: #fff;
+   transform: translateY(-2px);
+   box-shadow: 0 4px 12px rgba(6, 192, 180, 0.3);
+}
 
-   & > input {
-      width: 50px;
-      margin-left: 1em;
-      padding: 4px 8px;
-      border: 3px solid var(--cart-border-color);
-      border-radius: 5px;
-      background: var(--cart-back-color);
-      white-space: nowrap;
-   }
+.page-btn.disabled {
+   opacity: 0.4;
+   cursor: not-allowed;
+   pointer-events: none;
+}
 
-   .disabled {
-      opacity: 0.5;
-      cursor: not-allowed !important;
-   }
+.page-btn.ellipsis {
+   cursor: default;
+   border: none;
+   background: transparent;
+   padding: 8px 4px;
+   pointer-events: none;
+}
 
-   .ellipsis {
-      cursor: default !important;
-      border: none !important;
-      background: transparent !important;
+.page-btn.select-page {
+   background: #06c0b4;
+   border-color: #06c0b4;
+   color: #fff;
+   font-weight: bold;
+   box-shadow: 0 4px 12px rgba(6, 192, 180, 0.4);
+}
 
-      &:hover {
-         background: transparent !important;
-      }
-   }
+.page-btn.select-page:hover {
+   background: #04a89c;
+   border-color: #04a89c;
+}
+
+.page-input {
+   width: 60px;
+   padding: 8px 12px;
+   border-radius: 8px;
+   background: var(--cart-back-color);
+   border: 1px solid var(--cart-border-color);
+   white-space: nowrap;
+   text-align: center;
+   font-size: 0.9rem;
+   color: var(--bk-font-color);
+}
+
+.page-input:focus {
+   outline: none;
+   border-color: #06c0b4;
+   box-shadow: 0 0 0 3px rgba(6, 192, 180, 0.2);
 }
 
 .icons {
@@ -572,12 +632,13 @@ onMounted(() => {
                display: flex;
                margin-bottom: 0.5em;
 
-               & > div {
+               & > div:first-child {
                   cursor: pointer;
                   display: flex;
-                  flex-direction: column;
                   align-items: center;
                   justify-content: center;
+                  overflow: hidden;
+                  border-radius: 10px;
 
                   & > img {
                      width: 80px;
@@ -585,22 +646,32 @@ onMounted(() => {
                      border-radius: 10px;
                      margin-right: 1em;
                      margin-bottom: 0.5em;
-                  }
+                     transition: transform 0.3s ease;
+                     cursor: pointer;
 
-                  & > div {
-                     margin-bottom: 1em;
-                     font-size: 0.8em;
+                     &:hover {
+                        transform: scale(1.1);
+                     }
                   }
+               }
 
-                  & > :nth-child(1) {
+               & > div:last-child {
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+
+                  & > div:first-child {
+                     margin-bottom: 0.5em;
+                     font-size: 0.9em;
                      color: var(--bk-font-color);
+
+                     &:hover {
+                        color: #06c0b4;
+                     }
                   }
 
-                  & > :nth-child(1):hover {
-                     color: #06c0b4;
-                  }
-
-                  & > :nth-child(2) {
+                  & > div:last-child {
+                     font-size: 0.8em;
                      color: var(--cart-home-time-color);
                   }
                }

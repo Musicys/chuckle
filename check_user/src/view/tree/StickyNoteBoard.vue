@@ -13,12 +13,13 @@
          <div
             v-for="note in notes"
             :key="note.id"
-            class="note"
+            class="note note-enter"
             :class="[note.color, { active: activeNoteId === note.id }]"
             :style="{
                left: note.x + 'px',
                top: note.y + 'px',
-               zIndex: note.zIndex
+               zIndex: note.zIndex,
+               animationDelay: note.animationDelay + 'ms'
             }"
             @mousedown="startDrag($event, note)"
             @touchstart="startDrag($event, note)"
@@ -46,6 +47,21 @@
                   note.children.length
                }}</span>
             </button>
+         </div>
+      </div>
+
+      <!-- 分页加载更多 -->
+      <div v-if="hasMore || loading" class="pagination-area">
+         <button
+            v-if="hasMore"
+            @click.stop="loadMore"
+            :disabled="loading"
+            class="load-more-btn">
+            <span v-if="loading" class="loading-spinner"></span>
+            <span>{{ loading ? '加载中...' : '加载更多留言' }}</span>
+         </button>
+         <div v-else class="no-more">
+            已加载全部留言（共 {{ totalCount }} 条）
          </div>
       </div>
 
@@ -188,7 +204,12 @@ import {
    User,
    Message as MessageIcon
 } from '@element-plus/icons-vue';
-import { getMessageList, submitMessage, type Message } from '@/api/tree';
+import {
+   getMessageList,
+   submitMessage,
+   type Message,
+   type PageResponse
+} from '@/api/tree';
 import { ElMessage } from 'element-plus';
 
 interface Note extends Message {
@@ -197,6 +218,7 @@ interface Note extends Message {
    zIndex: number;
    color: string;
    time: string;
+   animationDelay: number;
 }
 
 const content = ref('');
@@ -210,6 +232,15 @@ const avatarUrl = ref('');
 const showNoteModal = ref(false);
 const selectedNote = ref<Note | null>(null);
 const replyInput = ref('');
+
+// 分页状态
+const currentPage = ref(1);
+const pageSize = ref(20);
+const totalCount = ref(0);
+const hasMore = ref(true);
+const loading = ref(false);
+// 存储API返回的完整数据，前端做分页展示
+const allNotes = ref<Note[]>([]);
 
 let zIndex = 1000;
 let isDragging = false;
@@ -230,24 +261,25 @@ const getAvatar = (note: Note) => {
 
 const loadNotes = async () => {
    try {
+      loading.value = true;
+      // API 不支持后端分页，一次拉取全部数据，前端做分页展示
       const response = await getMessageList();
       console.log('=== loadNotes ===');
       console.log('response:', response);
 
       let messageList: Message[] = [];
-      if (Array.isArray(response)) {
-         messageList = response;
-      } else if (response && typeof response === 'object') {
+
+      if (response && response.data) {
          if (Array.isArray(response.data)) {
             messageList = response.data;
-         } else if (
-            response.data &&
-            response.data.data &&
-            Array.isArray(response.data.data)
-         ) {
+         } else if (response.data.records) {
+            messageList = response.data.records;
+         } else if (Array.isArray(response.data.data)) {
             messageList = response.data.data;
          }
       }
+
+      totalCount.value = messageList.length;
       console.log('messageList.length:', messageList.length);
 
       const savedPositions = localStorage.getItem('sticky-notes-positions');
@@ -261,25 +293,39 @@ const loadNotes = async () => {
       const containerWidth = rect?.width || 800;
       const containerHeight = rect?.height || 600;
 
-      const newNotes = messageList.map((msg: Message) => {
+      allNotes.value = messageList.map((msg: Message, index: number) => {
          const saved = positions[msg.id];
          return {
             ...msg,
-            x: saved?.x ?? 20 + Math.random() * (containerWidth - 300),
-            y: saved?.y ?? 20 + Math.random() * (containerHeight - 180),
+            x: saved?.x ?? 20 + Math.random() * (containerWidth - 220),
+            y: saved?.y ?? 20 + Math.random() * (containerHeight - 140),
             zIndex: saved?.zIndex ?? zIndex++,
             color:
                saved?.color ??
                colors[Math.floor(Math.random() * colors.length)],
-            time: msg.createdAt
+            time: msg.createdAt,
+            animationDelay: index * 100
          };
       });
 
-      notes.value = newNotes;
-      console.log('notes.value.length:', notes.value.length);
+      // 显示第一页
+      currentPage.value = 1;
+      notes.value = allNotes.value.slice(0, pageSize.value);
+      hasMore.value = allNotes.value.length > pageSize.value;
    } catch (error) {
       console.error('加载留言失败:', error);
+   } finally {
+      loading.value = false;
    }
+};
+
+// 加载更多（客户端分页）
+const loadMore = () => {
+   if (loading.value || !hasMore.value) return;
+   currentPage.value++;
+   const end = currentPage.value * pageSize.value;
+   notes.value = allNotes.value.slice(0, end);
+   hasMore.value = end < allNotes.value.length;
 };
 
 const savePositions = () => {
@@ -287,7 +333,7 @@ const savePositions = () => {
       number,
       { x: number; y: number; zIndex: number; color: string }
    > = {};
-   notes.value.forEach(note => {
+   allNotes.value.forEach(note => {
       positions[note.id] = {
          x: note.x,
          y: note.y,
@@ -367,14 +413,17 @@ const confirmSubmit = async () => {
          replyToCommentId: null,
          createdAt: new Date().toLocaleString(),
          children: [],
-         x: 20 + Math.random() * (containerWidth - 300),
-         y: 20 + Math.random() * (containerHeight - 180),
+         x: 20 + Math.random() * (containerWidth - 220),
+         y: 20 + Math.random() * (containerHeight - 140),
          zIndex: zIndex++,
          color: colors[Math.floor(Math.random() * colors.length)],
          time: new Date().toLocaleString()
       };
 
       notes.value.push(noteData);
+      allNotes.value.push(noteData);
+      totalCount.value = allNotes.value.length;
+      hasMore.value = notes.value.length < allNotes.value.length;
       savePositions();
       content.value = '';
       closeModal();
@@ -420,8 +469,8 @@ const handleMove = (e: MouseEvent | TouchEvent) => {
    let newLeft = startLeft + dx;
    let newTop = startTop + dy;
 
-   newLeft = Math.max(0, Math.min(newLeft, rect.width - 280));
-   newTop = Math.max(0, Math.min(newTop, rect.height - 160));
+   newLeft = Math.max(0, Math.min(newLeft, rect.width - 200));
+   newTop = Math.max(0, Math.min(newTop, rect.height - 120));
 
    currentNote.x = newLeft;
    currentNote.y = newTop;
@@ -445,7 +494,10 @@ const bringToFront = (id: number) => {
 };
 
 const deleteNote = (id: number) => {
+   allNotes.value = allNotes.value.filter(n => n.id !== id);
    notes.value = notes.value.filter(n => n.id !== id);
+   totalCount.value = allNotes.value.length;
+   hasMore.value = notes.value.length < allNotes.value.length;
    savePositions();
 };
 
@@ -535,12 +587,14 @@ onBeforeUnmount(() => {
    document.removeEventListener('touchmove', handleMove);
    document.removeEventListener('touchend', handleEnd);
 });
+
+defineExpose({ loadMore, hasMore, loading, totalCount, currentPage, pageSize });
 </script>
 
 <style scoped>
 .sticky-board {
    width: 100%;
-   min-height: 700px;
+   min-height: 600px;
    position: relative;
    margin: auto;
 }
@@ -598,16 +652,33 @@ onBeforeUnmount(() => {
 
 .note {
    position: absolute;
-   width: 280px;
-   min-height: 160px;
-   padding: 16px;
-   border-radius: 10px;
+   width: 200px;
+   min-height: 120px;
+   padding: 10px;
+   border-radius: 8px;
    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
    cursor: move;
    user-select: none;
    transition: box-shadow 0.2s;
    display: flex;
    flex-direction: column;
+   opacity: 0;
+   transform: translateY(30px) scale(0.9);
+}
+
+.note-enter {
+   animation: noteFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes noteFadeIn {
+   from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.9);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+   }
 }
 
 .note:hover {
@@ -621,20 +692,20 @@ onBeforeUnmount(() => {
 .note-header {
    display: flex;
    align-items: center;
-   margin-bottom: 12px;
-   gap: 8px;
+   margin-bottom: 8px;
+   gap: 6px;
 }
 
 .note-meta {
    display: flex;
    align-items: center;
-   gap: 8px;
+   gap: 6px;
    flex: 1;
 }
 
 .note-avatar {
-   width: 36px;
-   height: 36px;
+   width: 28px;
+   height: 28px;
    border-radius: 50%;
    object-fit: cover;
    border: 2px solid rgba(0, 0, 0, 0.1);
@@ -646,29 +717,29 @@ onBeforeUnmount(() => {
 }
 
 .note-nickname {
-   font-size: 13px;
+   font-size: 12px;
    font-weight: 600;
    color: #333;
 }
 
 .note-email {
-   font-size: 11px;
+   font-size: 10px;
    color: #999;
 }
 
 .note-time {
-   font-size: 11px;
+   font-size: 10px;
    color: #999;
    flex-shrink: 0;
 }
 
 .note-close {
-   width: 24px;
-   height: 24px;
+   width: 20px;
+   height: 20px;
    border: none;
    background: transparent;
    cursor: pointer;
-   font-size: 18px;
+   font-size: 14px;
    line-height: 1;
    opacity: 0.6;
    flex-shrink: 0;
@@ -682,14 +753,14 @@ onBeforeUnmount(() => {
    display: flex;
    align-items: center;
    justify-content: center;
-   gap: 4px;
-   padding: 6px 12px;
+   gap: 3px;
+   padding: 4px 8px;
    border: none;
    background: rgba(0, 0, 0, 0.1);
    cursor: pointer;
-   font-size: 14px;
+   font-size: 12px;
    opacity: 0.7;
-   border-radius: 6px;
+   border-radius: 4px;
    transition: all 0.2s;
    margin-top: auto;
    align-self: flex-end;
@@ -701,8 +772,8 @@ onBeforeUnmount(() => {
 }
 
 .note-content {
-   font-size: 15px;
-   line-height: 1.6;
+   font-size: 13px;
+   line-height: 1.5;
    word-break: break-all;
 }
 
@@ -720,6 +791,54 @@ onBeforeUnmount(() => {
 
 .note-green {
    background: #d6ffdb;
+}
+
+/* 夜间模式便签颜色 */
+[data-theme='dark'] {
+   :deep(.note-yellow) {
+      background: #2a2518;
+   }
+
+   :deep(.note-pink) {
+      background: #2a1820;
+   }
+
+   :deep(.note-blue) {
+      background: #18202a;
+   }
+
+   :deep(.note-green) {
+      background: #182a1c;
+   }
+
+   :deep(.note-nickname) {
+      color: var(--bk-font-color);
+   }
+
+   :deep(.note-email) {
+      color: rgba(255, 255, 255, 0.6);
+   }
+
+   :deep(.note-time) {
+      color: rgba(255, 255, 255, 0.6);
+   }
+
+   :deep(.note-content) {
+      color: var(--bk-font-color);
+   }
+
+   :deep(.note-close) {
+      color: rgba(255, 255, 255, 0.6);
+   }
+
+   :deep(.note-reply) {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.8);
+
+      &:hover {
+         background: rgba(255, 255, 255, 0.2);
+      }
+   }
 }
 
 .modal-overlay {
@@ -1149,6 +1268,61 @@ onBeforeUnmount(() => {
             }
          }
       }
+   }
+}
+
+.pagination-area {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin-top: 20px;
+   padding: 15px;
+
+   .load-more-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--bk-draw-back-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+
+      &:hover:not(:disabled) {
+         opacity: 0.9;
+         transform: translateY(-2px);
+      }
+
+      &:disabled {
+         opacity: 0.6;
+         cursor: not-allowed;
+      }
+
+      .loading-spinner {
+         width: 16px;
+         height: 16px;
+         border: 2px solid rgba(255, 255, 255, 0.3);
+         border-top-color: white;
+         border-radius: 50%;
+         animation: spin 0.8s linear infinite;
+      }
+   }
+
+   .no-more {
+      padding: 12px 24px;
+      font-size: 14px;
+      color: var(--cart-home-time-color);
+      background: var(--mart-commment-bot-back);
+      border-radius: 8px;
+   }
+}
+
+@keyframes spin {
+   to {
+      transform: rotate(360deg);
    }
 }
 </style>

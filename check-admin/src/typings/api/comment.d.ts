@@ -35,5 +35,12 @@ declare namespace Api {
       replyToCommentId: number;
       content: string;
     }
+
+    interface EmailReplyParams {
+      commentId: number;
+      toEmail: string;
+      subject: string;
+      content: string;
+    }
   }
 }

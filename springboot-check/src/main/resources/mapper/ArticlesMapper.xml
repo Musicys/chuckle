@@ -35,6 +35,13 @@
         ORDER BY `year` DESC
     </select>
 
+    <select id="listArchives" resultType="com.yupi.springbootinit.model.domain.Articles">
+        SELECT <include refid="Base_Column_List" />
+        FROM articles
+        WHERE `status` = 1 AND is_delete = 0
+        ORDER BY created_at DESC
+    </select>
+
     <select id="getSiteInfo" resultType="java.util.Map">
         SELECT MIN(created_at)     AS site_uptime,
                COUNT(*)            AS total_articles,

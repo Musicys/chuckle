@@ -45,7 +45,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     component: 'layout.base$view.article',
     meta: {
       title: 'article',
-      i18nKey: 'route.article'
+      i18nKey: 'route.article',
+      icon: 'mdi:file-text'
     }
   },
   {
@@ -54,7 +55,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     component: 'layout.base$view.blogger',
     meta: {
       title: 'blogger',
-      i18nKey: 'route.blogger'
+      i18nKey: 'route.blogger',
+      icon: 'mdi:account'
     }
   },
   {
@@ -63,7 +65,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     component: 'layout.base$view.category',
     meta: {
       title: 'category',
-      i18nKey: 'route.category'
+      i18nKey: 'route.category',
+      icon: 'mdi:folder'
     }
   },
   {
@@ -72,7 +75,18 @@ export const generatedRoutes: GeneratedRoute[] = [
     component: 'layout.base$view.comment',
     meta: {
       title: 'comment',
-      i18nKey: 'route.comment'
+      i18nKey: 'route.comment',
+      icon: 'mdi:comment-text-outline'
+    }
+  },
+  {
+    name: 'friend-link',
+    path: '/friend-link',
+    component: 'layout.base$view.friend-link',
+    meta: {
+      title: 'friend-link',
+      i18nKey: 'route.friend-link',
+      icon: 'mdi:link'
     }
   },
   {
@@ -82,8 +96,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'home',
       i18nKey: 'route.home',
-      icon: 'mdi:monitor-dashboard',
-      order: 1
+      icon: 'mdi:monitor-dashboard'
     }
   },
   {
@@ -112,12 +125,23 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'portfolio',
+    path: '/portfolio',
+    component: 'layout.base$view.portfolio',
+    meta: {
+      title: 'portfolio',
+      i18nKey: 'route.portfolio',
+      icon: 'mdi:briefcase'
+    }
+  },
+  {
     name: 'tag',
     path: '/tag',
     component: 'layout.base$view.tag',
     meta: {
       title: 'tag',
-      i18nKey: 'route.tag'
+      i18nKey: 'route.tag',
+      icon: 'mdi:tag'
     }
   }
 ];

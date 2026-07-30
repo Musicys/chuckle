@@ -9,12 +9,14 @@ import com.yupi.springbootinit.common.ResultUtils;
 import com.yupi.springbootinit.exception.BusinessException;
 import com.yupi.springbootinit.model.domain.Articles;
 import com.yupi.springbootinit.model.domain.Comments;
+import com.yupi.springbootinit.model.dto.comment.CommentEmailReplyRequest;
 import com.yupi.springbootinit.model.dto.comment.CommentQueryRequest;
 import com.yupi.springbootinit.model.dto.comment.CommentReplyRequest;
 import com.yupi.springbootinit.model.dto.comment.CommentReviewRequest;
 import com.yupi.springbootinit.model.vo.CommentAdminVO;
 import com.yupi.springbootinit.service.ArticlesService;
 import com.yupi.springbootinit.service.CommentsService;
+import com.yupi.springbootinit.service.EmailService;
 import com.yupi.springbootinit.utils.JwtUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,6 +39,9 @@ public class AdminCommentController {
 
     @Resource
     private ArticlesService articlesService;
+
+    @Resource
+    private EmailService emailService;
 
     /**
      * 校验管理员登录状态
@@ -172,6 +177,35 @@ public class AdminCommentController {
                 articlesService.updateById(article);
             }
         }
+
+        return ResultUtils.success(true);
+    }
+
+    @PostMapping("/reply-by-email")
+    @ApiOperation(value = "邮件回复评论")
+    public BaseResponse<Boolean> replyCommentByEmail(@RequestBody CommentEmailReplyRequest request, HttpServletRequest httpRequest) {
+        checkAdmin(httpRequest);
+
+        if (request.getCommentId() == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "评论ID不能为空");
+        }
+        if (!StringUtils.hasText(request.getToEmail())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "收件人邮箱不能为空");
+        }
+        if (!StringUtils.hasText(request.getSubject())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "邮件主题不能为空");
+        }
+        if (!StringUtils.hasText(request.getContent())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "邮件内容不能为空");
+        }
+
+        // 验证评论存在
+        Comments comment = commentsService.getById(request.getCommentId());
+        if (comment == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "评论不存在");
+        }
+
+        emailService.sendTextEmail(request.getToEmail(), request.getSubject(), request.getContent());
 
         return ResultUtils.success(true);
     }

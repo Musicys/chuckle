@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
 import { getBloggerInfo } from '@/api/home';
-import type { BloggerInfo, Config } from '@/api/home';
+import type { BloggerInfo, Config, ProfileStat } from '@/api/home';
 
 interface User {
    username: string;
@@ -18,11 +18,12 @@ interface User {
    CsdnUrl: string;
    StartTilte: string;
    announcement: string;
-   // 新增字段
    occupation: string;
    address: string;
    tags: string[];
    hobbies: string[];
+   games: string[];
+   profileStats: ProfileStat[];
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -44,7 +45,9 @@ export const useUserStore = defineStore('user', () => {
       occupation: '',
       address: '',
       tags: [],
-      hobbies: []
+      hobbies: [],
+      games: [],
+      profileStats: []
    });
 
    const config: Config = reactive({
@@ -80,7 +83,7 @@ export const useUserStore = defineStore('user', () => {
             user.occupation = data.occupation || '';
             user.address = data.address || '';
 
-            // 解析 tags 和 hobbies
+            // 解析 tags、hobbies、games
             try {
                user.tags = data.tags ? JSON.parse(data.tags) : [];
             } catch {
@@ -91,6 +94,14 @@ export const useUserStore = defineStore('user', () => {
             } catch {
                user.hobbies = [];
             }
+            try {
+               user.games = data.games ? JSON.parse(data.games) : [];
+            } catch {
+               user.games = [];
+            }
+
+            // 博主主页统计
+            user.profileStats = data.profileStats || [];
 
             // 解析 config
             if (data.config) {
